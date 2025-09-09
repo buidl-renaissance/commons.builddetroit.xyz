@@ -45,9 +45,9 @@ export default async function handler(
           message: 'Registration successful! We\'ll send you event updates and details soon.',
           registration: result[0],
         });
-      } catch (dbError: any) {
+      } catch (dbError: unknown) {
         // Handle unique constraint violation (duplicate email)
-        if (dbError.message && dbError.message.includes('UNIQUE constraint failed')) {
+        if (dbError instanceof Error && dbError.message.includes('UNIQUE constraint failed')) {
           return res.status(409).json({
             success: false,
             message: 'This email is already registered for Open October.',
