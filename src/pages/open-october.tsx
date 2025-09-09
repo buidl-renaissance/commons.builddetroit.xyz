@@ -282,7 +282,7 @@ const SectionDescription = styled.p<{ theme: ThemeType; compact?: boolean }>`
   text-align: center;
   ${({ compact }) => compact && css`
     font-size: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     line-height: 1.2;
   `}
 `;
@@ -780,7 +780,7 @@ export default function OpenOctober() {
     <>
       <Head>
         <title>
-          Open October: Build • Learn • Merge | Detroit Open Source Event Series
+          Open October: Build • Learn • Merge | Detroit Open Commons Event Series
         </title>
         <meta
           name="description"
@@ -944,8 +944,8 @@ export default function OpenOctober() {
                 🚀 Submit Your Project Idea
               </CTAButton>
             </Link>
-            <div style={{ marginTop: '1rem', opacity: 0.8, fontSize: '0.9rem' }}>
-              <strong>Submission Deadline:</strong> October 1st, 2024
+            <div style={{ marginTop: '2rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <strong>Submission Deadline:</strong> October 1st
             </div>
           </div>
 
@@ -984,7 +984,7 @@ export default function OpenOctober() {
             <ScheduleItem>
               <ScheduleDate>October 2nd • Kickoff Day</ScheduleDate>
               <ScheduleTitle>
-                <GitIcon>fork</GitIcon> Projects Introduced & Teams Formed
+                <GitIcon>add</GitIcon> Projects Introduced & Teams Formed
               </ScheduleTitle>
               <ScheduleDescription>
                 • Selected projects are introduced, goals discussed
@@ -1000,7 +1000,7 @@ export default function OpenOctober() {
             <ScheduleItem>
               <ScheduleDate>October 7th, 14th, 21st and 28th</ScheduleDate>
               <ScheduleTitle>
-                <GitIcon>add</GitIcon> Open Build Session #1-4
+                <GitIcon>commit</GitIcon> Open Build Session #1-4
               </ScheduleTitle>
               <ScheduleDescription>
                 <PizzaIcon>🍕</PizzaIcon> Community building, peer
@@ -1029,11 +1029,11 @@ export default function OpenOctober() {
       <Section>
         <Container>
           <SectionTitle>How We Build Together</SectionTitle>
-          <SectionDescription compact>
+          <SectionDescription>
             Clear expectations, collaborative principles, and shared outcomes that make Open October successful.
           </SectionDescription>
 
-          <Grid>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
             <Card>
               <CardTitle>🔍 Project Criteria</CardTitle>
               <CardDescription>
@@ -1059,7 +1059,9 @@ export default function OpenOctober() {
                 <strong>Commitment to Commons</strong> — Participation is a commitment to shared success
               </CardDescription>
             </Card>
+          </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
             <Card>
               <CardTitle>📜 Code of Collaboration</CardTitle>
               <CardDescription>
@@ -1085,7 +1087,7 @@ export default function OpenOctober() {
                 <strong>Community growth</strong> — Stronger connections between creators and builders
               </CardDescription>
             </Card>
-          </Grid>
+          </div>
 
           <AboutQuote style={{ marginTop: "3rem" }}>
             &quot;Participation is a commitment to the Commons.&quot;
@@ -1100,10 +1102,10 @@ export default function OpenOctober() {
         <Container>
           <RegistrationContainer>
             <RegistrationFormContainer>
-              <SectionTitle>Register for Open October</SectionTitle>
-              <SectionDescription>
+              <SectionTitle>Register</SectionTitle>
+              <SectionDescription compact>
                 Ready to connect, build, and merge with Detroit&apos;s open
-                source and open data community? Register below.
+                commons?
               </SectionDescription>
 
               <RegistrationForm onSubmit={handleRegistrationSubmit}>
@@ -1122,18 +1124,6 @@ export default function OpenOctober() {
                   value={formData.name}
                   onChange={handleInputChange}
                 />
-                <CheckboxGroup>
-                  <Checkbox
-                    type="checkbox"
-                    id="newsletter"
-                    name="subscribeToNewsletter"
-                    checked={formData.subscribeToNewsletter}
-                    onChange={handleInputChange}
-                  />
-                  <CheckboxLabel htmlFor="newsletter">
-                    Also subscribe to thebarefoot.dev newsletter
-                  </CheckboxLabel>
-                </CheckboxGroup>
                 <SubmitButton type="submit" primary disabled={loading}>
                   {loading ? "Registering..." : "Register"}
                 </SubmitButton>
