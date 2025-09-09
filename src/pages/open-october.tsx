@@ -866,6 +866,11 @@ export default function OpenOctober() {
                 <GitIcon>git</GitIcon> Register for Kickoff
               </CTAButton>
             </Link>
+            <Link href="/submit-project" passHref legacyBehavior>
+              <CTAButton as="a">
+                🚀 Submit Your Project
+              </CTAButton>
+            </Link>
           </CTAGroup>
         </HeroContent>
       </HeroSection>
@@ -881,6 +886,60 @@ export default function OpenOctober() {
 
           <AboutQuote>
             &quot;Open source. Open data. An Open Platform for Detroit.&quot;
+          </AboutQuote>
+        </Container>
+      </Section>
+
+      {/* Project Submission Call to Action */}
+      <Section autumn>
+        <Container>
+          <SectionTitle>🚀 Submit Your Project</SectionTitle>
+          
+          <SectionDescription>
+            Got an idea that could strengthen Detroit&apos;s open commons? We&apos;re looking for <strong>5 projects</strong> to launch during Open October. Your project could be the foundation of something bigger.
+          </SectionDescription>
+
+          <Grid columns={2}>
+            <Card>
+              <CardTitle>💡 What We're Looking For</CardTitle>
+              <CardDescription>
+                <strong>Open Source Projects</strong> — Code, data, or tools that anyone can use and contribute to
+                <br /><br />
+                <strong>Community Impact</strong> — Projects that serve Detroit&apos;s neighborhoods, creators, or civic needs
+                <br /><br />
+                <strong>Collaborative by Design</strong> — Clear ways for others to jump in and help
+                <br /><br />
+                <strong>4-Week Scope</strong> — Achievable goals that can show real progress in one month
+              </CardDescription>
+            </Card>
+
+            <Card>
+              <CardTitle>🎯 Project Examples</CardTitle>
+              <CardDescription>
+                <strong>Civic Tech</strong> — Tools for local government transparency, community organizing, or public data
+                <br /><br />
+                <strong>Creative Platforms</strong> — Apps or sites that showcase Detroit&apos;s artists, musicians, or makers
+                <br /><br />
+                <strong>Open Data</strong> — Datasets about Detroit neighborhoods, businesses, or community resources
+                <br /><br />
+                <strong>Developer Tools</strong> — Libraries, APIs, or frameworks that help other builders
+              </CardDescription>
+            </Card>
+          </Grid>
+
+          <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+            <Link href="/submit-project" passHref legacyBehavior>
+              <CTAButton primary as="a" style={{ fontSize: '1.2rem', padding: '1.25rem 2.5rem' }}>
+                🚀 Submit Your Project Idea
+              </CTAButton>
+            </Link>
+            <div style={{ marginTop: '1rem', opacity: 0.8, fontSize: '0.9rem' }}>
+              <strong>Submission Deadline:</strong> October 1st, 2024
+            </div>
+          </div>
+
+          <AboutQuote style={{ marginTop: '2rem', fontSize: '1.1rem' }}>
+            &quot;The best projects are the ones that invite others to build alongside you.&quot;
           </AboutQuote>
         </Container>
       </Section>
@@ -901,13 +960,13 @@ export default function OpenOctober() {
                 <GitIcon>init</GitIcon> Project Proposals Due
               </ScheduleTitle>
               <ScheduleDescription>
-                • Submit your project proposals
+                • <strong>Submit your project proposals</strong> using our <Link href="/submit-project" passHref legacyBehavior><a style={{color: openOctoberColors.goldenrod, textDecoration: 'underline'}}>submission form</a></Link>
                 <br />
                 • Include project name, description, and 4-week scope
                 <br />
                 • Define how others can contribute
                 <br />
-                • 5 projects will be selected for Open October
+                • <strong>5 projects will be selected</strong> for Open October
               </ScheduleDescription>
             </ScheduleItem>
 

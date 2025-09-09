@@ -644,7 +644,7 @@ export default function Home() {
             <CTAButton href="#join" role="button">
               🔔 Join the Commons
             </CTAButton>
-            <CTAButton href="#submit" role="button">
+            <CTAButton href="/submit-project" role="button">
               🚀 Submit a Project
             </CTAButton>
             <CTAButton href="#build" role="button">

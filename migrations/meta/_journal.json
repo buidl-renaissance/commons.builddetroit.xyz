@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1757409859696,
+      "tag": "0000_elite_unus",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1757410446265,
+      "tag": "0001_new_blindfold",
+      "breakpoints": true
+    }
+  ]
+}
