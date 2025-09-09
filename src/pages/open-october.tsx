@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import React, { useState } from "react";
 import Link from "next/link";
 import type { ThemeType } from "@/styles/theme";
@@ -271,7 +271,7 @@ const SectionTitle = styled.h2<{ theme: ThemeType }>`
   }
 `;
 
-const SectionDescription = styled.p<{ theme: ThemeType }>`
+const SectionDescription = styled.p<{ theme: ThemeType; compact?: boolean }>`
   font-family: ${({ theme }) => theme.fonts.body};
   font-size: 1.4rem;
   margin-bottom: 3rem;
@@ -280,6 +280,11 @@ const SectionDescription = styled.p<{ theme: ThemeType }>`
   margin-right: auto;
   line-height: 1.7;
   text-align: center;
+  ${({ compact }) => compact && css`
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  `}
 `;
 
 const Grid = styled.div<{ columns?: number }>`
@@ -398,7 +403,7 @@ const ScheduleItem = styled.div<{ theme: ThemeType }>`
 
 const ScheduleDate = styled.div<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.mono};
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: ${openOctoberColors.goldenrod};
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -833,7 +838,7 @@ export default function OpenOctober() {
 
           <SubHeadline>Connect • Build • Merge</SubHeadline>
 
-          <HeroDatesContainer>
+          {/* <HeroDatesContainer>
             <HeroDateItem>
               <HeroDateNumber>Oct 7</HeroDateNumber>
               <HeroDateLabel>Kickoff</HeroDateLabel>
@@ -850,7 +855,7 @@ export default function OpenOctober() {
               <HeroDateNumber>Oct 28</HeroDateNumber>
               <HeroDateLabel>Merge Party</HeroDateLabel>
             </HeroDateItem>
-          </HeroDatesContainer>
+          </HeroDatesContainer> */}
 
           <HeroSubHeadlineStyled>
             Join the team building the open commons of Detroit.
@@ -871,10 +876,7 @@ export default function OpenOctober() {
           <SectionTitle>About Open October</SectionTitle>
 
           <SectionDescription>
-            Detroit is building its open commons. Whether you&apos;re a
-            seasoned developer, a civic-minded community member, or just
-            curious what it means to build an open platform, join us for a month of learning,
-            building, and celebrating the power of community-driven technology.
+            Open October is a month-long build cycle where Detroit&apos;s creative and technical community comes together to launch and document projects that strengthen the <strong>Detroit Open Commons</strong>. We are building open, collaborative systems that reflect values of transparency, accessibility, and permissionless innovation.
           </SectionDescription>
 
           <AboutQuote>
@@ -886,61 +888,91 @@ export default function OpenOctober() {
       {/* Schedule */}
       <Section autumn>
         <Container>
-          <SectionTitle>October Schedule</SectionTitle>
-          <SectionDescription>
+          <SectionTitle>Schedule</SectionTitle>
+          <SectionDescription compact>
             Four weeks of hands-on learning with open source tools, open data
             exploration, and community building.
           </SectionDescription>
 
           <ScheduleContainer>
             <ScheduleItem>
-              <ScheduleDate>Week 1 • October 7</ScheduleDate>
+              <ScheduleDate>October 1st • Submission Deadline</ScheduleDate>
               <ScheduleTitle>
-                <GitIcon>init</GitIcon> Kickoff — Git, GitHub, Open Source +
-                Open Data Tools
+                <GitIcon>init</GitIcon> Project Proposals Due
               </ScheduleTitle>
               <ScheduleDescription>
-                • Git foundations and collaborative workflows
+                • Submit your project proposals
                 <br />
-                • OSS tools: Supabase, Turso, Next.js, Auth.js
+                • Include project name, description, and 4-week scope
                 <br />
-                • Intro to open data + community datasets
-                <br />• Meet your fellow builders and explore project ideas
+                • Define how others can contribute
+                <br />
+                • 5 projects will be selected for Open October
               </ScheduleDescription>
             </ScheduleItem>
 
             <ScheduleItem>
-              <ScheduleDate>Week 2 • October 14</ScheduleDate>
+              <ScheduleDate>October 2nd • Kickoff Day</ScheduleDate>
+              <ScheduleTitle>
+                <GitIcon>fork</GitIcon> Projects Introduced & Teams Formed
+              </ScheduleTitle>
+              <ScheduleDescription>
+                • Selected projects are introduced, goals discussed
+                <br />
+                • Teams formed around 5 curated projects
+                <br />
+                • Meet your fellow builders and collaborators
+                <br />
+                • Set expectations and timelines
+              </ScheduleDescription>
+            </ScheduleItem>
+
+            <ScheduleItem>
+              <ScheduleDate>October 7th</ScheduleDate>
               <ScheduleTitle>
                 <GitIcon>add</GitIcon> Open Build Session #1
               </ScheduleTitle>
               <ScheduleDescription>
-                <PizzaIcon>🍕</PizzaIcon> Optional consultations, peer
-                mentoring, pizza.
-                <br />
-                Projects can be code, data visualizations, or documentation.
-                <br />
-                Work on apps, civic tools, or community storytelling projects.
+                <PizzaIcon>🍕</PizzaIcon> Community building, peer
+                mentoring, and pizza.
               </ScheduleDescription>
             </ScheduleItem>
 
             <ScheduleItem>
-              <ScheduleDate>Week 3 • October 21</ScheduleDate>
+              <ScheduleDate>October 14th</ScheduleDate>
               <ScheduleTitle>
-                <GitIcon>commit</GitIcon> Open Build Session #2
+                <GitIcon>add</GitIcon> Open Build Session #2
               </ScheduleTitle>
               <ScheduleDescription>
-                <PizzaIcon>🍕</PizzaIcon> Continue building, refining, and
-                preparing your contributions.
-                <br />
-                Focus on documentation, testing, and polishing your projects.
-                <br />
-                Prepare demos for the showcase.
+                <PizzaIcon>🍕</PizzaIcon> Community building, peer
+                mentoring, and pizza.
               </ScheduleDescription>
             </ScheduleItem>
 
             <ScheduleItem>
-              <ScheduleDate>Week 4 • October 28</ScheduleDate>
+              <ScheduleDate>October 21st</ScheduleDate>
+              <ScheduleTitle>
+                <GitIcon>commit</GitIcon> Open Build Session #3
+              </ScheduleTitle>
+              <ScheduleDescription>
+                <PizzaIcon>🍕</PizzaIcon> Community building, peer
+                  mentoring, and pizza.
+              </ScheduleDescription>
+            </ScheduleItem>
+
+            <ScheduleItem>
+              <ScheduleDate>October 28th</ScheduleDate>
+              <ScheduleTitle>
+                <GitIcon>commit</GitIcon> Open Build Session #4
+              </ScheduleTitle>
+              <ScheduleDescription>
+                <PizzaIcon>🍕</PizzaIcon> Community building, peer
+                  mentoring, and pizza.
+              </ScheduleDescription>
+            </ScheduleItem>
+
+            <ScheduleItem>
+              <ScheduleDate>October 30th</ScheduleDate>
               <ScheduleTitle>
                 <GitIcon>merge</GitIcon> Merge Party Showcase
               </ScheduleTitle>
@@ -956,10 +988,145 @@ export default function OpenOctober() {
         </Container>
       </Section>
 
+      {/* Project Guidelines & Collaboration */}
+      <Section>
+        <Container>
+          <SectionTitle>How We Build Together</SectionTitle>
+          <SectionDescription compact>
+            Clear expectations, collaborative principles, and shared outcomes that make Open October successful.
+          </SectionDescription>
+
+          <Grid>
+            <Card>
+              <CardTitle>🔍 Project Criteria</CardTitle>
+              <CardDescription>
+                <strong>Contribute to Detroit Open Commons</strong> — Open source, open data, permissionless
+                <br /><br />
+                <strong>Scoped for 4 weeks</strong> — Show meaningful progress in sprint timeframe
+                <br /><br />
+                <strong>Collaborative by design</strong> — Clear roles for contributors
+                <br /><br />
+                <strong>Interactive outputs</strong> — Others can engage with code, data, designs, documentation
+              </CardDescription>
+            </Card>
+
+            <Card>
+              <CardTitle>👥 Participation Expectations</CardTitle>
+              <CardDescription>
+                <strong>Attend key events</strong> — Kickoff Day, Merge Party, and at least one Open Build Day
+                <br /><br />
+                <strong>Communicate openly</strong> — Life happens, but ghosting is not community
+                <br /><br />
+                <strong>Respect time & contributions</strong> — Honor each other&apos;s pace of learning
+                <br /><br />
+                <strong>Commitment to Commons</strong> — Participation is a commitment to shared success
+              </CardDescription>
+            </Card>
+
+            <Card>
+              <CardTitle>📜 Code of Collaboration</CardTitle>
+              <CardDescription>
+                <strong>Openness</strong> — Projects contribute back to the Commons
+                <br /><br />
+                <strong>Respect</strong> — Honor time, contributions, and shared goals
+                <br /><br />
+                <strong>Permissionlessness</strong> — Anyone can fork, remix, or extend projects
+                <br /><br />
+                <strong>Accountability</strong> — Non-communication affects future invitations until trust is re-earned
+              </CardDescription>
+            </Card>
+
+            <Card>
+              <CardTitle>📦 Expected Outcomes</CardTitle>
+              <CardDescription>
+                <strong>5 new Commons projects</strong> — Initiated and documented for ongoing development
+                <br /><br />
+                <strong>Reusable playbook</strong> — Framework for future Open Commons build cycles
+                <br /><br />
+                <strong>Sustained momentum</strong> — Ongoing collaboration in Detroit&apos;s open ecosystem
+                <br /><br />
+                <strong>Community growth</strong> — Stronger connections between creators and builders
+              </CardDescription>
+            </Card>
+          </Grid>
+
+          <AboutQuote style={{ marginTop: "3rem" }}>
+            &quot;Participation is a commitment to the Commons.&quot;
+          </AboutQuote>
+        </Container>
+      </Section>
+
+
+
+      {/* Registration/Contact */}
+      <Section id="register" autumn>
+        <Container>
+          <RegistrationContainer>
+            <RegistrationFormContainer>
+              <SectionTitle>Register for Open October</SectionTitle>
+              <SectionDescription>
+                Ready to connect, build, and merge with Detroit&apos;s open
+                source and open data community? Register below.
+              </SectionDescription>
+
+              <RegistrationForm onSubmit={handleRegistrationSubmit}>
+                <FormInput
+                  type="email"
+                  name="email"
+                  placeholder="your@email.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+                <FormInput
+                  type="text"
+                  name="name"
+                  placeholder="Your name (optional)"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+                <CheckboxGroup>
+                  <Checkbox
+                    type="checkbox"
+                    id="newsletter"
+                    name="subscribeToNewsletter"
+                    checked={formData.subscribeToNewsletter}
+                    onChange={handleInputChange}
+                  />
+                  <CheckboxLabel htmlFor="newsletter">
+                    Also subscribe to thebarefoot.dev newsletter
+                  </CheckboxLabel>
+                </CheckboxGroup>
+                <SubmitButton type="submit" primary disabled={loading}>
+                  {loading ? "Registering..." : "Register"}
+                </SubmitButton>
+              </RegistrationForm>
+
+              {error && <FormMessage>{error}</FormMessage>}
+              {success && (
+                <FormMessage success>
+                  🎉 You&apos;re registered! We&apos;ll send you event updates
+                  and details soon.
+                </FormMessage>
+              )}
+            </RegistrationFormContainer>
+
+            <ContactSection>
+              <p>Questions? Contact us:</p>
+              <p>
+                <ContactEmail href="mailto:john@thebarefoot.dev">
+                  john@thebarefoot.dev
+                </ContactEmail>
+              </p>
+            </ContactSection>
+          </RegistrationContainer>
+        </Container>
+      </Section>
+
       {/* Sponsorship */}
       <Section>
         <Container>
-          <SectionTitle>Sponsorship Tiers</SectionTitle>
+          <SectionTitle>Become a Sponsor</SectionTitle>
           <SectionDescription>
             Fuel Detroit&apos;s open commons. <br /> 
             <span style={{ fontSize: "1rem" }}>Your sponsorship directly
@@ -1095,317 +1262,6 @@ export default function OpenOctober() {
               </Link>
             </div>
           </TreasuryWidget>
-        </Container>
-      </Section>
-
-      {/* Open Source Resources */}
-      <Section autumn>
-        <Container>
-          <SectionTitle>Open Source + Open Data Resources</SectionTitle>
-          <SectionDescription>
-            Curated tools, datasets, and guides to jumpstart your open source
-            and open data journey.
-          </SectionDescription>
-
-          <ResourcesContainer>
-            <ResourceSectionTitle className="featured">
-              🚀 Featured Projects
-            </ResourceSectionTitle>
-            <ResourceGrid>
-              <ResourceItem href="https://nextjs.org" target="_blank">
-                <strong>Next.js</strong>
-                <br />
-                React framework for production
-              </ResourceItem>
-              <ResourceItem href="https://supabase.io" target="_blank">
-                <strong>Supabase</strong>
-                <br />
-                Open source Firebase alternative
-              </ResourceItem>
-              <ResourceItem href="https://turso.tech" target="_blank">
-                <strong>Turso</strong>
-                <br />
-                Edge SQLite platform
-              </ResourceItem>
-              <ResourceItem href="https://authjs.dev" target="_blank">
-                <strong>Auth.js</strong>
-                <br />
-                Authentication for the web
-              </ResourceItem>
-              <ResourceItem href="https://strapi.io" target="_blank">
-                <strong>Strapi</strong>
-                <br />
-                Headless CMS
-              </ResourceItem>
-              <ResourceItem href="https://tailwindcss.com" target="_blank">
-                <strong>Tailwind CSS</strong>
-                <br />
-                Utility-first CSS framework
-              </ResourceItem>
-            </ResourceGrid>
-
-            <ResourceSectionContainer>
-              <ResourceSectionTitle className="open-data">
-                📊 Open Data Resources
-              </ResourceSectionTitle>
-              <ResourceGrid>
-                <ResourceItem
-                  href="https://data.detroitmi.gov/"
-                  target="_blank"
-                >
-                  <strong>Detroit Open Data Portal</strong>
-                  <br />
-                  City datasets, demographics, services
-                </ResourceItem>
-                <ResourceItem href="https://www.data.gov/" target="_blank">
-                  <strong>Data.gov</strong>
-                  <br />
-                  Federal government open data
-                </ResourceItem>
-                <ResourceItem
-                  href="https://github.com/awesomedata/awesome-public-datasets"
-                  target="_blank"
-                >
-                  <strong>Awesome Public Datasets</strong>
-                  <br />
-                  Curated list of public datasets
-                </ResourceItem>
-                <ResourceItem
-                  href="https://datasetsearch.research.google.com/"
-                  target="_blank"
-                >
-                  <strong>Google Dataset Search</strong>
-                  <br />
-                  Search engine for datasets
-                </ResourceItem>
-              </ResourceGrid>
-            </ResourceSectionContainer>
-
-            <ResourceSectionContainer>
-              <ResourceSectionTitle className="git-guides">
-                📚 Git & GitHub Guides
-              </ResourceSectionTitle>
-              <ResourceGrid>
-                <ResourceItem href="https://git-scm.com/doc" target="_blank">
-                  <strong>Official Git Documentation</strong>
-                  <br />
-                  Complete reference and tutorials
-                </ResourceItem>
-                <ResourceItem href="https://docs.github.com" target="_blank">
-                  <strong>GitHub Docs</strong>
-                  <br />
-                  Everything about GitHub
-                </ResourceItem>
-                <ResourceItem
-                  href="https://learngitbranching.js.org"
-                  target="_blank"
-                >
-                  <strong>Learn Git Branching</strong>
-                  <br />
-                  Interactive Git tutorial
-                </ResourceItem>
-                <ResourceItem
-                  href="https://github.com/firstcontributions/first-contributions"
-                  target="_blank"
-                >
-                  <strong>First Contributions</strong>
-                  <br />
-                  Make your first open source contribution
-                </ResourceItem>
-              </ResourceGrid>
-            </ResourceSectionContainer>
-
-            <ResourceSectionContainer>
-              <ResourceSectionTitle className="educational">
-                📖 Educational Guides
-              </ResourceSectionTitle>
-              <ResourceGrid>
-                <ResourceItem
-                  href="https://opendatahandbook.org/"
-                  target="_blank"
-                >
-                  <strong>Open Data Handbook</strong>
-                  <br />
-                  Complete guide to open data
-                </ResourceItem>
-                <ResourceItem
-                  href="https://github.com/collections/government"
-                  target="_blank"
-                >
-                  <strong>Government on GitHub</strong>
-                  <br />
-                  Open source government projects
-                </ResourceItem>
-                <ResourceItem
-                  href="https://www.codeforamerica.org/"
-                  target="_blank"
-                >
-                  <strong>Code for America</strong>
-                  <br />
-                  Civic technology community
-                </ResourceItem>
-                <ResourceItem
-                  href="https://sunlightfoundation.com/open-data-policy-hub/"
-                  target="_blank"
-                >
-                  <strong>Open Data Policy Hub</strong>
-                  <br />
-                  Policy resources and guides
-                </ResourceItem>
-              </ResourceGrid>
-            </ResourceSectionContainer>
-
-            <RecordingsNote>
-              <RecordingsText>
-                📹 Session recordings and slides will be added here after each
-                week
-              </RecordingsText>
-            </RecordingsNote>
-          </ResourcesContainer>
-        </Container>
-      </Section>
-
-      {/* Community & Transparency */}
-      <Section>
-        <Container>
-          <SectionTitle>Community & Transparency</SectionTitle>
-          <SectionDescription>
-            Everything about Open October is open source — from our code to our
-            finances.
-          </SectionDescription>
-
-          <Grid>
-            <Card>
-              <CardTitle>
-                <GitIcon>org</GitIcon> GitHub Organization
-              </CardTitle>
-              <CardDescription>
-                All event materials, projects, and resources are available on
-                our GitHub organization. Fork, contribute, and build with us.
-              </CardDescription>
-              <Link
-                href="https://github.com/buidl-renaissance"
-                passHref
-                legacyBehavior
-              >
-                <CommunityLink style={{ fontWeight: "bold" }}>
-                  Visit GitHub Org →
-                </CommunityLink>
-              </Link>
-            </Card>
-
-            <Card>
-              <CardTitle>💰 Financial Transparency</CardTitle>
-              <CardDescription>
-                Our USDC treasury is completely transparent. Every donation and
-                expense is tracked on-chain for full community visibility.
-              </CardDescription>
-              <Link
-                href="https://etherscan.io/address/0x..."
-                passHref
-                legacyBehavior
-              >
-                <CommunityLink style={{ fontWeight: "bold" }}>
-                  View Treasury →
-                </CommunityLink>
-              </Link>
-            </Card>
-
-            <Card>
-              <CardTitle>
-                <PizzaIcon>🍕</PizzaIcon> Local Partners
-              </CardTitle>
-              <CardDescription>
-                Proudly supported by Detroit&apos;s best pizza shops and local
-                businesses who believe in building community through technology.
-              </CardDescription>
-              <CommunityPartnersNote>TBA</CommunityPartnersNote>
-            </Card>
-
-            <Card>
-              <CardTitle>🏗️ BuildDetroit Partnership</CardTitle>
-              <CardDescription>
-                Open October is proudly organized in partnership with
-                BuildDetroit and thebarefoot.dev, bringing open source education
-                to Detroit&apos;s tech community.
-              </CardDescription>
-              <CommunityLinksContainer>
-                <Link href="https://builddetroit.xyz" passHref legacyBehavior>
-                  <CommunityLink target="_blank">BuildDetroit →</CommunityLink>
-                </Link>
-                <Link href="https://thebarefoot.dev" passHref legacyBehavior>
-                  <CommunityLink target="_blank">
-                    thebarefoot.dev →
-                  </CommunityLink>
-                </Link>
-              </CommunityLinksContainer>
-            </Card>
-          </Grid>
-        </Container>
-      </Section>
-
-      {/* Registration/Contact */}
-      <Section id="register" autumn>
-        <Container>
-          <RegistrationContainer>
-            <RegistrationFormContainer>
-              <SectionTitle>Register for Open October</SectionTitle>
-              <SectionDescription>
-                Ready to connect, build, and merge with Detroit&apos;s open
-                source and open data community? Register below.
-              </SectionDescription>
-
-              <RegistrationForm onSubmit={handleRegistrationSubmit}>
-                <FormInput
-                  type="email"
-                  name="email"
-                  placeholder="your@email.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-                <FormInput
-                  type="text"
-                  name="name"
-                  placeholder="Your name (optional)"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                />
-                <CheckboxGroup>
-                  <Checkbox
-                    type="checkbox"
-                    id="newsletter"
-                    name="subscribeToNewsletter"
-                    checked={formData.subscribeToNewsletter}
-                    onChange={handleInputChange}
-                  />
-                  <CheckboxLabel htmlFor="newsletter">
-                    Also subscribe to thebarefoot.dev newsletter
-                  </CheckboxLabel>
-                </CheckboxGroup>
-                <SubmitButton type="submit" primary disabled={loading}>
-                  {loading ? "Registering..." : "Register"}
-                </SubmitButton>
-              </RegistrationForm>
-
-              {error && <FormMessage>{error}</FormMessage>}
-              {success && (
-                <FormMessage success>
-                  🎉 You&apos;re registered! We&apos;ll send you event updates
-                  and details soon.
-                </FormMessage>
-              )}
-            </RegistrationFormContainer>
-
-            <ContactSection>
-              <p>Questions? Contact us:</p>
-              <p>
-                <ContactEmail href="mailto:john@thebarefoot.dev">
-                  john@thebarefoot.dev
-                </ContactEmail>
-              </p>
-            </ContactSection>
-          </RegistrationContainer>
         </Container>
       </Section>
 
