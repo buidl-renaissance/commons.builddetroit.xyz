@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { eq, desc } from 'drizzle-orm';
 import { db } from '../../../db';
 import { projects } from '../../../db/schema';
 
@@ -74,8 +75,8 @@ export default async function handler(
       const approvedProjects = await db
         .select()
         .from(projects)
-        .where(projects.status.eq('approved'))
-        .orderBy(projects.createdAt.desc());
+        .where(eq(projects.status, 'approved'))
+        .orderBy(desc(projects.createdAt));
 
       // Parse JSON fields for response
       const formattedProjects = approvedProjects.map(project => ({

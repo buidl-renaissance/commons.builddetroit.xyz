@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text, real } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const events = sqliteTable("events", {
   id: integer("id").primaryKey(),
@@ -51,11 +51,9 @@ export const blogPosts = sqliteTable("blog_posts", {
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const walkSubmissions = sqliteTable("walk_submissions", {
+export const openOctoberRegistrations = sqliteTable("open_october_registrations", {
   id: integer("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  walkType: text("walk_type").notNull(),
-  description: text("description"),
+  email: text("email").notNull().unique(),
+  name: text("name"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });

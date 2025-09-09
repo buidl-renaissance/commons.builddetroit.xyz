@@ -390,9 +390,9 @@ const CTATitle = styled.h2`
 
 const CTAGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 2rem;
-  max-width: 900px;
+  max-width: 600px;
   margin: 0 auto;
   
   @media (max-width: 1024px) {
@@ -640,16 +640,28 @@ export default function Home() {
 
         <CTASection>
           <CTATitle>🚀 How to Get Involved</CTATitle>
+          <p style={{ 
+            textAlign: 'center', 
+            fontSize: '1.2rem', 
+            color: '#f0f0f0', 
+            marginBottom: '2rem',
+            maxWidth: '800px',
+            margin: '0 auto 2rem auto',
+            lineHeight: '1.6'
+          }}>
+            <strong style={{ color: '#FF4F00' }}>Open October is upon us!</strong> Join Detroit&apos;s month-long open source build cycle. 
+            Submit your project, collaborate with builders, and help strengthen our open commons.
+          </p>
           <CTAGrid>
-            <CTAButton href="#join" role="button">
-              🔔 Join the Commons
+            <CTAButton href="/open-october" role="button" style={{ backgroundColor: '#FF4F00', borderColor: '#FF4F00', fontSize: '1.1rem', fontWeight: '800' }}>
+              Learn more about Open October
             </CTAButton>
-            <CTAButton href="/submit-project" role="button">
+            {/* <CTAButton href="/submit-project" role="button">
               🚀 Submit a Project
             </CTAButton>
-            <CTAButton href="#build" role="button">
-              🛠️ Join as a Builder
-            </CTAButton>
+            <CTAButton href="#join" role="button">
+              🔔 Join the Commons
+            </CTAButton> */}
           </CTAGrid>
         </CTASection>
 

@@ -721,17 +721,16 @@ export default function OpenOctober() {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
-    subscribeToNewsletter: false,
   });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
     setError("");
   };
@@ -762,7 +761,7 @@ export default function OpenOctober() {
       if (data.success) {
         setSuccess(true);
         setError("");
-        setFormData({ email: "", name: "", subscribeToNewsletter: false });
+        setFormData({ email: "", name: "" });
       } else {
         setError(data.message || "Something went wrong. Please try again.");
         setSuccess(false);
