@@ -291,14 +291,25 @@ const Grid = styled.div<{ columns?: number }>`
   display: grid;
   grid-template-columns: repeat(
     auto-fit,
-    minmax(${({ columns }) => (columns === 2 ? "400px" : "250px")}, 1fr)
+    minmax(${({ columns }) => (columns === 2 ? "350px" : "250px")}, 1fr)
   );
   gap: 2rem;
   margin-top: 3rem;
 
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  ${({ columns }) => columns === 2 && `
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  `}
+
+  ${({ columns }) => !columns || columns !== 2 ? `
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  ` : ''}
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -901,7 +912,7 @@ export default function OpenOctober() {
 
           <Grid columns={2}>
             <Card>
-              <CardTitle>💡 What We're Looking For</CardTitle>
+              <CardTitle>💡 What We&apos;re Looking For</CardTitle>
               <CardDescription>
                 <strong>Open Source Projects</strong> — Code, data, or tools that anyone can use and contribute to
                 <br /><br />
@@ -938,7 +949,7 @@ export default function OpenOctober() {
             </div>
           </div>
 
-          <AboutQuote style={{ marginTop: '2rem', fontSize: '1.1rem' }}>
+          <AboutQuote style={{ marginTop: '2.5rem', fontSize: '1.1rem' }}>
             &quot;The best projects are the ones that invite others to build alongside you.&quot;
           </AboutQuote>
         </Container>
@@ -987,46 +998,13 @@ export default function OpenOctober() {
             </ScheduleItem>
 
             <ScheduleItem>
-              <ScheduleDate>October 7th</ScheduleDate>
+              <ScheduleDate>October 7th, 14th, 21st and 28th</ScheduleDate>
               <ScheduleTitle>
-                <GitIcon>add</GitIcon> Open Build Session #1
+                <GitIcon>add</GitIcon> Open Build Session #1-4
               </ScheduleTitle>
               <ScheduleDescription>
                 <PizzaIcon>🍕</PizzaIcon> Community building, peer
                 mentoring, and pizza.
-              </ScheduleDescription>
-            </ScheduleItem>
-
-            <ScheduleItem>
-              <ScheduleDate>October 14th</ScheduleDate>
-              <ScheduleTitle>
-                <GitIcon>add</GitIcon> Open Build Session #2
-              </ScheduleTitle>
-              <ScheduleDescription>
-                <PizzaIcon>🍕</PizzaIcon> Community building, peer
-                mentoring, and pizza.
-              </ScheduleDescription>
-            </ScheduleItem>
-
-            <ScheduleItem>
-              <ScheduleDate>October 21st</ScheduleDate>
-              <ScheduleTitle>
-                <GitIcon>commit</GitIcon> Open Build Session #3
-              </ScheduleTitle>
-              <ScheduleDescription>
-                <PizzaIcon>🍕</PizzaIcon> Community building, peer
-                  mentoring, and pizza.
-              </ScheduleDescription>
-            </ScheduleItem>
-
-            <ScheduleItem>
-              <ScheduleDate>October 28th</ScheduleDate>
-              <ScheduleTitle>
-                <GitIcon>commit</GitIcon> Open Build Session #4
-              </ScheduleTitle>
-              <ScheduleDescription>
-                <PizzaIcon>🍕</PizzaIcon> Community building, peer
-                  mentoring, and pizza.
               </ScheduleDescription>
             </ScheduleItem>
 
