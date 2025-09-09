@@ -583,8 +583,8 @@ export default function Home() {
           <Title>Detroit&apos;s Open Commons</Title>
           <Subtitle>Detroit builds in the open.</Subtitle>
           <Description>
-            A shared digital space where creators come together to connect, collaborate, and build. 
-            It&apos;s a public digital commons designed to empower Detroit&apos;s community by aligning scattered efforts, 
+            A shared space where creators come together to connect, collaborate, and build. 
+            It&apos;s a public commons designed to empower Detroit&apos;s community by aligning scattered efforts, 
             breaking down silos, and amplifying collective impact.
           </Description>
         </Header>
@@ -594,7 +594,7 @@ export default function Home() {
             <CardIcon>✨</CardIcon>
             <CardTitle>Mission</CardTitle>
             <CardDescription>
-              To create and maintain an open digital commons that empowers Detroit&apos;s communities to:
+              To create and maintain an open commons that empowers Detroit&apos;s communities to:
             </CardDescription>
             <CardList>
               <li>Collaborate transparently</li>

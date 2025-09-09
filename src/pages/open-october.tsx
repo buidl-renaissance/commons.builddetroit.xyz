@@ -890,7 +890,7 @@ export default function OpenOctober() {
         <Container>
           <SectionTitle>Schedule</SectionTitle>
           <SectionDescription compact>
-            Four weeks of hands-on learning with open source tools, open data
+            A month of hands-on learning with open source tools, open data
             exploration, and community building.
           </SectionDescription>
 
