@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -330,9 +331,9 @@ export default function SubmitProject() {
             <SuccessMessage>
               <strong>🎉 Project submitted successfully!</strong>
               <br /><br />
-              <a href="/submissions" style={{ color: '#059669', textDecoration: 'underline' }}>
+              <Link href="/submissions" style={{ color: '#059669', textDecoration: 'underline' }}>
                 View all submissions →
-              </a>
+              </Link>
             </SuccessMessage>
           )}
 

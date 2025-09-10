@@ -61,22 +61,77 @@ const CTAButton = styled(Link)`
 
 const SubmissionsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
 `;
 
 const ProjectCard = styled.div`
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(34, 35, 36, 0.1);
-  padding: 2rem;
+  padding: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 48px rgba(34, 35, 36, 0.15);
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const ProjectCardContent = styled.div`
+  padding: 2rem;
+  flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
+`;
+
+const ProjectIframeContainer = styled.div`
+  width: 60%;
+  height: 700px;
+  border-left: 2px solid ${({ theme }) => theme.colors.rustedSteel}20;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 600px;
+    border-left: none;
+    border-bottom: 2px solid ${({ theme }) => theme.colors.rustedSteel}20;
+  }
+
+  @media (max-width: 480px) {
+    height: 600px;
+  }
+`;
+
+const ProjectIframe = styled.iframe`
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+`;
+
+const IframeOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 1;
+  pointer-events: none;
 `;
 
 const ProjectName = styled.h3`
@@ -262,41 +317,54 @@ export default function Submissions() {
             <SubmissionsGrid>
               {projects.map((project) => (
                 <ProjectCard key={project.id}>
-                  <ProjectName>{project.name}</ProjectName>
-                  <StatusBadge status={project.status}>{project.status}</StatusBadge>
-                  
-                  <ProjectDescription>{project.description}</ProjectDescription>
+                  <ProjectCardContent>
+                    <ProjectName>{project.name}</ProjectName>
+                    <StatusBadge status={project.status}>{project.status}</StatusBadge>
+                    
+                    <ProjectDescription>{project.description}</ProjectDescription>
 
-                  <ProjectMeta>
-                    <div><strong>Lead:</strong> {project.leadName}</div>
-                    {getArrayValue(project.teamMembers).length > 0 && (
-                      <div><strong>Team:</strong> {getArrayValue(project.teamMembers).join(', ')}</div>
-                    )}
-                    <div><strong>Submitted:</strong> {formatDate(project.createdAt)}</div>
-                  </ProjectMeta>
+                    <ProjectMeta>
+                      <div><strong>Lead:</strong> {project.leadName}</div>
+                      {getArrayValue(project.teamMembers).length > 0 && (
+                        <div><strong>Team:</strong> {getArrayValue(project.teamMembers).join(', ')}</div>
+                      )}
+                      <div><strong>Submitted:</strong> {formatDate(project.createdAt)}</div>
+                    </ProjectMeta>
 
-                  <ProjectLinks>
-                    {project.roadmapLink && (
-                      <ProjectLink href={project.roadmapLink} target="_blank" rel="noopener noreferrer">
-                        📋 MVP Proposal
-                      </ProjectLink>
-                    )}
-                    {project.homepageLink && (
-                      <ProjectLink href={project.homepageLink} target="_blank" rel="noopener noreferrer">
-                        🌐 Homepage
-                      </ProjectLink>
-                    )}
-                    {getArrayValue(project.additionalResources).map((resource, index) => (
-                      <ProjectLink 
-                        key={index} 
-                        href={resource} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                      >
-                        🔗 Resource {index + 1}
-                      </ProjectLink>
-                    ))}
-                  </ProjectLinks>
+                    <ProjectLinks>
+                      {project.roadmapLink && (
+                        <ProjectLink href={project.roadmapLink} target="_blank" rel="noopener noreferrer">
+                          📋 MVP Proposal
+                        </ProjectLink>
+                      )}
+                      {project.homepageLink && (
+                        <ProjectLink href={project.homepageLink} target="_blank" rel="noopener noreferrer">
+                          🌐 Homepage
+                        </ProjectLink>
+                      )}
+                      {getArrayValue(project.additionalResources).map((resource, index) => (
+                        <ProjectLink 
+                          key={index} 
+                          href={resource} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          🔗 Resource {index + 1}
+                        </ProjectLink>
+                      ))}
+                    </ProjectLinks>
+                  </ProjectCardContent>
+
+                  {project.homepageLink && (
+                    <ProjectIframeContainer>
+                      <ProjectIframe 
+                        src={project.homepageLink}
+                        title={`${project.name} Marketing Page`}
+                        loading="lazy"
+                      />
+                      <IframeOverlay />
+                    </ProjectIframeContainer>
+                  )}
                 </ProjectCard>
               ))}
             </SubmissionsGrid>
