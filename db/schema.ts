@@ -22,6 +22,12 @@ export const members = sqliteTable("members", {
   email: text("email").notNull().unique(),
   bio: text("bio"),
   skills: text("skills"), // JSON array as string
+  profilePicture: text("profile_picture"), // URL to profile picture
+  website: text("website"), // Personal website URL
+  linkedin: text("linkedin"), // LinkedIn profile URL
+  github: text("github"), // GitHub profile URL
+  twitter: text("twitter"), // Twitter/X profile URL
+  other_links: text("other_links"), // JSON array of other links
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 

@@ -390,15 +390,15 @@ const CTATitle = styled.h2`
 
 const CTAGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
     gap: 1.5rem;
-    max-width: 400px;
+    max-width: 500px;
   }
   
   @media (max-width: 768px) {
@@ -656,12 +656,9 @@ export default function Home() {
             <CTAButton href="/open-october" role="button" style={{ backgroundColor: '#FF4F00', borderColor: '#FF4F00', fontSize: '1.1rem', fontWeight: '800' }}>
               Learn more about Open October
             </CTAButton>
-            {/* <CTAButton href="/submit-project" role="button">
-              🚀 Submit a Project
+            <CTAButton href="/join" role="button">
+              🛠️ Join the Builders
             </CTAButton>
-            <CTAButton href="#join" role="button">
-              🔔 Join the Commons
-            </CTAButton> */}
           </CTAGrid>
         </CTASection>
 
