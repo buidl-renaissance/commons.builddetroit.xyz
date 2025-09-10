@@ -71,23 +71,20 @@ export default async function handler(
     }
   } else if (req.method === 'GET') {
     try {
-      // Get all approved projects (for public display)
-      const approvedProjects = await db
+      // Get all projects (for submissions page)
+      const allProjects = await db
         .select()
         .from(projects)
-        .where(eq(projects.status, 'approved'))
         .orderBy(desc(projects.createdAt));
 
       // Parse JSON fields for response
-      const formattedProjects = approvedProjects.map(project => ({
+      const formattedProjects = allProjects.map(project => ({
         ...project,
-        additionalResources: project.additionalResources ? JSON.parse(project.additionalResources) : null,
-        teamMembers: project.teamMembers ? JSON.parse(project.teamMembers) : null,
+        additionalResources: project.additionalResources ? JSON.parse(project.additionalResources) : [],
+        teamMembers: project.teamMembers ? JSON.parse(project.teamMembers) : [],
       }));
 
-      res.status(200).json({
-        projects: formattedProjects,
-      });
+      res.status(200).json(formattedProjects);
     } catch (error) {
       console.error('Error fetching projects:', error);
       res.status(500).json({

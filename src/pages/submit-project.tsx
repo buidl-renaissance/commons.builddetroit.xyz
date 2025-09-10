@@ -328,7 +328,11 @@ export default function SubmitProject() {
           {error && <ErrorMessage>{error}</ErrorMessage>}
           {success && (
             <SuccessMessage>
-              Your project has been submitted successfully! We&apos;ll review it and get back to you soon.
+              <strong>🎉 Project submitted successfully!</strong>
+              <br /><br />
+              <a href="/submissions" style={{ color: '#059669', textDecoration: 'underline' }}>
+                View all submissions →
+              </a>
             </SuccessMessage>
           )}
 
