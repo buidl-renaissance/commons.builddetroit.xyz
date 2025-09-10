@@ -376,13 +376,14 @@ export default function SubmitProject() {
               </div>
 
               <div>
-                <Label htmlFor="roadmapLink">Link to Roadmap</Label>
+                <Label htmlFor="roadmapLink">MVP Proposal for Open October *</Label>
                 <Input
                   id="roadmapLink"
                   type="url"
                   value={formData.roadmapLink}
                   onChange={(e) => handleInputChange('roadmapLink', e.target.value)}
-                  placeholder="https://..."
+                  placeholder="Link to your MVP roadmap/proposal for 4-week completion"
+                  required
                 />
               </div>
 

@@ -32,9 +32,9 @@ export default async function handler(
       }: ProjectSubmissionData = req.body;
 
       // Validate required fields
-      if (!name || !description || !leadName || !leadEmail) {
+      if (!name || !description || !roadmapLink || !leadName || !leadEmail) {
         return res.status(400).json({
-          error: 'Missing required fields: name, description, leadName, and leadEmail are required',
+          error: 'Missing required fields: name, description, MVP proposal link, leadName, and leadEmail are required',
         });
       }
 

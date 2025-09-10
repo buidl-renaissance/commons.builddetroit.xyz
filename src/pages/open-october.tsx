@@ -919,7 +919,7 @@ export default function OpenOctober() {
                 <br /><br />
                 <strong>Collaborative by Design</strong> — Clear ways for others to jump in and help
                 <br /><br />
-                <strong>4-Week Scope</strong> — Achievable goals that can show real progress in one month
+                <strong>4-Week MVP</strong> — Clear roadmap with achievable MVP goals for Open October completion
               </CardDescription>
             </Card>
 
