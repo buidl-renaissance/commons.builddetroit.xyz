@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { eq, desc } from 'drizzle-orm';
 import { db } from '../../../db';
 import { projects } from '../../../db/schema';
+import { generateModificationKey } from '../../../lib/modification-key';
+import { sendProjectSubmissionEmail } from '../../../lib/email';
 
 interface ProjectSubmissionData {
   name: string;
@@ -46,6 +48,9 @@ export default async function handler(
         });
       }
 
+      // Generate modification key for email-based updates
+      const modificationKey = generateModificationKey();
+
       // Insert project into database
       const result = await db.insert(projects).values({
         name: name.trim(),
@@ -57,7 +62,20 @@ export default async function handler(
         leadEmail: leadEmail.trim().toLowerCase(),
         teamMembers: teamMembers ? JSON.stringify(teamMembers) : null,
         status: 'pending',
+        modificationKey,
       }).returning();
+
+      // Send confirmation email with modification link
+      try {
+        await sendProjectSubmissionEmail(
+          leadEmail.trim().toLowerCase(),
+          name.trim(),
+          modificationKey
+        );
+      } catch (emailError) {
+        console.error('Failed to send project submission email:', emailError);
+        // Don't fail the submission if email fails
+      }
 
       res.status(201).json({
         message: 'Project submission received successfully',

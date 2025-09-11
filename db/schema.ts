@@ -28,6 +28,7 @@ export const members = sqliteTable("members", {
   github: text("github"), // GitHub profile URL
   twitter: text("twitter"), // Twitter/X profile URL
   other_links: text("other_links"), // JSON array of other links
+  modificationKey: text("modification_key").notNull().unique(), // For email-based modifications
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -42,6 +43,7 @@ export const projects = sqliteTable("projects", {
   leadEmail: text("lead_email").notNull(),
   teamMembers: text("team_members"), // JSON array as string
   status: text("status").default("pending"), // pending, approved, rejected
+  modificationKey: text("modification_key").notNull().unique(), // For email-based modifications
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
