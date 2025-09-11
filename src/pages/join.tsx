@@ -505,10 +505,15 @@ export default function JoinBuilders() {
               <br /><br />
               Your profile has been submitted successfully. You&apos;re now part of Detroit&apos;s 
               open commons community.
+              <br /><br />
+              <a href="/builders" style={{ color: '#059669', textDecoration: 'underline', fontWeight: '600' }}>
+                View all builders →
+              </a>
             </SuccessMessage>
           )}
 
-          <Form onSubmit={handleSubmit}>
+          {!success && (
+            <Form onSubmit={handleSubmit}>
             {/* Profile Picture at the top */}
             <ProfilePictureContainer>
               <ProfilePictureUpload hasImage={!!profilePreview} onClick={() => document.getElementById('profilePictureInput')?.click()}>
@@ -659,6 +664,7 @@ export default function JoinBuilders() {
               {isSubmitting ? 'Joining...' : 'Join the Builders'}
             </SubmitButton>
           </Form>
+          )}
         </FormContainer>
       </Container>
     </>
