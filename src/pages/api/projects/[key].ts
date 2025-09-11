@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { eq } from 'drizzle-orm';
 import { db } from '../../../../db';
 import { projects } from '../../../../db/schema';
-import { isValidModificationKey } from '../../../../lib/modification-key';
+import { isValidModificationKey } from '@/lib/modification-key';
 
 export default async function handler(
   req: NextApiRequest,

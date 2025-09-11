@@ -81,51 +81,9 @@ const HeroTreeImage = styled(Image)`
   }
 `;
 
-const HeroDatesContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin: 1rem 0 3rem 0;
-  flex-wrap: wrap;
 
-  @media (max-width: 768px) {
-    gap: 1rem;
-    margin: 1rem 0 1rem 0;
-  }
-`;
 
-const HeroDateItem = styled.div<{ theme: ThemeType }>`
-  text-align: center;
-  font-family: ${({ theme }) => theme.fonts.mono};
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  font-size: 0.9rem;
-  opacity: 0.9;
 
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-  }
-`;
-
-const HeroDateNumber = styled.div`
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: ${openOctoberColors.goldenrod};
-  margin-bottom: 0.2rem;
-
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-  }
-`;
-
-const HeroDateLabel = styled.div`
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-
-  @media (max-width: 768px) {
-    font-size: 0.7rem;
-  }
-`;
 
 const MainHeadline = styled.h1<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.mono};
@@ -436,30 +394,6 @@ const ScheduleDescription = styled.p<{ theme: ThemeType }>`
   opacity: 0.9;
 `;
 
-const ResourceGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
-`;
-
-const ResourceItem = styled.a<{ theme: ThemeType }>`
-  display: block;
-  background: ${({ theme }) => theme.colors.asphaltBlack};
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid ${openOctoberColors.githubGreen};
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-family: ${({ theme }) => theme.fonts.body};
-
-  &:hover {
-    background: ${openOctoberColors.githubGreen};
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
-  }
-`;
 
 const TreasuryWidget = styled.div<{ theme: ThemeType }>`
   background: linear-gradient(
@@ -543,27 +477,6 @@ const FormInput = styled.input<{ theme: ThemeType }>`
   }
 `;
 
-const CheckboxGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-`;
-
-const Checkbox = styled.input`
-  width: 22px;
-  height: 22px;
-  accent-color: ${openOctoberColors.githubGreen};
-  margin-right: 0.25rem;
-`;
-
-const CheckboxLabel = styled.label<{ theme: ThemeType }>`
-  font-family: ${({ theme }) => theme.fonts.body};
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  font-size: 0.9rem;
-  cursor: pointer;
-  text-align: left;
-`;
 
 const SubmitButton = styled(CTAButton)`
   width: 100%;
@@ -589,48 +502,6 @@ const FormMessage = styled.div<{ success?: boolean; theme: ThemeType }>`
     ${({ success }) => (success ? openOctoberColors.githubGreen : "#ff6b6b")};
 `;
 
-// Resources section components
-const ResourcesContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const ResourceSectionTitle = styled.h3`
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-family: ${({ theme }) => theme.fonts.heading};
-
-  &.featured {
-    color: ${openOctoberColors.goldenrod};
-  }
-
-  &.open-data {
-    color: ${openOctoberColors.civicBlue};
-  }
-
-  &.git-guides {
-    color: ${openOctoberColors.goldenrod};
-  }
-
-  &.educational {
-    color: ${openOctoberColors.dataGreen};
-  }
-`;
-
-const ResourceSectionContainer = styled.div`
-  margin-top: 3rem;
-`;
-
-const RecordingsNote = styled.div`
-  text-align: center;
-  margin-top: 3rem;
-`;
-
-const RecordingsText = styled.p`
-  font-size: 1rem;
-  opacity: 0.8;
-  margin-bottom: 1rem;
-`;
 
 // Registration section components
 const RegistrationContainer = styled.div`
@@ -694,27 +565,13 @@ const SponsorshipCTAContainer = styled.div`
   margin-top: 3rem;
 `;
 
-// Community section components
-const CommunityLinksContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
 const CommunityLink = styled.a`
   color: ${openOctoberColors.githubGreen};
   text-decoration: none;
   font-size: 0.9rem;
-
   &:hover {
     text-decoration: underline;
   }
-`;
-
-const CommunityPartnersNote = styled.div`
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  opacity: 0.8;
 `;
 
 export default function OpenOctober() {

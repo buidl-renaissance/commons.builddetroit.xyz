@@ -2,8 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { eq, desc } from 'drizzle-orm';
 import { db } from '../../../db';
 import { members } from '../../../db/schema';
-import { generateModificationKey } from '../../../lib/modification-key';
-import { sendBuilderSubmissionEmail } from '../../../lib/email';
+import { generateModificationKey } from '@/lib/modification-key';
+import { sendBuilderSubmissionEmail } from '@/lib/email';
 
 interface BuilderSubmissionData {
   name: string;
@@ -76,7 +76,7 @@ export default async function handler(
         linkedin: linkedin?.trim() || null,
         github: github?.trim() || null,
         twitter: twitter?.trim() || null,
-        other_links: otherLinks && otherLinks.length > 0 ? JSON.stringify(otherLinks.filter(link => link.trim())) : null,
+        other_links: otherLinks && otherLinks.length > 0 ? JSON.stringify(otherLinks.filter((link: string) => link.trim())) : null,
         skills: null, // We'll add skills later if needed
         modificationKey,
       }).returning();

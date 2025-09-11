@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { eq, desc } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { db } from '../../../db';
 import { projects } from '../../../db/schema';
-import { generateModificationKey } from '../../../lib/modification-key';
-import { sendProjectSubmissionEmail } from '../../../lib/email';
+import { generateModificationKey } from '@/lib/modification-key';
+import { sendProjectSubmissionEmail } from '@/lib/email';
 
 interface ProjectSubmissionData {
   name: string;

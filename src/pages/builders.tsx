@@ -278,12 +278,6 @@ export default function Builders() {
     }
   };
 
-  const getLinkType = (url: string): string => {
-    if (url.includes('linkedin.com')) return 'linkedin';
-    if (url.includes('github.com')) return 'github';
-    if (url.includes('twitter.com') || url.includes('x.com')) return 'twitter';
-    return 'website';
-  };
 
   const getLinkIcon = (type: string): string => {
     switch (type) {

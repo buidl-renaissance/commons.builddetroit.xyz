@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { eq } from 'drizzle-orm';
 import { db } from '../../../../db';
 import { members } from '../../../../db/schema';
-import { isValidModificationKey } from '../../../../lib/modification-key';
+import { isValidModificationKey } from '@/lib/modification-key';
 
 export default async function handler(
   req: NextApiRequest,
@@ -94,7 +94,7 @@ export default async function handler(
           linkedin: linkedin?.trim() || null,
           github: github?.trim() || null,
           twitter: twitter?.trim() || null,
-          other_links: other_links && other_links.length > 0 ? JSON.stringify(other_links.filter(link => link.trim())) : null,
+          other_links: other_links && other_links.length > 0 ? JSON.stringify(other_links.filter((link: string) => link.trim())) : null,
         })
         .where(eq(members.modificationKey, key))
         .returning();
