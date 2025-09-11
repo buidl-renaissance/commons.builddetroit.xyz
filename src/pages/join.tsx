@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -506,9 +507,9 @@ export default function JoinBuilders() {
               Your profile has been submitted successfully. You&apos;re now part of Detroit&apos;s 
               open commons community.
               <br /><br />
-              <a href="/builders" style={{ color: '#059669', textDecoration: 'underline', fontWeight: '600' }}>
+              <Link href="/builders" style={{ color: '#059669', textDecoration: 'underline', fontWeight: '600' }}>
                 View all builders →
-              </a>
+              </Link>
             </SuccessMessage>
           )}
 
