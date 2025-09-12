@@ -517,7 +517,7 @@ export default function JoinBuilders() {
             <Form onSubmit={handleSubmit}>
             {/* Profile Picture at the top */}
             <ProfilePictureContainer>
-              <ProfilePictureUpload hasImage={!!profilePreview} onClick={() => document.getElementById('profilePictureInput')?.click()}>
+              <ProfilePictureUpload hasImage={!!profilePreview}>
                 <HiddenFileInput
                   id="profilePictureInput"
                   type="file"

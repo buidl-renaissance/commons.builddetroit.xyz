@@ -21,7 +21,7 @@ export async function sendEmail({ to, subject, html, from }: EmailOptions) {
 
   try {
     const result = await resend.emails.send({
-      from: from || 'Detroit Commons <noreply@commons.buildetroit.xyz>',
+      from: from || 'Detroit Commons <john@thebarefoot.dev>',
       to: [to],
       subject,
       html,
@@ -87,7 +87,7 @@ export async function sendProjectSubmissionEmail(
         
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
         
-        <p>Questions? Reply to this email or visit <a href="https://commons.buildetroit.xyz">commons.buildetroit.xyz</a></p>
+        <p>Questions? Reply to this email or visit <a href="https://commons.builddetroit.xyz">commons.buildetroit.xyz</a></p>
       </div>
       
       <div class="footer">
