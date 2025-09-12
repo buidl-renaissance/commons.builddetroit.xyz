@@ -289,6 +289,8 @@ const ImageOverlay = styled.div`
   letter-spacing: 1px;
   opacity: 0;
   transition: opacity 0.3s ease;
+  text-align: center;
+  border-radius: 50%;
 
   ${ProfilePictureUpload}:hover & {
     opacity: 1;
@@ -404,8 +406,11 @@ export default function ModifyBuilder() {
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File upload triggered', event.target.files);
     const file = event.target.files?.[0];
     if (file) {
+      console.log('File selected:', file.name, file.type, file.size);
+      
       // Validate file type
       if (!file.type.startsWith('image/')) {
         setError('Please select an image file');
@@ -423,6 +428,7 @@ export default function ModifyBuilder() {
       // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
+        console.log('File reader loaded');
         setProfilePreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
@@ -560,7 +566,13 @@ export default function ModifyBuilder() {
           <Form onSubmit={handleSubmit}>
             {/* Profile Picture Upload at the top */}
             <ProfilePictureContainer>
-              <ProfilePictureUpload hasImage={!!(profilePreview || builderData.profilePicture)}>
+              <ProfilePictureUpload 
+                hasImage={!!(profilePreview || builderData.profilePicture)}
+                onClick={() => {
+                  console.log('Profile picture upload clicked');
+                  document.getElementById('profilePictureInput')?.click();
+                }}
+              >
                 <HiddenFileInput
                   id="profilePictureInput"
                   type="file"
