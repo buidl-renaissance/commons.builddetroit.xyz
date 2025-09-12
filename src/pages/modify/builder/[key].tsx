@@ -204,6 +204,106 @@ const ErrorMessage = styled.div`
   margin-bottom: 1rem;
 `;
 
+const ProfilePictureContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+`;
+
+const ProfilePictureUpload = styled.div<{ hasImage: boolean }>`
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px dashed ${({ theme, hasImage }) => hasImage ? theme.colors.neonOrange : theme.colors.rustedSteel}60;
+  background: ${({ theme, hasImage }) => hasImage ? 'transparent' : `${theme.colors.creamyBeige}40`};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    border-style: solid;
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(255, 79, 0, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+`;
+
+const ProfilePlaceholder = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${({ theme }) => theme.colors.rustedSteel};
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1rem;
+`;
+
+const UploadIcon = styled.div`
+  font-size: 2rem;
+  color: ${({ theme }) => theme.colors.rustedSteel}80;
+  margin-bottom: 0.5rem;
+`;
+
+const HiddenFileInput = styled.input`
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+`;
+
+const ImageOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  ${ProfilePictureUpload}:hover & {
+    opacity: 1;
+  }
+`;
+
+const UploadText = styled.div`
+  font-family: ${({ theme }) => theme.fonts.body};
+  color: ${({ theme }) => theme.colors.rustedSteel};
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`;
+
 const SuccessMessage = styled.div`
   background-color: #10B98120;
   color: #059669;
@@ -244,6 +344,8 @@ export default function ModifyBuilder() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string>('');
 
   useEffect(() => {
     if (key) {
@@ -301,6 +403,35 @@ export default function ModifyBuilder() {
     }
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image file size must be less than 5MB');
+        return;
+      }
+
+      setProfilePictureFile(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfilePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      // Clear any previous errors
+      setError('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!builderData || !key) return;
@@ -309,9 +440,45 @@ export default function ModifyBuilder() {
     setError('');
 
     try {
+      let profilePictureUrl = builderData.profilePicture;
+      
+      // Upload profile picture if a new one is selected
+      if (profilePictureFile) {
+        // Convert file to base64 for upload API
+        const reader = new FileReader();
+        const base64Data = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(profilePictureFile);
+        });
+
+        // Upload the file using the upload API
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            file: base64Data,
+            fileName: `profile-${Date.now()}.${profilePictureFile.name.split('.').pop()}`,
+            fileType: profilePictureFile.type,
+            folder: 'profiles'
+          }),
+        });
+
+        const uploadResult = await uploadResponse.json();
+        
+        if (!uploadResponse.ok || !uploadResult.success) {
+          throw new Error(uploadResult.error || 'Failed to upload profile picture');
+        }
+
+        profilePictureUrl = uploadResult.url;
+      }
+
       // Filter out empty strings from other links
       const cleanedData = {
         ...builderData,
+        profilePicture: profilePictureUrl,
         other_links: builderData.other_links.filter(link => link.trim()),
       };
 
@@ -391,6 +558,37 @@ export default function ModifyBuilder() {
           )}
 
           <Form onSubmit={handleSubmit}>
+            {/* Profile Picture Upload at the top */}
+            <ProfilePictureContainer>
+              <ProfilePictureUpload hasImage={!!(profilePreview || builderData.profilePicture)}>
+                <HiddenFileInput
+                  id="profilePictureInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
+                
+                {profilePreview || builderData.profilePicture ? (
+                  <>
+                    <ProfileImage 
+                      src={profilePreview || builderData.profilePicture} 
+                      alt="Profile preview" 
+                    />
+                    <ImageOverlay>Change Photo</ImageOverlay>
+                  </>
+                ) : (
+                  <ProfilePlaceholder>
+                    <UploadIcon>📷</UploadIcon>
+                    <div>Click to upload</div>
+                  </ProfilePlaceholder>
+                )}
+              </ProfilePictureUpload>
+              
+              <UploadText>
+                {profilePreview || builderData.profilePicture ? 'Click to change your profile picture' : 'Upload a profile picture (max 5MB)'}
+              </UploadText>
+            </ProfilePictureContainer>
+
             <FormSection>
               <SectionTitle>Basic Information</SectionTitle>
               
@@ -415,17 +613,6 @@ export default function ModifyBuilder() {
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="your.email@example.com"
                   required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="profilePicture">Profile Picture URL</Label>
-                <Input
-                  id="profilePicture"
-                  type="url"
-                  value={builderData.profilePicture}
-                  onChange={(e) => handleInputChange('profilePicture', e.target.value)}
-                  placeholder="https://example.com/your-photo.jpg"
                 />
               </div>
 
