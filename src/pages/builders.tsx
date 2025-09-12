@@ -36,7 +36,7 @@ const BuildersGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 2rem;
   
   @media (max-width: 768px) {
@@ -95,7 +95,7 @@ const BuilderBio = styled.p`
   line-height: 1.5;
   margin-bottom: 1.5rem;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
