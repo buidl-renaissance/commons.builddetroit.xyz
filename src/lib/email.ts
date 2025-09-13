@@ -415,3 +415,108 @@ export async function sendBuilderInvitationEmail(
     html,
   });
 }
+
+export async function sendWelcomeEmail(
+  email: string,
+  name: string,
+  modificationKey: string
+) {
+  const modificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/modify/builder/${modificationKey}`;
+  const openOctoberUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/open-october`;
+  const inviteUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/invitations`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome to Detroit Builders!</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); padding: 40px 30px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+            Welcome to Detroit Builders! 🎉
+          </h1>
+          <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">
+            You're now part of our amazing builder community
+          </p>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 40px 30px;">
+          <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+            Hi ${name},
+          </p>
+          
+          <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+            Welcome to Detroit Commons! We're thrilled to have you join our community of builders, creators, and innovators. You're now part of something special.
+          </p>
+
+          <!-- Open October Section -->
+          <div style="background-color: #f8f9fa; border-left: 4px solid #FF6B35; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+            <h2 style="color: #FF6B35; margin: 0 0 15px 0; font-size: 20px; font-weight: 600;">
+              🚀 Open October is Here!
+            </h2>
+            <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
+              Don't miss out on our biggest event of the year! Open October brings together builders from across Detroit for a month of collaboration, learning, and building in the open.
+            </p>
+            <a href="${openOctoberUrl}" style="display: inline-block; background-color: #FF6B35; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+              Learn About Open October
+            </a>
+          </div>
+
+          <!-- Account Management Section -->
+          <div style="background-color: #f8f9fa; border-left: 4px solid #4CAF50; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+            <h2 style="color: #4CAF50; margin: 0 0 15px 0; font-size: 20px; font-weight: 600;">
+              ✏️ Manage Your Profile
+            </h2>
+            <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
+              You can update your profile, add more details, or change your information anytime using your personal modification link.
+            </p>
+            <a href="${modificationUrl}" style="display: inline-block; background-color: #4CAF50; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+              Update My Profile
+            </a>
+          </div>
+
+          <!-- Invite Others Section -->
+          <div style="background-color: #f8f9fa; border-left: 4px solid #2196F3; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+            <h2 style="color: #2196F3; margin: 0 0 15px 0; font-size: 20px; font-weight: 600;">
+              👥 Invite Other Builders
+            </h2>
+            <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
+              Know other amazing builders who should join our community? You can send them personalized invitations with pre-filled profiles.
+            </p>
+            <a href="${inviteUrl}" style="display: inline-block; background-color: #2196F3; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+              Invite Builders
+            </a>
+          </div>
+
+          <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 30px 0 0 0;">
+            We're excited to see what you'll build! If you have any questions or need help getting started, don't hesitate to reach out.
+          </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e9ecef;">
+          <p style="color: #6c757d; font-size: 14px; margin: 0 0 10px 0;">
+            <strong>Detroit Commons</strong> - Building in the Open
+          </p>
+          <p style="color: #6c757d; font-size: 14px; margin: 0;">
+            Questions? Reply to this email or visit <a href="https://commons.buildetroit.xyz" style="color: #FF6B35; text-decoration: none;">commons.buildetroit.xyz</a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: `Welcome to Detroit Builders, ${name}! 🎉`,
+    html,
+  });
+}

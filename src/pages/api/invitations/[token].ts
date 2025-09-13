@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '../../../../db';
 import { builderInvitations, members } from '../../../../db/schema';
 import { generateModificationKey } from '@/lib/modification-key';
+import { sendWelcomeEmail } from '@/lib/email';
 import { eq, and } from 'drizzle-orm';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -138,6 +139,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           updatedAt: new Date().toISOString()
         })
         .where(eq(builderInvitations.id, inv.id));
+
+      // Send welcome email
+      try {
+        await sendWelcomeEmail(
+          newMember[0].email,
+          newMember[0].name,
+          newMember[0].modificationKey
+        );
+      } catch (emailError) {
+        console.error('Error sending welcome email:', emailError);
+        // Don't fail the request if email fails
+      }
 
       res.status(201).json({
         success: true,
