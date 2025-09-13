@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled, { ThemeProvider } from 'styled-components';
 import { theme } from '../../styles/theme';
-import ProfileImageUpload from '../../components/ProfileImageUpload';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -155,6 +154,102 @@ const Message = styled.div<{ success?: boolean }>`
   };
 `;
 
+const TrackingSection = styled.div`
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(34, 35, 36, 0.1);
+  padding: 2rem;
+`;
+
+const SectionTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.heading};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`;
+
+const ItemList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const ItemCard = styled.div`
+  padding: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.rustedSteel}30;
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.colors.creamyBeige}20;
+`;
+
+const ItemHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+`;
+
+const ItemName = styled.h3`
+  font-family: ${({ theme }) => theme.fonts.body};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+`;
+
+const StatusBadge = styled.span<{ status: string }>`
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: ${({ status, theme }) => {
+    switch (status) {
+      case 'accepted': return `${theme.colors.neonYellow}40`;
+      case 'pending': return `${theme.colors.neonOrange}40`;
+      case 'expired': return `${theme.colors.rustedSteel}40`;
+      case 'draft': return `${theme.colors.rustedSteel}40`;
+      case 'submitted': return `${theme.colors.neonOrange}40`;
+      case 'approved': return `${theme.colors.neonYellow}40`;
+      case 'rejected': return `${theme.colors.brickRed}40`;
+      case 'in_review': return `${theme.colors.neonOrange}40`;
+      default: return `${theme.colors.rustedSteel}40`;
+    }
+  }};
+  color: ${({ status, theme }) => {
+    switch (status) {
+      case 'accepted': return theme.colors.asphaltBlack;
+      case 'pending': return theme.colors.asphaltBlack;
+      case 'expired': return theme.colors.rustedSteel;
+      case 'draft': return theme.colors.rustedSteel;
+      case 'submitted': return theme.colors.asphaltBlack;
+      case 'approved': return theme.colors.asphaltBlack;
+      case 'rejected': return theme.colors.brickRed;
+      case 'in_review': return theme.colors.asphaltBlack;
+      default: return theme.colors.rustedSteel;
+    }
+  }};
+`;
+
+const ItemDetails = styled.div`
+  font-family: ${({ theme }) => theme.fonts.body};
+  color: ${({ theme }) => theme.colors.rustedSteel};
+  font-size: 0.9rem;
+  line-height: 1.4;
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: ${({ theme }) => theme.colors.rustedSteel};
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-style: italic;
+`;
+
 interface MemberData {
   id: number;
   name: string;
@@ -170,18 +265,43 @@ interface MemberData {
   profilePicture: string;
 }
 
+interface Invitation {
+  id: number;
+  email: string;
+  name: string;
+  status: string;
+  createdAt: string;
+  acceptedAt?: string;
+  expiresAt: string;
+}
+
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  createdAt: string;
+  submittedAt?: string;
+  reviewedAt?: string;
+  reviewNotes?: string;
+}
+
 export default function BuilderPage() {
   const router = useRouter();
   const { key } = router.query;
   
   const [memberData, setMemberData] = useState<MemberData | null>(null);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Fetch member data
+  // Fetch member data, invitations, and projects
   useEffect(() => {
     if (key) {
       fetchMemberData(key as string);
+      fetchInvitations(key as string);
+      fetchProjects(key as string);
     }
   }, [key]);
 
@@ -194,10 +314,39 @@ export default function BuilderPage() {
       } else {
         setError('Invalid builder link. Please check the URL and try again.');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to load builder data. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchInvitations = async (modificationKey: string) => {
+    try {
+      // First get the member data to get the ID
+      const memberResponse = await fetch(`/api/builders/${modificationKey}`);
+      if (memberResponse.ok) {
+        const memberData = await memberResponse.json();
+        const response = await fetch(`/api/member-invitations?memberId=${memberData.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setInvitations(data.invitations || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load invitations:', err);
+    }
+  };
+
+  const fetchProjects = async (modificationKey: string) => {
+    try {
+      const response = await fetch(`/api/projects?modificationKey=${modificationKey}`);
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data.projects || []);
+      }
+    } catch (err) {
+      console.error('Failed to load projects:', err);
     }
   };
 
@@ -286,6 +435,74 @@ export default function BuilderPage() {
             Open October
           </SecondaryButton>
         </ActionCard>
+
+        <TrackingSection>
+          <SectionTitle>Your Invitations</SectionTitle>
+          {invitations.length > 0 ? (
+            <ItemList>
+              {invitations.map((invitation) => (
+                <ItemCard key={invitation.id}>
+                  <ItemHeader>
+                    <ItemName>{invitation.name || invitation.email}</ItemName>
+                    <StatusBadge status={invitation.status}>
+                      {invitation.status}
+                    </StatusBadge>
+                  </ItemHeader>
+                  <ItemDetails>
+                    <div><strong>Email:</strong> {invitation.email}</div>
+                    <div><strong>Sent:</strong> {new Date(invitation.createdAt).toLocaleDateString()}</div>
+                    {invitation.acceptedAt && (
+                      <div><strong>Accepted:</strong> {new Date(invitation.acceptedAt).toLocaleDateString()}</div>
+                    )}
+                    {invitation.status === 'pending' && (
+                      <div><strong>Expires:</strong> {new Date(invitation.expiresAt).toLocaleDateString()}</div>
+                    )}
+                  </ItemDetails>
+                </ItemCard>
+              ))}
+            </ItemList>
+          ) : (
+            <EmptyState>No invitations sent yet</EmptyState>
+          )}
+        </TrackingSection>
+
+        <TrackingSection>
+          <SectionTitle>Your Projects</SectionTitle>
+          {projects.length > 0 ? (
+            <ItemList>
+              {projects.map((project) => (
+                <ItemCard key={project.id}>
+                  <ItemHeader>
+                    <ItemName>{project.name}</ItemName>
+                    <StatusBadge status={project.status}>
+                      {project.status.replace('_', ' ')}
+                    </StatusBadge>
+                  </ItemHeader>
+                  <ItemDetails>
+                    <div>{project.description}</div>
+                    <div><strong>Created:</strong> {new Date(project.createdAt).toLocaleDateString()}</div>
+                    {project.submittedAt && (
+                      <div><strong>Submitted:</strong> {new Date(project.submittedAt).toLocaleDateString()}</div>
+                    )}
+                    {project.reviewedAt && (
+                      <div><strong>Reviewed:</strong> {new Date(project.reviewedAt).toLocaleDateString()}</div>
+                    )}
+                    {project.reviewNotes && (
+                      <div><strong>Review Notes:</strong> {project.reviewNotes}</div>
+                    )}
+                  </ItemDetails>
+                </ItemCard>
+              ))}
+            </ItemList>
+          ) : (
+            <EmptyState>No projects yet</EmptyState>
+          )}
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <Button href="/submit-project">
+              Submit New Project
+            </Button>
+          </div>
+        </TrackingSection>
 
       </Container>
     </ThemeProvider>

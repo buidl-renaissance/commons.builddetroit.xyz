@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '../../../db';
-import { builderInvitations } from '../../../db/schema';
+import { builderInvitations, members } from '../../../db/schema';
 import { generateInvitationToken, createInvitationUrl } from '@/lib/invitation-token';
 import { sendBuilderInvitationEmail } from '@/lib/email';
+import { eq } from 'drizzle-orm';
 
 interface MemberInvitationData {
   email: string;
@@ -16,6 +17,7 @@ interface MemberInvitationData {
   instagram?: string;
   otherLinks?: string;
   profilePicture?: string;
+  invitedByMemberId?: number;
 }
 
 export default async function handler(
@@ -36,8 +38,8 @@ export default async function handler(
         instagram,
         otherLinks,
         profilePicture,
-        invitedBy,
-      }: MemberInvitationData & { invitedBy?: string } = req.body;
+        invitedByMemberId,
+      }: MemberInvitationData = req.body;
 
       // Validate required fields
       if (!email) {
@@ -88,6 +90,25 @@ export default async function handler(
         }
       }
 
+      // Get inviter information if member ID is provided
+      let invitedBy = 'a community member';
+      let invitedByName = 'a community member';
+      let invitedByMemberIdValue = null;
+
+      if (invitedByMemberId) {
+        const inviter = await db
+          .select()
+          .from(members)
+          .where(eq(members.id, invitedByMemberId))
+          .limit(1);
+
+        if (inviter.length > 0) {
+          invitedBy = inviter[0].email;
+          invitedByName = inviter[0].name;
+          invitedByMemberIdValue = invitedByMemberId;
+        }
+      }
+
       // Insert invitation into database
       try {
         const result = await db.insert(builderInvitations).values({
@@ -104,7 +125,9 @@ export default async function handler(
           other_links: parsedOtherLinks,
           invitationToken,
           status: 'pending',
-          invitedBy: invitedBy || 'a community member',
+          invitedBy,
+          invitedByName,
+          invitedByMemberId: invitedByMemberIdValue,
           expiresAt: expiresAt.toISOString(),
         }).returning();
 
@@ -114,7 +137,7 @@ export default async function handler(
             to: email,
             name: name || 'there',
             invitationUrl,
-            invitedBy: invitedBy || 'a community member',
+            invitedBy: invitedByName,
           });
 
           res.status(201).json({
@@ -157,8 +180,68 @@ export default async function handler(
         message: 'Internal server error. Please try again later.',
       });
     }
+  } else if (req.method === 'GET') {
+    // Get invitations sent by a specific member
+    try {
+      const { memberId } = req.query;
+
+      if (!memberId || typeof memberId !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Member ID is required',
+        });
+      }
+
+      const memberIdNum = parseInt(memberId);
+      if (isNaN(memberIdNum)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid member ID',
+        });
+      }
+
+      // First, get the member to verify they exist
+      const member = await db
+        .select()
+        .from(members)
+        .where(eq(members.id, memberIdNum))
+        .limit(1);
+
+      if (member.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Member not found',
+        });
+      }
+
+      // Get invitations sent by this member
+      const invitations = await db
+        .select()
+        .from(builderInvitations)
+        .where(eq(builderInvitations.invitedByMemberId, memberIdNum))
+        .orderBy(builderInvitations.createdAt);
+
+      res.status(200).json({
+        success: true,
+        invitations: invitations.map(invitation => ({
+          id: invitation.id,
+          email: invitation.email,
+          name: invitation.name,
+          status: invitation.status,
+          createdAt: invitation.createdAt,
+          acceptedAt: invitation.acceptedAt,
+          expiresAt: invitation.expiresAt,
+        })),
+      });
+    } catch (error) {
+      console.error('Error fetching member invitations:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error. Please try again later.',
+      });
+    }
   } else {
-    res.setHeader('Allow', ['POST']);
+    res.setHeader('Allow', ['POST', 'GET']);
     res.status(405).json({
       success: false,
       message: `Method ${req.method} not allowed`,

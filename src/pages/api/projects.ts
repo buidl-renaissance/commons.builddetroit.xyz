@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { db } from '../../../db';
-import { projects } from '../../../db/schema';
+import { projects, members } from '../../../db/schema';
 import { generateModificationKey } from '@/lib/modification-key';
 import { sendProjectSubmissionEmail } from '@/lib/email';
 
@@ -89,11 +89,36 @@ export default async function handler(
     }
   } else if (req.method === 'GET') {
     try {
-      // Get all projects (for submissions page)
-      const allProjects = await db
-        .select()
-        .from(projects)
-        .orderBy(desc(projects.createdAt));
+      const { modificationKey } = req.query;
+
+      let allProjects;
+
+      if (modificationKey && typeof modificationKey === 'string') {
+        // Get projects for a specific member
+        const member = await db
+          .select()
+          .from(members)
+          .where(eq(members.modificationKey, modificationKey))
+          .limit(1);
+
+        if (member.length === 0) {
+          return res.status(404).json({
+            error: 'Member not found',
+          });
+        }
+
+        allProjects = await db
+          .select()
+          .from(projects)
+          .where(eq(projects.modificationKey, modificationKey))
+          .orderBy(desc(projects.createdAt));
+      } else {
+        // Get all projects (for submissions page)
+        allProjects = await db
+          .select()
+          .from(projects)
+          .orderBy(desc(projects.createdAt));
+      }
 
       // Parse JSON fields for response
       const formattedProjects = allProjects.map(project => ({
@@ -102,7 +127,10 @@ export default async function handler(
         teamMembers: project.teamMembers ? JSON.parse(project.teamMembers) : [],
       }));
 
-      res.status(200).json(formattedProjects);
+      res.status(200).json({
+        success: true,
+        projects: formattedProjects,
+      });
     } catch (error) {
       console.error('Error fetching projects:', error);
       res.status(500).json({

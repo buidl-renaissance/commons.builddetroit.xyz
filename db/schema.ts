@@ -43,8 +43,12 @@ export const projects = sqliteTable("projects", {
   leadName: text("lead_name").notNull(),
   leadEmail: text("lead_email").notNull(),
   teamMembers: text("team_members"), // JSON array as string
-  status: text("status").default("pending"), // pending, approved, rejected
+  status: text("status").default("draft"), // draft, submitted, approved, rejected, in_review
   modificationKey: text("modification_key").notNull().unique(), // For email-based modifications
+  submittedAt: text("submitted_at"), // When project was submitted for review
+  reviewedAt: text("reviewed_at"), // When project was reviewed
+  reviewedBy: text("reviewed_by"), // Email of reviewer
+  reviewNotes: text("review_notes"), // Notes from reviewer
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -84,6 +88,8 @@ export const builderInvitations = sqliteTable("builder_invitations", {
   invitationToken: text("invitation_token").notNull().unique(), // Unique token for invitation link
   status: text("status").default("pending"), // pending, accepted, expired
   invitedBy: text("invited_by"), // Email of person who sent invitation
+  invitedByName: text("invited_by_name"), // Name of person who sent invitation
+  invitedByMemberId: integer("invited_by_member_id"), // ID of the member who sent invitation
   expiresAt: text("expires_at"), // Expiration date for invitation
   acceptedAt: text("accepted_at"), // When invitation was accepted
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),

@@ -321,7 +321,7 @@ export default function InviteBuilderPage() {
         body: JSON.stringify({
           ...formData,
           profilePicture: profilePictureUrl,
-          invitedBy: memberData ? `${memberData.name} (${memberData.email})` : 'a community member'
+          invitedByMemberId: memberData?.id
         }),
       });
 
