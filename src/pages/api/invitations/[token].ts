@@ -54,9 +54,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching invitation:', error);
-      res.status(500).json({ success: false, error: error.message || 'Failed to fetch invitation' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch invitation';
+      res.status(500).json({ success: false, error: errorMessage });
     }
   } else if (req.method === 'POST') {
     // Accept invitation and create builder profile
@@ -148,9 +149,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error accepting invitation:', error);
-      res.status(500).json({ success: false, error: error.message || 'Failed to accept invitation' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to accept invitation';
+      res.status(500).json({ success: false, error: errorMessage });
     }
   } else {
     res.setHeader('Allow', ['GET', 'POST']);
