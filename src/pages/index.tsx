@@ -658,9 +658,6 @@ export default function Home() {
             <CTAButton href="/open-october" role="button" style={{ backgroundColor: '#FF4F00', borderColor: '#FF4F00', fontSize: '1.1rem', fontWeight: '800' }}>
               Learn more about Open October
             </CTAButton>
-            <CTAButton href="/join" role="button">
-              🛠️ Join the Builders
-            </CTAButton>
             <CTAButton href="/builders" role="button">
               👥 Meet the Builders
             </CTAButton>

@@ -590,9 +590,6 @@ export default function About() {
                 Designers, writers, organizers, educators—we need diverse skills to build 
                 a thriving commons. Share your expertise and help others learn and grow.
               </CardDescription>
-              <CardLink href="#join">
-                Join Community →
-              </CardLink>
             </Card>
 
             <Card>

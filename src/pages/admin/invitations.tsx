@@ -392,7 +392,7 @@ export default function AdminInvitations() {
         <InviteForm>
           <FormTitle>Send New Invitation</FormTitle>
           <FormSubtitle>
-            Invite a builder to join Detroit Commons. You can pre-fill their profile information to make it easier for them.
+            Invite a builder to Detroit Commons. You can pre-fill their profile information to make it easier for them.
           </FormSubtitle>
 
           {error && <ErrorMessage>{error}</ErrorMessage>}

@@ -409,15 +409,15 @@ export default function InviteBuilder() {
     <>
       <Head>
         <title>Accept Invitation - Detroit Commons</title>
-        <meta name="description" content="Accept your invitation to join Detroit Builders" />
+        <meta name="description" content="Accept your invitation to Detroit Builders" />
       </Head>
 
       <Container>
         <Card>
           <Header>
-            <Title>Join Detroit Builders</Title>
+            <Title>Welcome to Detroit Builders</Title>
             <Subtitle>
-              You&apos;ve been invited to join our builder community! Complete your profile below to get started.
+              You&apos;ve been invited to our builder community! Complete your profile below to get started.
             </Subtitle>
           </Header>
 
@@ -551,7 +551,7 @@ export default function InviteBuilder() {
             </FormSection>
 
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Creating Profile...' : 'Accept Invitation & Join'}
+              {submitting ? 'Creating Profile...' : 'Accept Invitation'}
             </Button>
           </Form>
         </Card>

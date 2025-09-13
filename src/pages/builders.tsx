@@ -337,8 +337,7 @@ export default function Builders() {
         {builders.length === 0 ? (
           <EmptyState>
             <h3>No builders yet</h3>
-            <p>Be the first to join Detroit&apos;s builder community!</p>
-            <CTAButton href="/join">Join the Builders</CTAButton>
+            <p>Detroit&apos;s builder community is growing. Check back soon!</p>
           </EmptyState>
         ) : (
           <BuildersGrid>

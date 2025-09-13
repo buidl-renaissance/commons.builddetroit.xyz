@@ -244,7 +244,7 @@ export async function sendBuilderSubmissionEmail(
         
         <div class="footer">
           <p>Detroit Commons - Building in the Open</p>
-          <p>This email was sent because you joined our builder community.</p>
+          <p>This email was sent because you're part of our builder community.</p>
         </div>
       </div>
     </body>
@@ -370,13 +370,13 @@ export async function sendBuilderInvitationEmail(
       <div class="container">
         <div class="header">
           <h1>🎉 You're Invited!</h1>
-          <p>Join Detroit's Builder Community</p>
+          <p>Detroit's Builder Community</p>
         </div>
         
         <div class="content">
           <h2>Hi ${builderName}!</h2>
           
-          <p>You've been invited to join Detroit's builder community! We'd love to have you as part of our network of creative and technical minds building Detroit's open commons.</p>
+          <p>You've been invited to Detroit's builder community! We'd love to have you as part of our network of creative and technical minds building Detroit's open commons.</p>
           
           <div class="highlight">
             <strong>What's next?</strong> Click the button below to accept your invitation and set up your builder profile. You'll be able to customize your information and connect with other builders in the community.
@@ -391,7 +391,7 @@ export async function sendBuilderInvitationEmail(
             <li>Updates on community events and opportunities</li>
           </ul>
           
-          <a href="${invitationUrl}" class="button">Accept Invitation & Join</a>
+          <a href="${invitationUrl}" class="button">Accept Invitation</a>
           
           <p><strong>Important:</strong> This invitation link will expire in 7 days. If you have any questions, just reply to this email!</p>
           
@@ -402,7 +402,7 @@ export async function sendBuilderInvitationEmail(
         
         <div class="footer">
           <p>Detroit Commons - Building in the Open</p>
-          <p>This invitation was sent because you were invited to join our builder community.</p>
+          <p>This invitation was sent because you were invited to our builder community.</p>
         </div>
       </div>
     </body>
@@ -411,7 +411,7 @@ export async function sendBuilderInvitationEmail(
 
   return sendEmail({
     to: email,
-    subject: `You're Invited to Join Detroit Builders!`,
+    subject: `You're Invited to Detroit Builders!`,
     html,
   });
 }
@@ -453,7 +453,7 @@ export async function sendWelcomeEmail(
           </p>
           
           <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-            Welcome to Detroit Commons! We're thrilled to have you join our community of builders, creators, and innovators. You're now part of something special.
+            Welcome to Detroit Commons! We're thrilled to have you in our community of builders, creators, and innovators. You're now part of something special.
           </p>
 
           <!-- Open October Section -->
@@ -488,7 +488,7 @@ export async function sendWelcomeEmail(
               👥 Invite Other Builders
             </h2>
             <p style="color: #222324; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
-              Know other amazing builders who should join our community? You can send them personalized invitations with pre-filled profiles.
+              Know other amazing builders who should be part of our community? You can send them personalized invitations with pre-filled profiles.
             </p>
             <a href="${inviteUrl}" style="display: inline-block; background-color: #2196F3; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
               Invite Builders

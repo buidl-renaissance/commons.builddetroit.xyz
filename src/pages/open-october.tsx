@@ -640,7 +640,7 @@ export default function OpenOctober() {
         </title>
         <meta
           name="description"
-          content="Join Detroit's month-long open source event series. Learn Git, build in community, and celebrate at the Merge Party. From pizza to pull requests, Detroit is building its open commons."
+          content="Detroit's month-long open source event series. Learn Git, build in community, and celebrate at the Merge Party. From pizza to pull requests, Detroit is building its open commons."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -725,7 +725,7 @@ export default function OpenOctober() {
           </HeroDatesContainer> */}
 
           <HeroSubHeadlineStyled>
-            Join the team building the open commons of Detroit.
+            Building the open commons of Detroit together.
           </HeroSubHeadlineStyled>
           <CTAGroup>
             <Link href="#register" passHref legacyBehavior>
