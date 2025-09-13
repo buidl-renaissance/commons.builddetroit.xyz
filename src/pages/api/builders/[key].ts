@@ -64,6 +64,7 @@ export default async function handler(
         linkedin,
         github,
         twitter,
+        instagram,
         other_links,
       } = req.body;
 
@@ -94,6 +95,7 @@ export default async function handler(
           linkedin: linkedin?.trim() || null,
           github: github?.trim() || null,
           twitter: twitter?.trim() || null,
+          instagram: instagram?.trim() || null,
           other_links: other_links && other_links.length > 0 ? JSON.stringify(other_links.filter((link: string) => link.trim())) : null,
         })
         .where(eq(members.modificationKey, key))

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import styled from 'styled-components';
+import ProfileImageUpload from '@/components/ProfileImageUpload';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -214,113 +215,17 @@ const SuccessMessage = styled.div`
   margin-bottom: 1rem;
 `;
 
-const ProfilePictureContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const ProfilePictureUpload = styled.div<{ hasImage: boolean }>`
-  position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 3px dashed ${({ theme, hasImage }) => hasImage ? theme.colors.neonOrange : theme.colors.rustedSteel}60;
-  background: ${({ theme, hasImage }) => hasImage ? 'transparent' : `${theme.colors.creamyBeige}40`};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  overflow: hidden;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.neonOrange};
-    border-style: solid;
-    transform: scale(1.05);
-    box-shadow: 0 8px 24px rgba(255, 79, 0, 0.2);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-`;
-
-const ProfileImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-`;
-
-const ProfilePlaceholder = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.rustedSteel};
-  font-family: ${({ theme }) => theme.fonts.body};
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 1rem;
-`;
-
-const UploadIcon = styled.div`
-  font-size: 2rem;
-  color: ${({ theme }) => theme.colors.rustedSteel}80;
-  margin-bottom: 0.5rem;
-`;
-
-const HiddenFileInput = styled.input`
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-`;
-
-const UploadText = styled.div`
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.rustedSteel};
-  text-align: center;
-  margin-top: 0.5rem;
-`;
-
-const ImageOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  color: white;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-
-  ${ProfilePictureUpload}:hover & {
-    opacity: 1;
-  }
-`;
 
 interface FormData {
   name: string;
   email: string;
   bio: string;
-  profilePicture: File | null;
+  profilePicture: string; // Now stores URL instead of File
   website: string;
   linkedin: string;
   github: string;
   twitter: string;
+  instagram: string;
   otherLinks: string[];
 }
 
@@ -329,15 +234,15 @@ export default function JoinBuilders() {
     name: '',
     email: '',
     bio: '',
-    profilePicture: null,
+    profilePicture: '',
     website: '',
     linkedin: '',
     github: '',
     twitter: '',
+    instagram: '',
     otherLinks: [''],
   });
 
-  const [profilePreview, setProfilePreview] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -346,33 +251,12 @@ export default function JoinBuilders() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setError('Please select an image file');
-        return;
-      }
+  const handleProfileImageChange = (url: string) => {
+    setFormData(prev => ({ ...prev, profilePicture: url }));
+  };
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image file size must be less than 5MB');
-        return;
-      }
-
-      setFormData(prev => ({ ...prev, profilePicture: file }));
-      
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfilePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-      
-      // Clear any previous errors
-      setError('');
-    }
+  const handleProfileImageError = (error: string) => {
+    setError(error);
   };
 
   const handleOtherLinksChange = (index: number, value: string) => {
@@ -402,51 +286,17 @@ export default function JoinBuilders() {
     setError('');
 
     try {
-      let profilePictureUrl = '';
-      
-      // Upload profile picture if one is selected
-      if (formData.profilePicture) {
-        // Convert file to base64 for upload API
-        const reader = new FileReader();
-        const base64Data = await new Promise<string>((resolve, reject) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(formData.profilePicture!);
-        });
-
-        // Upload the file using the upload API
-        const uploadResponse = await fetch('/api/upload', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            file: base64Data,
-            fileName: `profile-${Date.now()}.${formData.profilePicture.name.split('.').pop()}`,
-            fileType: formData.profilePicture.type,
-            folder: 'profiles'
-          }),
-        });
-
-        const uploadResult = await uploadResponse.json();
-        
-        if (!uploadResponse.ok || !uploadResult.success) {
-          throw new Error(uploadResult.error || 'Failed to upload profile picture');
-        }
-
-        profilePictureUrl = uploadResult.url;
-      }
-
       // Filter out empty strings from other links
       const cleanedData = {
         name: formData.name,
         email: formData.email,
         bio: formData.bio,
-        profilePicture: profilePictureUrl,
+        profilePicture: formData.profilePicture, // Already uploaded, just pass the URL
         website: formData.website,
         linkedin: formData.linkedin,
         github: formData.github,
         twitter: formData.twitter,
+        instagram: formData.instagram,
         otherLinks: formData.otherLinks.filter(link => link.trim()),
       };
 
@@ -469,14 +319,14 @@ export default function JoinBuilders() {
         name: '',
         email: '',
         bio: '',
-        profilePicture: null,
+        profilePicture: '',
         website: '',
         linkedin: '',
         github: '',
         twitter: '',
+        instagram: '',
         otherLinks: [''],
       });
-      setProfilePreview('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -516,32 +366,14 @@ export default function JoinBuilders() {
           {!success && (
             <Form onSubmit={handleSubmit}>
             {/* Profile Picture at the top */}
-            <ProfilePictureContainer>
-              <ProfilePictureUpload hasImage={!!profilePreview}>
-                <HiddenFileInput
-                  id="profilePictureInput"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                />
-                
-                {profilePreview ? (
-                  <>
-                    <ProfileImage src={profilePreview} alt="Profile preview" />
-                    <ImageOverlay>Change Photo</ImageOverlay>
-                  </>
-                ) : (
-                  <ProfilePlaceholder>
-                    <UploadIcon>📷</UploadIcon>
-                    <div>Click to upload</div>
-                  </ProfilePlaceholder>
-                )}
-              </ProfilePictureUpload>
-              
-              <UploadText>
-                {profilePreview ? 'Click to change your profile picture' : 'Upload a profile picture (max 5MB)'}
-              </UploadText>
-            </ProfilePictureContainer>
+            <ProfileImageUpload
+              label="Profile Picture"
+              value={formData.profilePicture}
+              onChange={handleProfileImageChange}
+              onError={handleProfileImageError}
+              required={false}
+              maxSize={5}
+            />
 
             <FormSection>
               <SectionTitle>Basic Information</SectionTitle>
@@ -626,6 +458,17 @@ export default function JoinBuilders() {
                   value={formData.twitter}
                   onChange={(e) => handleInputChange('twitter', e.target.value)}
                   placeholder="https://twitter.com/yourusername"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="instagram">Instagram Profile</Label>
+                <Input
+                  id="instagram"
+                  type="url"
+                  value={formData.instagram}
+                  onChange={(e) => handleInputChange('instagram', e.target.value)}
+                  placeholder="https://instagram.com/yourusername"
                 />
               </div>
 

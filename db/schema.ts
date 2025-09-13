@@ -27,6 +27,7 @@ export const members = sqliteTable("members", {
   linkedin: text("linkedin"), // LinkedIn profile URL
   github: text("github"), // GitHub profile URL
   twitter: text("twitter"), // Twitter/X profile URL
+  instagram: text("instagram"), // Instagram profile URL
   other_links: text("other_links"), // JSON array of other links
   modificationKey: text("modification_key").notNull().unique(), // For email-based modifications
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
@@ -64,4 +65,26 @@ export const openOctoberRegistrations = sqliteTable("open_october_registrations"
   email: text("email").notNull().unique(),
   name: text("name"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const builderInvitations = sqliteTable("builder_invitations", {
+  id: integer("id").primaryKey(),
+  email: text("email").notNull(),
+  name: text("name"), // Pre-filled name if provided
+  bio: text("bio"), // Pre-filled bio if provided
+  skills: text("skills"), // JSON array as string
+  profilePicture: text("profile_picture"), // Pre-filled profile picture URL if provided
+  website: text("website"), // Pre-filled website if provided
+  linkedin: text("linkedin"), // Pre-filled LinkedIn if provided
+  github: text("github"), // Pre-filled GitHub if provided
+  twitter: text("twitter"), // Pre-filled Twitter if provided
+  instagram: text("instagram"), // Pre-filled Instagram if provided
+  other_links: text("other_links"), // JSON array of other links
+  invitationToken: text("invitation_token").notNull().unique(), // Unique token for invitation link
+  status: text("status").default("pending"), // pending, accepted, expired
+  invitedBy: text("invited_by"), // Email of person who sent invitation
+  expiresAt: text("expires_at"), // Expiration date for invitation
+  acceptedAt: text("accepted_at"), // When invitation was accepted
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });

@@ -334,6 +334,7 @@ interface BuilderData {
   linkedin: string;
   github: string;
   twitter: string;
+  instagram: string;
   other_links: string[];
 }
 
@@ -684,6 +685,17 @@ export default function ModifyBuilder() {
                   value={builderData.twitter}
                   onChange={(e) => handleInputChange('twitter', e.target.value)}
                   placeholder="https://twitter.com/yourusername"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="instagram">Instagram Profile</Label>
+                <Input
+                  id="instagram"
+                  type="url"
+                  value={builderData.instagram}
+                  onChange={(e) => handleInputChange('instagram', e.target.value)}
+                  placeholder="https://instagram.com/yourusername"
                 />
               </div>
 

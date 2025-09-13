@@ -257,3 +257,161 @@ export async function sendBuilderSubmissionEmail(
     html,
   });
 }
+
+/**
+ * Send builder invitation email
+ */
+export async function sendBuilderInvitationEmail(
+  email: string,
+  builderName: string,
+  invitationUrl: string
+) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>You're Invited to Detroit Builders - Detroit Commons</title>
+      <style>
+        body { 
+          font-family: Arial, sans-serif; 
+          line-height: 1.6; 
+          color: #333; 
+          margin: 0; 
+          padding: 20px; 
+          background-color: #f5f5f5;
+        }
+        .container { 
+          max-width: 600px; 
+          margin: 0 auto; 
+          background: white; 
+          border-radius: 8px; 
+          overflow: hidden; 
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header { 
+          background: linear-gradient(135deg, #FF4F00, #FFD700); 
+          color: white; 
+          padding: 30px; 
+          text-align: center; 
+        }
+        .content { 
+          background: white; 
+          padding: 30px; 
+        }
+        .button { 
+          display: inline-block; 
+          background: #FF4F00; 
+          color: white !important; 
+          padding: 12px 24px; 
+          text-decoration: none; 
+          border-radius: 6px; 
+          font-weight: bold; 
+          margin: 20px 0; 
+        }
+        .button:hover { 
+          background: #e04500; 
+          color: white !important; 
+        }
+        .footer { 
+          text-align: center; 
+          margin-top: 30px; 
+          color: #666; 
+          font-size: 14px; 
+        }
+        a { 
+          color: #FF4F00; 
+          text-decoration: none; 
+        }
+        a:hover { 
+          color: #e04500; 
+          text-decoration: underline; 
+        }
+        h1 { 
+          margin: 0 0 10px 0; 
+          font-size: 28px; 
+        }
+        h2 { 
+          margin: 0 0 15px 0; 
+          color: #FF4F00; 
+          font-size: 24px; 
+        }
+        h3 { 
+          margin: 25px 0 15px 0; 
+          color: #333; 
+          font-size: 18px; 
+        }
+        ul { 
+          margin: 15px 0; 
+          padding-left: 20px; 
+        }
+        li { 
+          margin: 8px 0; 
+        }
+        p { 
+          margin: 15px 0; 
+        }
+        hr { 
+          margin: 30px 0; 
+          border: none; 
+          border-top: 1px solid #ddd; 
+        }
+        .highlight {
+          background-color: #fff3cd;
+          border: 1px solid #ffeaa7;
+          border-radius: 6px;
+          padding: 15px;
+          margin: 20px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🎉 You're Invited!</h1>
+          <p>Join Detroit's Builder Community</p>
+        </div>
+        
+        <div class="content">
+          <h2>Hi ${builderName}!</h2>
+          
+          <p>You've been invited to join Detroit's builder community! We'd love to have you as part of our network of creative and technical minds building Detroit's open commons.</p>
+          
+          <div class="highlight">
+            <strong>What's next?</strong> Click the button below to accept your invitation and set up your builder profile. You'll be able to customize your information and connect with other builders in the community.
+          </div>
+          
+          <h3>What you'll get:</h3>
+          <ul>
+            <li>Your own builder profile page</li>
+            <li>Access to the community directory</li>
+            <li>Opportunities to collaborate on projects</li>
+            <li>Connection with other Detroit builders</li>
+            <li>Updates on community events and opportunities</li>
+          </ul>
+          
+          <a href="${invitationUrl}" class="button">Accept Invitation & Join</a>
+          
+          <p><strong>Important:</strong> This invitation link will expire in 7 days. If you have any questions, just reply to this email!</p>
+          
+          <hr>
+          
+          <p>Questions? Reply to this email or visit <a href="https://commons.buildetroit.xyz">commons.buildetroit.xyz</a></p>
+        </div>
+        
+        <div class="footer">
+          <p>Detroit Commons - Building in the Open</p>
+          <p>This invitation was sent because you were invited to join our builder community.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: `You're Invited to Join Detroit Builders!`,
+    html,
+  });
+}

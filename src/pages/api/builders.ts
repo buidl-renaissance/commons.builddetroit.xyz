@@ -14,6 +14,7 @@ interface BuilderSubmissionData {
   linkedin?: string;
   github?: string;
   twitter?: string;
+  instagram?: string;
   otherLinks?: string[];
 }
 
@@ -32,6 +33,7 @@ export default async function handler(
         linkedin,
         github,
         twitter,
+        instagram,
         otherLinks,
       }: BuilderSubmissionData = req.body;
 
@@ -76,6 +78,7 @@ export default async function handler(
         linkedin: linkedin?.trim() || null,
         github: github?.trim() || null,
         twitter: twitter?.trim() || null,
+        instagram: instagram?.trim() || null,
         other_links: otherLinks && otherLinks.length > 0 ? JSON.stringify(otherLinks.filter((link: string) => link.trim())) : null,
         skills: null, // We'll add skills later if needed
         modificationKey,

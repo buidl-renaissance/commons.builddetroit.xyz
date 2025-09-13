@@ -14,6 +14,7 @@ const Header = styled.div`
   text-align: center;
 `;
 
+
 const Title = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
   color: ${({ theme }) => theme.colors.asphaltBlack};

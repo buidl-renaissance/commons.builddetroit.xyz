@@ -22,6 +22,27 @@
       "when": 1757412363070,
       "tag": "0002_exotic_joystick",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1757700011468,
+      "tag": "0003_neat_forgotten_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1757702982223,
+      "tag": "0004_brainy_shatterstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1757725716379,
+      "tag": "0005_empty_skrulls",
+      "breakpoints": true
     }
   ]
 }

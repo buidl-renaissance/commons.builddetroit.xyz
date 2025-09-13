@@ -1,0 +1,1 @@
+ALTER TABLE `builder_invitations` ADD `profile_picture` text;
