@@ -45,6 +45,7 @@ export const projects = sqliteTable("projects", {
   teamMembers: text("team_members"), // JSON array as string
   status: text("status").default("draft"), // draft, submitted, approved, rejected, in_review
   modificationKey: text("modification_key").notNull().unique(), // For email-based modifications
+  builderId: integer("builder_id"), // ID of the builder who submitted the project
   submittedAt: text("submitted_at"), // When project was submitted for review
   reviewedAt: text("reviewed_at"), // When project was reviewed
   reviewedBy: text("reviewed_by"), // Email of reviewer

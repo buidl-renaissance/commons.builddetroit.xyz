@@ -14,6 +14,7 @@ interface ProjectSubmissionData {
   leadName: string;
   leadEmail: string;
   teamMembers?: string[];
+  builderId?: number;
 }
 
 export default async function handler(
@@ -31,6 +32,7 @@ export default async function handler(
         leadName,
         leadEmail,
         teamMembers,
+        builderId,
       }: ProjectSubmissionData = req.body;
 
       // Validate required fields
@@ -61,8 +63,9 @@ export default async function handler(
         leadName: leadName.trim(),
         leadEmail: leadEmail.trim().toLowerCase(),
         teamMembers: teamMembers ? JSON.stringify(teamMembers) : null,
-        status: 'pending',
+        status: 'draft',
         modificationKey,
+        builderId: builderId || null,
       }).returning();
 
       // Send confirmation email with modification link
@@ -89,12 +92,26 @@ export default async function handler(
     }
   } else if (req.method === 'GET') {
     try {
-      const { modificationKey } = req.query;
+      const { modificationKey, builderId } = req.query;
 
       let allProjects;
 
-      if (modificationKey && typeof modificationKey === 'string') {
-        // Get projects for a specific member
+      if (builderId && typeof builderId === 'string') {
+        // Get projects for a specific builder by ID
+        const builderIdNum = parseInt(builderId);
+        if (isNaN(builderIdNum)) {
+          return res.status(400).json({
+            error: 'Invalid builder ID',
+          });
+        }
+
+        allProjects = await db
+          .select()
+          .from(projects)
+          .where(eq(projects.builderId, builderIdNum))
+          .orderBy(desc(projects.createdAt));
+      } else if (modificationKey && typeof modificationKey === 'string') {
+        // Get projects for a specific member by modification key
         const member = await db
           .select()
           .from(members)

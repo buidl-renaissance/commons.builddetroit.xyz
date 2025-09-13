@@ -340,10 +340,15 @@ export default function BuilderPage() {
 
   const fetchProjects = async (modificationKey: string) => {
     try {
-      const response = await fetch(`/api/projects?modificationKey=${modificationKey}`);
-      if (response.ok) {
-        const data = await response.json();
-        setProjects(data.projects || []);
+      // First get the member data to get the ID
+      const memberResponse = await fetch(`/api/builders/${modificationKey}`);
+      if (memberResponse.ok) {
+        const memberData = await memberResponse.json();
+        const response = await fetch(`/api/projects?builderId=${memberData.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProjects(data.projects || []);
+        }
       }
     } catch (err) {
       console.error('Failed to load projects:', err);
@@ -498,7 +503,7 @@ export default function BuilderPage() {
             <EmptyState>No projects yet</EmptyState>
           )}
           <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-            <Button href="/submit-project">
+            <Button href={`/builder/${key}/submit-project`}>
               Submit New Project
             </Button>
           </div>
