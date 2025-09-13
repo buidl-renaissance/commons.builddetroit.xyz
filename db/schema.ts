@@ -63,7 +63,8 @@ export const blogPosts = sqliteTable("blog_posts", {
 export const openOctoberRegistrations = sqliteTable("open_october_registrations", {
   id: integer("id").primaryKey(),
   email: text("email").notNull().unique(),
-  name: text("name"),
+  name: text("name").notNull(),
+  message: text("message"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 

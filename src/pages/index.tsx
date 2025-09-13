@@ -390,9 +390,9 @@ const CTATitle = styled.h2`
 
 const CTAGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 1.5rem;
-  max-width: 1000px;
+  max-width: 500px;
   margin: 0 auto;
   
   @media (max-width: 1024px) {
@@ -657,9 +657,6 @@ export default function Home() {
           <CTAGrid>
             <CTAButton href="/open-october" role="button" style={{ backgroundColor: '#FF4F00', borderColor: '#FF4F00', fontSize: '1.1rem', fontWeight: '800' }}>
               Learn more about Open October
-            </CTAButton>
-            <CTAButton href="/builders" role="button">
-              👥 Meet the Builders
             </CTAButton>
           </CTAGrid>
         </CTASection>

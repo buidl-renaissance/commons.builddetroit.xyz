@@ -477,6 +477,29 @@ const FormInput = styled.input<{ theme: ThemeType }>`
   }
 `;
 
+const FormTextArea = styled.textarea<{ theme: ThemeType }>`
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid ${openOctoberColors.civicBlue};
+  background: rgba(0, 0, 0, 0.5);
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  resize: vertical;
+  min-height: 100px;
+
+  &::placeholder {
+    color: rgba(245, 233, 218, 0.6);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: ${openOctoberColors.githubGreen};
+  }
+`;
+
 
 const SubmitButton = styled(CTAButton)`
   width: 100%;
@@ -578,12 +601,13 @@ export default function OpenOctober() {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
+    message: "",
   });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -618,7 +642,7 @@ export default function OpenOctober() {
       if (data.success) {
         setSuccess(true);
         setError("");
-        setFormData({ email: "", name: "" });
+        setFormData({ email: "", name: "", message: "" });
       } else {
         setError(data.message || "Something went wrong. Please try again.");
         setSuccess(false);
@@ -730,14 +754,14 @@ export default function OpenOctober() {
           <CTAGroup>
             <Link href="#register" passHref legacyBehavior>
               <CTAButton primary as="a">
-                <GitIcon>git</GitIcon> Register for Kickoff
+                <GitIcon>git</GitIcon> Learn How to Get Involved
               </CTAButton>
             </Link>
-            <Link href="/submit-project" passHref legacyBehavior>
+            {/* <Link href="/submit-project" passHref legacyBehavior>
               <CTAButton as="a">
                 🚀 Submit Your Project
               </CTAButton>
-            </Link>
+            </Link> */}
           </CTAGroup>
         </HeroContent>
       </HeroSection>
@@ -758,7 +782,7 @@ export default function OpenOctober() {
       </Section>
 
       {/* Project Submission Call to Action */}
-      <Section autumn>
+      {/* <Section autumn>
         <Container>
           <SectionTitle>🚀 Submit Your Project</SectionTitle>
           
@@ -809,7 +833,7 @@ export default function OpenOctober() {
             &quot;The best projects are the ones that invite others to build alongside you.&quot;
           </AboutQuote>
         </Container>
-      </Section>
+      </Section> */}
 
       {/* Schedule */}
       <Section autumn>
@@ -958,10 +982,10 @@ export default function OpenOctober() {
         <Container>
           <RegistrationContainer>
             <RegistrationFormContainer>
-              <SectionTitle>Register</SectionTitle>
+              <SectionTitle>Get Involved</SectionTitle>
               <SectionDescription compact>
-                Ready to connect, build, and merge with Detroit&apos;s open
-                commons?
+                Interested in connecting, building, and merging with Detroit&apos;s open
+                commons? Let us know how you&apos;d like to participate.
               </SectionDescription>
 
               <RegistrationForm onSubmit={handleRegistrationSubmit}>
@@ -976,20 +1000,28 @@ export default function OpenOctober() {
                 <FormInput
                   type="text"
                   name="name"
-                  placeholder="Your name (optional)"
+                  placeholder="Your name"
                   value={formData.name}
                   onChange={handleInputChange}
+                  required
+                />
+                <FormTextArea
+                  name="message"
+                  placeholder="Tell us about yourself and why you're interested in Open October... (optional)"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  rows={4}
                 />
                 <SubmitButton type="submit" primary disabled={loading}>
-                  {loading ? "Registering..." : "Register"}
+                  {loading ? "Sending Request..." : "Request Information"}
                 </SubmitButton>
               </RegistrationForm>
 
               {error && <FormMessage>{error}</FormMessage>}
               {success && (
                 <FormMessage success>
-                  🎉 You&apos;re registered! We&apos;ll send you event updates
-                  and details soon.
+                  🎉 Thanks for your interest! We&apos;ll reach out with information
+                  about how to get involved in Open October.
                 </FormMessage>
               )}
             </RegistrationFormContainer>

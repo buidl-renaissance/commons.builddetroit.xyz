@@ -72,17 +72,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Send invitation email
       const invitationUrl = createInvitationUrl(invitationToken);
-      await sendBuilderInvitationEmail(email, name || 'Builder', invitationUrl);
-
-      res.status(201).json({
-        success: true,
-        invitation: {
-          id: invitation[0].id,
-          email,
+      try {
+        await sendBuilderInvitationEmail({
+          to: email,
+          name: name || 'Builder',
           invitationUrl,
-          expiresAt: expiresAt.toISOString()
-        }
-      });
+          invitedBy: invitedBy || 'admin@commons.buildetroit.xyz'
+        });
+
+        res.status(201).json({
+          success: true,
+          invitation: {
+            id: invitation[0].id,
+            email,
+            invitationUrl,
+            expiresAt: expiresAt.toISOString()
+          }
+        });
+      } catch (emailError) {
+        console.error('Error sending invitation email:', emailError);
+        // Still return success since the invitation was created
+        res.status(201).json({
+          success: true,
+          invitation: {
+            id: invitation[0].id,
+            email,
+            invitationUrl,
+            expiresAt: expiresAt.toISOString()
+          },
+          warning: 'Invitation created but email failed to send. Please contact them directly.'
+        });
+      }
 
     } catch (error: unknown) {
       console.error('Error creating invitation:', error);

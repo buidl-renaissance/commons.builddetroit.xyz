@@ -102,6 +102,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ success: false, error: 'Name is required' });
       }
 
+      if (!bio) {
+        return res.status(400).json({ success: false, error: 'Bio is required' });
+      }
+
       // Check if user already exists
       const existingMember = await db
         .select()

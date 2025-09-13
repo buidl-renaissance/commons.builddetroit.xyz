@@ -52,47 +52,50 @@ export async function sendProjectSubmissionEmail(
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Project Submitted - Detroit Commons</title>
       <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #FF4F00, #FFD700); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+        body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #FF4F00, #FFD700); color: white; padding: 30px; text-align: center; }
+        .content { background: #f9f9f9; padding: 30px; }
         .button { display: inline-block; background: #FF4F00; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
         .button:hover { background: #e04500; color: white !important; }
-        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; padding: 20px; }
       </style>
     </head>
     <body>
-      <div class="header">
-        <h1>🚀 Project Submitted!</h1>
-        <p>Welcome to Detroit's Open Commons</p>
-      </div>
-      
-      <div class="content">
-        <h2>Thank you for submitting "${projectName}"</h2>
+      <div class="container">
+        <div class="header">
+          <h1>🚀 Project Submitted!</h1>
+          <p>Welcome to Detroit's Open Commons</p>
+        </div>
         
-        <p>Your project has been successfully submitted to Detroit Commons. We're excited to see what you're building!</p>
+        <div class="content">
+          <h2>Thank you for submitting "${projectName}"</h2>
+          
+          <p>Your project has been successfully submitted to Detroit Commons. We're excited to see what you're building!</p>
+          
+          <h3>What happens next?</h3>
+          <ul>
+            <li>Your project will be reviewed by our community</li>
+            <li>You'll receive updates on its status</li>
+            <li>Other builders can discover and collaborate on your project</li>
+          </ul>
+          
+          <h3>Need to make changes?</h3>
+          <p>You can modify your project submission anytime using the link below:</p>
+          
+          <a href="${modificationUrl}" class="button">Modify Your Project</a>
+          
+          <p><strong>Important:</strong> Keep this link safe - it's the only way to modify your submission.</p>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+          
+          <p>Questions? Reply to this email or visit <a href="https://commons.builddetroit.xyz">commons.buildetroit.xyz</a></p>
+        </div>
         
-        <h3>What happens next?</h3>
-        <ul>
-          <li>Your project will be reviewed by our community</li>
-          <li>You'll receive updates on its status</li>
-          <li>Other builders can discover and collaborate on your project</li>
-        </ul>
-        
-        <h3>Need to make changes?</h3>
-        <p>You can modify your project submission anytime using the link below:</p>
-        
-        <a href="${modificationUrl}" class="button">Modify Your Project</a>
-        
-        <p><strong>Important:</strong> Keep this link safe - it's the only way to modify your submission.</p>
-        
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-        
-        <p>Questions? Reply to this email or visit <a href="https://commons.builddetroit.xyz">commons.buildetroit.xyz</a></p>
-      </div>
-      
-      <div class="footer">
-        <p>Detroit Commons - Building in the Open</p>
-        <p>This email was sent because you submitted a project to our community.</p>
+        <div class="footer">
+          <p>Detroit Commons - Building in the Open</p>
+          <p>This email was sent because you submitted a project to our community.</p>
+        </div>
       </div>
     </body>
     </html>
@@ -261,11 +264,17 @@ export async function sendBuilderSubmissionEmail(
 /**
  * Send builder invitation email
  */
-export async function sendBuilderInvitationEmail(
-  email: string,
-  builderName: string,
-  invitationUrl: string
-) {
+export async function sendBuilderInvitationEmail({
+  to,
+  name,
+  invitationUrl,
+  invitedBy
+}: {
+  to: string;
+  name: string;
+  invitationUrl: string;
+  invitedBy: string;
+}) {
   const html = `
     <!DOCTYPE html>
     <html>
@@ -374,9 +383,9 @@ export async function sendBuilderInvitationEmail(
         </div>
         
         <div class="content">
-          <h2>Hi ${builderName}!</h2>
+          <h2>Hi ${name}!</h2>
           
-          <p>You've been invited to Detroit's builder community! We'd love to have you as part of our network of creative and technical minds building Detroit's open commons.</p>
+          <p>You've been invited to Detroit's builder community by ${invitedBy}! We'd love to have you as part of our network of creative and technical minds building Detroit's open commons.</p>
           
           <div class="highlight">
             <strong>What's next?</strong> Click the button below to accept your invitation and set up your builder profile. You'll be able to customize your information and connect with other builders in the community.
@@ -393,7 +402,7 @@ export async function sendBuilderInvitationEmail(
           
           <a href="${invitationUrl}" class="button">Accept Invitation</a>
           
-          <p><strong>Important:</strong> This invitation link will expire in 7 days. If you have any questions, just reply to this email!</p>
+          <p><strong>Important:</strong> This invitation link will expire in 30 days. If you have any questions, just reply to this email!</p>
           
           <hr>
           
@@ -402,7 +411,7 @@ export async function sendBuilderInvitationEmail(
         
         <div class="footer">
           <p>Detroit Commons - Building in the Open</p>
-          <p>This invitation was sent because you were invited to our builder community.</p>
+          <p>This invitation was sent by ${invitedBy} to invite you to our builder community.</p>
         </div>
       </div>
     </body>
@@ -410,7 +419,7 @@ export async function sendBuilderInvitationEmail(
   `;
 
   return sendEmail({
-    to: email,
+    to,
     subject: `You're Invited to Detroit Builders!`,
     html,
   });
@@ -421,9 +430,9 @@ export async function sendWelcomeEmail(
   name: string,
   modificationKey: string
 ) {
-  const modificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/modify/builder/${modificationKey}`;
+  const modificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/builder/${modificationKey}/modify`;
   const openOctoberUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/open-october`;
-  const inviteUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/invitations`;
+  const inviteUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/builder/${modificationKey}/invite`;
 
   const html = `
     <!DOCTYPE html>
@@ -433,7 +442,7 @@ export async function sendWelcomeEmail(
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Welcome to Detroit Builders!</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
+    <body style="margin: 0; padding: 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         
         <!-- Header -->

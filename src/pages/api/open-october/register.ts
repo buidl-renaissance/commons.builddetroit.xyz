@@ -3,9 +3,10 @@ import { desc } from 'drizzle-orm';
 import { db } from '../../../../db';
 import { openOctoberRegistrations } from '../../../../db/schema';
 
-interface RegistrationData {
+interface InformationRequestData {
   email: string;
-  name?: string;
+  name: string;
+  message?: string;
 }
 
 export default async function handler(
@@ -14,7 +15,7 @@ export default async function handler(
 ) {
   if (req.method === 'POST') {
     try {
-      const { email, name }: RegistrationData = req.body;
+      const { email, name, message }: InformationRequestData = req.body;
 
       // Validate required fields
       if (!email) {
@@ -23,6 +24,14 @@ export default async function handler(
           message: 'Email is required',
         });
       }
+
+      if (!name) {
+        return res.status(400).json({
+          success: false,
+          message: 'Name is required',
+        });
+      }
+
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,12 +46,13 @@ export default async function handler(
       try {
         const result = await db.insert(openOctoberRegistrations).values({
           email: email.trim().toLowerCase(),
-          name: name?.trim() || null,
+          name: name.trim(),
+          message: message?.trim() || null,
         }).returning();
 
         res.status(201).json({
           success: true,
-          message: 'Registration successful! We\'ll send you event updates and details soon.',
+          message: 'Thanks for your interest! We\'ll reach out with information about how to get involved in Open October.',
           registration: result[0],
         });
       } catch (dbError: unknown) {
@@ -50,13 +60,13 @@ export default async function handler(
         if (dbError instanceof Error && dbError.message.includes('UNIQUE constraint failed')) {
           return res.status(409).json({
             success: false,
-            message: 'This email is already registered for Open October.',
+            message: 'We already have your information for Open October.',
           });
         }
         throw dbError;
       }
     } catch (error) {
-      console.error('Error registering for Open October:', error);
+      console.error('Error processing Open October information request:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error. Please try again later.',

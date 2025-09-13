@@ -18,8 +18,8 @@ const Header = styled.div`
 const Title = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
   color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
 `;
@@ -36,16 +36,16 @@ const InviteForm = styled.div`
 const FormTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
   color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 2rem;
+  font-size: 1.5rem;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 `;
 
 const FormSubtitle = styled.p`
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.rustedSteel};
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin-bottom: 2.5rem;
   line-height: 1.6;
 `;

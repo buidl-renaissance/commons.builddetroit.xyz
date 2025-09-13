@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const ProfilePictureContainer = styled.div`
@@ -138,6 +138,11 @@ export default function ProfileImageUploadComponent({
 }: ProfileImageUploadProps) {
   const [preview, setPreview] = useState<string>(value);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Update preview when value prop changes
+  useEffect(() => {
+    setPreview(value);
+  }, [value]);
 
   const uploadImage = async (file: File): Promise<string> => {
     // Convert file to base64 for upload API
