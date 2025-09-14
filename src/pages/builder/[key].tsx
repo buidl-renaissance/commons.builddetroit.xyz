@@ -8,19 +8,19 @@ import { theme } from '../../styles/theme';
 const Container = styled.div`
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.creamyBeige};
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
 `;
 
 const Header = styled.div`
   max-width: 1200px;
-  margin: 0 auto 3rem;
+  margin: 0 auto 2rem;
   text-align: center;
 `;
 
 const Title = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
   color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -29,27 +29,27 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.rustedSteel};
-  font-size: 1.1rem;
-  margin-bottom: 2.5rem;
-  line-height: 1.6;
-  max-width: 600px;
-  margin: 0 auto 2.5rem;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+  max-width: 500px;
+  margin: 0 auto 2rem;
 `;
 
 const ActionCard = styled.div`
   max-width: 600px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1.5rem;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(34, 35, 36, 0.1);
-  padding: 3rem;
-  text-align: center;
+  padding: 1.5rem;
+  text-align: left;
 `;
 
 const CardTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
   color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -58,9 +58,9 @@ const CardTitle = styled.h2`
 const CardDescription = styled.p`
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.rustedSteel};
-  font-size: 1rem;
-  margin-bottom: 2rem;
-  line-height: 1.6;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
 `;
 
 const Button = styled(Link)`
@@ -69,8 +69,8 @@ const Button = styled(Link)`
   color: ${({ theme }) => theme.colors.asphaltBlack};
   font-family: ${({ theme }) => theme.fonts.body};
   font-weight: 600;
-  font-size: 1rem;
-  padding: 1rem 2rem;
+  font-size: 0.85rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -78,12 +78,12 @@ const Button = styled(Link)`
   text-transform: uppercase;
   letter-spacing: 1px;
   text-decoration: none;
-  margin: 0.5rem;
+  margin: 0.25rem;
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.neonOrange};
     color: ${({ theme }) => theme.colors.creamyBeige};
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 
   &:active {
@@ -97,8 +97,8 @@ const SecondaryButton = styled(Link)`
   color: ${({ theme }) => theme.colors.asphaltBlack};
   font-family: ${({ theme }) => theme.fonts.body};
   font-weight: 600;
-  font-size: 1rem;
-  padding: 1rem 2rem;
+  font-size: 0.85rem;
+  padding: 0.6rem 1.2rem;
   border: 2px solid ${({ theme }) => theme.colors.rustedSteel}60;
   border-radius: 6px;
   cursor: pointer;
@@ -106,12 +106,12 @@ const SecondaryButton = styled(Link)`
   text-transform: uppercase;
   letter-spacing: 1px;
   text-decoration: none;
-  margin: 0.5rem;
+  margin: 0.25rem;
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.neonOrange};
     color: ${({ theme }) => theme.colors.neonOrange};
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 
   &:active {
@@ -156,17 +156,17 @@ const Message = styled.div<{ success?: boolean }>`
 
 const TrackingSection = styled.div`
   max-width: 600px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1.5rem;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(34, 35, 36, 0.1);
-  padding: 2rem;
+  padding: 1.5rem;
 `;
 
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
   color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin-bottom: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -175,11 +175,12 @@ const SectionTitle = styled.h2`
 const ItemList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  text-align: left;
+  gap: 0.75rem;
 `;
 
 const ItemCard = styled.div`
-  padding: 1rem;
+  padding: 0.75rem;
   border: 1px solid ${({ theme }) => theme.colors.rustedSteel}30;
   border-radius: 8px;
   background-color: ${({ theme }) => theme.colors.creamyBeige}20;
@@ -189,21 +190,21 @@ const ItemHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 `;
 
 const ItemName = styled.h3`
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   margin: 0;
 `;
 
 const StatusBadge = styled.span<{ status: string }>`
-  padding: 0.25rem 0.75rem;
+  padding: 0.2rem 0.6rem;
   border-radius: 12px;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -238,16 +239,24 @@ const StatusBadge = styled.span<{ status: string }>`
 const ItemDetails = styled.div`
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.rustedSteel};
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 0.8rem;
+  line-height: 1.3;
 `;
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: 2rem;
+  padding: 1.5rem;
   color: ${({ theme }) => theme.colors.rustedSteel};
   font-family: ${({ theme }) => theme.fonts.body};
   font-style: italic;
+  font-size: 0.9rem;
+`;
+
+const InvitationActions = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
 `;
 
 interface MemberData {
@@ -419,16 +428,6 @@ export default function BuilderPage() {
         </ActionCard>
 
         <ActionCard>
-          <CardTitle>Invite Other Builders</CardTitle>
-          <CardDescription>
-            Know other amazing builders who should be part of our community? Send them personalized invitations.
-          </CardDescription>
-          <Button href={`/builder/${key}/invite`}>
-            Send Invitations
-          </Button>
-        </ActionCard>
-
-        <ActionCard>
           <CardTitle>Community</CardTitle>
           <CardDescription>
             Explore the builder community and discover new opportunities.
@@ -441,8 +440,14 @@ export default function BuilderPage() {
           </SecondaryButton>
         </ActionCard>
 
-        <TrackingSection>
-          <SectionTitle>Your Invitations</SectionTitle>
+        <ActionCard>
+          <CardTitle>Invitations</CardTitle>
+          <CardDescription>
+            Manage your invitations and send new ones to other builders.
+          </CardDescription>
+          <Button href={`/builder/${key}/invite`}>
+            Send New Invitation
+          </Button>
           {invitations.length > 0 ? (
             <ItemList>
               {invitations.map((invitation) => (
@@ -466,13 +471,14 @@ export default function BuilderPage() {
                 </ItemCard>
               ))}
             </ItemList>
-          ) : (
-            <EmptyState>No invitations sent yet</EmptyState>
-          )}
-        </TrackingSection>
+          ) : null}
+        </ActionCard>
 
-        <TrackingSection>
-          <SectionTitle>Your Projects</SectionTitle>
+        <ActionCard>
+          <CardTitle>Your Projects</CardTitle>
+          <CardDescription>
+            Manage your projects and track their status.
+          </CardDescription>
           {projects.length > 0 ? (
             <ItemList>
               {projects.map((project) => (
@@ -502,12 +508,12 @@ export default function BuilderPage() {
           ) : (
             <EmptyState>No projects yet</EmptyState>
           )}
-          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          <div style={{ marginTop: '1rem' }}>
             <Button href={`/builder/${key}/submit-project`}>
               Submit New Project
             </Button>
           </div>
-        </TrackingSection>
+        </ActionCard>
 
       </Container>
     </ThemeProvider>
