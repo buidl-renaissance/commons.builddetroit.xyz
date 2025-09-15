@@ -8,6 +8,7 @@ export const theme = {
     neonYellow: "#FFD700", // Neon Yellow (Detroit Techno)
     brickRed: "#B33A3A", // Brick Red
     creamyBeige: "#F5E9DA", // Creamy Beige
+    successGreen: "#22C55E", // Success Green
   },
   fonts: {
     heading: '"Bebas Neue", "Anton", Arial, sans-serif', // Bold, industrial

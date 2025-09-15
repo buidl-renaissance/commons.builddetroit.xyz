@@ -59,14 +59,14 @@ const FormSubtitle = styled.p`
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.rustedSteel};
   font-size: 1rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   line-height: 1.6;
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 `;
 
 const FormSection = styled.div`
@@ -79,7 +79,7 @@ const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
   color: ${({ theme }) => theme.colors.neonOrange};
   font-size: 1.2rem;
-  margin-bottom: 0.5rem;
+  margin-top: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
 `;
@@ -161,7 +161,6 @@ const Button = styled.button<{ primary?: boolean; disabled?: boolean }>`
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 1rem;
   width: 100%;
 
   &:hover:not(:disabled) {
@@ -188,16 +187,20 @@ const Message = styled.div<{ success?: boolean }>`
   font-family: ${({ theme }) => theme.fonts.body};
   font-size: 0.9rem;
   text-align: center;
-  margin-bottom: 1rem;
-  background-color: ${({ success, theme }) => 
-    success 
-      ? `${theme.colors.neonYellow}20` 
+  background-color: ${({ success, theme }) =>
+    success
+      ? `${theme.colors.successGreen}20`
       : `${theme.colors.brickRed}20`
   };
-  color: ${({ success, theme }) => 
-    success 
-      ? theme.colors.asphaltBlack 
+  color: ${({ success, theme }) =>
+    success
+      ? theme.colors.successGreen
       : theme.colors.brickRed
+  };
+  border: ${({ success, theme }) =>
+    success
+      ? `1px solid ${theme.colors.successGreen}40`
+      : `1px solid ${theme.colors.brickRed}40`
   };
 `;
 
@@ -248,7 +251,7 @@ interface BuilderData {
 export default function ModifyBuilderPage() {
   const router = useRouter();
   const { key } = router.query;
-  
+
   const [builderData, setBuilderData] = useState<BuilderData | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -338,11 +341,11 @@ export default function ModifyBuilderPage() {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.message) {
         setSuccess(true);
         setBuilderData(prev => prev ? { ...prev, ...formData, profilePicture: profilePictureUrl } : null);
       } else {
-        setError(data.message || 'Failed to update profile');
+        setError(data.error || 'Failed to update profile');
       }
     } catch (err: unknown) {
       console.error('Failed to update profile:', err);
@@ -381,7 +384,11 @@ export default function ModifyBuilderPage() {
         <title>Modify Profile - Detroit Commons</title>
         <meta name="description" content="Modify your builder profile" />
       </Head>
+
       <Container>
+        <BackLink href={`/builder/${key}`}>
+          ← Back to Builder Dashboard
+        </BackLink>
         <Header>
           <Title>Modify Profile</Title>
           <Subtitle>
@@ -395,13 +402,8 @@ export default function ModifyBuilderPage() {
             Keep your information current so other builders can connect with you.
           </FormSubtitle>
 
-          <BackLink href={`/builder/${key}`}>
-            ← Back to Builder Dashboard
-          </BackLink>
-
           <Form onSubmit={handleSubmit}>
             <FormSection>
-              <SectionTitle>Profile Picture</SectionTitle>
               <ProfileImageUpload
                 value={profilePictureUrl}
                 onChange={handleProfileImageChange}
@@ -412,7 +414,7 @@ export default function ModifyBuilderPage() {
 
             <FormSection>
               <SectionTitle>Basic Information</SectionTitle>
-              
+
               <div>
                 <Label htmlFor="name">Name *</Label>
                 <Input
@@ -453,7 +455,7 @@ export default function ModifyBuilderPage() {
 
             <FormSection>
               <SectionTitle>Links & Social Media</SectionTitle>
-              
+
               <div>
                 <Label htmlFor="website">Website</Label>
                 <Input

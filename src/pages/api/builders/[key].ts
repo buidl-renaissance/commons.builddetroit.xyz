@@ -68,36 +68,44 @@ export default async function handler(
         other_links,
       } = req.body;
 
-      // Validate required fields
-      if (!name || !email) {
+      // Validate required fields - only name is required for modification
+      if (!name) {
         return res.status(400).json({
-          error: 'Missing required fields: name and email are required',
+          error: 'Missing required field: name is required',
         });
       }
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({
-          error: 'Invalid email format',
-        });
+      // If email is provided, validate it, otherwise keep existing email
+      if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({
+            error: 'Invalid email format',
+          });
+        }
       }
 
       // Update builder in database
+      const updateData: Partial<typeof members.$inferInsert> = {
+        name: name.trim(),
+        bio: bio?.trim() || null,
+        profilePicture: profilePicture?.trim() || null,
+        website: website?.trim() || null,
+        linkedin: linkedin?.trim() || null,
+        github: github?.trim() || null,
+        twitter: twitter?.trim() || null,
+        instagram: instagram?.trim() || null,
+        other_links: other_links && other_links.length > 0 ? JSON.stringify(other_links.filter((link: string) => link.trim())) : null,
+      };
+
+      // Only update email if provided
+      if (email) {
+        updateData.email = email.trim().toLowerCase();
+      }
+
       const result = await db
         .update(members)
-        .set({
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          bio: bio?.trim() || null,
-          profilePicture: profilePicture?.trim() || null,
-          website: website?.trim() || null,
-          linkedin: linkedin?.trim() || null,
-          github: github?.trim() || null,
-          twitter: twitter?.trim() || null,
-          instagram: instagram?.trim() || null,
-          other_links: other_links && other_links.length > 0 ? JSON.stringify(other_links.filter((link: string) => link.trim())) : null,
-        })
+        .set(updateData)
         .where(eq(members.modificationKey, key))
         .returning();
 

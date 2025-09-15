@@ -167,12 +167,12 @@ const Message = styled.div<{ success?: boolean }>`
   margin-bottom: 1rem;
   background-color: ${({ success, theme }) => 
     success 
-      ? `${theme.colors.neonYellow}20` 
+      ? `${theme.colors.successGreen}20` 
       : `${theme.colors.brickRed}20`
   };
   color: ${({ success, theme }) => 
     success 
-      ? theme.colors.asphaltBlack 
+      ? theme.colors.successGreen 
       : theme.colors.brickRed
   };
 `;
@@ -326,7 +326,7 @@ export default function AcceptInvitationPage() {
       } else {
         setError(data.message || 'Failed to accept invitation');
       }
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
