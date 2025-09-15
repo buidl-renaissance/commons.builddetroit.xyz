@@ -343,7 +343,7 @@ export default function AcceptInvitationPage() {
           <FormContainer>
             <Title>Welcome to Detroit Builders! 🎉</Title>
             <Subtitle>
-              You've successfully joined our builder community. You'll be redirected to your builder dashboard in a few seconds.
+              You&apos;ve successfully joined our builder community. You&apos;ll be redirected to your builder dashboard in a few seconds.
             </Subtitle>
             <Button onClick={() => router.push('/builders')}>
               Continue to Builders
@@ -381,7 +381,7 @@ export default function AcceptInvitationPage() {
         <FormContainer>
           <Title>Accept Invitation</Title>
           <Subtitle>
-            You've been invited to join Detroit's builder community! Complete your profile below to get started.
+            You&apos;ve been invited to join Detroit&apos;s builder community! Complete your profile below to get started.
           </Subtitle>
 
 
