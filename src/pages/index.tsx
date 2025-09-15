@@ -673,6 +673,21 @@ export default function Home() {
           </VisionCard>
         </ContentSection>
 
+        <ContentSection>
+          <CTATitle>Explore the Commons</CTATitle>
+          <CTAGrid style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+            <CTAButton href="/builders" role="button">
+              Meet the Builders
+            </CTAButton>
+            <CTAButton href="/projects" role="button">
+              Active Projects
+            </CTAButton>
+            <CTAButton href="/open-october" role="button">
+              Open October
+            </CTAButton>
+          </CTAGrid>
+        </ContentSection>
+
         <Footer>
           <Tagline>&ldquo;The commons belongs to us all.&rdquo;</Tagline>
           <p style={{color: '#708090', fontSize: '0.9rem'}}>

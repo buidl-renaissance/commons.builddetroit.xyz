@@ -256,7 +256,8 @@ export default function AcceptInvitationPage() {
       } else {
         setError('Invalid or expired invitation. Please check the link and try again.');
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      console.error('Failed to load invitation:', err);
       setError('Failed to load invitation. Please try again.');
     }
   }, []);

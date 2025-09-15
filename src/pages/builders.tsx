@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -31,6 +32,38 @@ const Subtitle = styled.p`
   line-height: 1.6;
   max-width: 600px;
   margin: 0 auto;
+`;
+
+const Navigation = styled.div`
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+
+const NavLink = styled(Link)`
+  display: inline-block;
+  background-color: white;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  border: 2px solid ${({ theme }) => theme.colors.rustedSteel}30;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.neonOrange};
+    color: ${({ theme }) => theme.colors.creamyBeige};
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    transform: translateY(-2px);
+  }
 `;
 
 const BuildersGrid = styled.div`
@@ -333,6 +366,11 @@ export default function Builders() {
             These are the people shaping our local ecosystem with global impact.
           </Subtitle>
         </Header>
+
+        <Navigation>
+          <NavLink href="/projects">View Active Projects</NavLink>
+          <NavLink href="/open-october">Open October</NavLink>
+        </Navigation>
 
         {builders.length === 0 ? (
           <EmptyState>

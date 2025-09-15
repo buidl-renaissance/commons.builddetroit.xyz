@@ -154,24 +154,6 @@ const Message = styled.div<{ success?: boolean }>`
   };
 `;
 
-const TrackingSection = styled.div`
-  max-width: 600px;
-  margin: 0 auto 1.5rem;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(34, 35, 36, 0.1);
-  padding: 1.5rem;
-`;
-
-const SectionTitle = styled.h2`
-  font-family: ${({ theme }) => theme.fonts.heading};
-  color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-`;
-
 const ItemList = styled.div`
   display: flex;
   flex-direction: column;
@@ -250,13 +232,6 @@ const EmptyState = styled.div`
   font-family: ${({ theme }) => theme.fonts.body};
   font-style: italic;
   font-size: 0.9rem;
-`;
-
-const InvitationActions = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
 `;
 
 interface MemberData {

@@ -296,7 +296,8 @@ export default function ModifyBuilderPage() {
       } else {
         setError('Invalid modification key. Please check the URL and try again.');
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      console.error('Failed to load builder data:', err);
       setError('Failed to load builder data. Please try again.');
     }
   };
@@ -343,7 +344,8 @@ export default function ModifyBuilderPage() {
       } else {
         setError(data.message || 'Failed to update profile');
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      console.error('Failed to update profile:', err);
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
