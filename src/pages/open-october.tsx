@@ -735,7 +735,7 @@ export default function OpenOctober() {
         />
         <meta
           property="og:image"
-          content="https://thebarefoot.dev/images/open-october-featured.jpg"
+          content="https://commons.builddetroit.xyz/images/open-october-featured.jpg"
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -756,7 +756,7 @@ export default function OpenOctober() {
         />
         <meta
           name="twitter:image"
-          content="https://thebarefoot.dev/images/open-october-featured.jpg"
+          content="https://commons.builddetroit.xyz/images/open-october-featured.jpg"
         />
         <meta
           name="twitter:image:alt"
