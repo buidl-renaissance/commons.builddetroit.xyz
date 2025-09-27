@@ -398,7 +398,7 @@ const HeroDatesContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin: 1rem 0 3rem 0;
+  margin: 1rem 0 1.5rem 0;
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
@@ -420,10 +420,10 @@ const HeroDateItem = styled.div<{ theme: ThemeType }>`
 `;
 
 const HeroDateNumber = styled.div`
-  font-size: 1.4rem;
+  font-size: 2rem;
   font-weight: bold;
   color: ${openOctoberColors.goldenrod};
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.5rem;
 
   @media (max-width: 768px) {
     font-size: 1.2rem;
