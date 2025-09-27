@@ -612,6 +612,10 @@ const HeroSubHeadlineStyled = styled(SubHeadline)`
   margin-bottom: 2rem;
   font-weight: 500;
   font-size: 1.2rem;
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+    margin-top: 2rem;
+  }
 `;
 
 
@@ -777,27 +781,27 @@ export default function OpenOctober() {
 
           <HeroDatesContainer>
             <HeroDateItem>
-              <HeroDateNumber>Oct 1st</HeroDateNumber>
+              <HeroDateNumber>1st</HeroDateNumber>
               <HeroDateLabel>KICKOFF</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 7th</HeroDateNumber>
+              <HeroDateNumber>7th</HeroDateNumber>
               <HeroDateLabel>BUILD #1</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 14th</HeroDateNumber>
+              <HeroDateNumber>14th</HeroDateNumber>
               <HeroDateLabel>BUILD #2</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 21st</HeroDateNumber>
+              <HeroDateNumber>21st</HeroDateNumber>
               <HeroDateLabel>BUILD #3</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 28th</HeroDateNumber>
+              <HeroDateNumber>28th</HeroDateNumber>
               <HeroDateLabel>BUILD #4</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 30th</HeroDateNumber>
+              <HeroDateNumber>30th</HeroDateNumber>
               <HeroDateLabel>MERGE PARTY</HeroDateLabel>
             </HeroDateItem>
           </HeroDatesContainer>
