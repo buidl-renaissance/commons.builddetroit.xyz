@@ -42,7 +42,7 @@ export default async function handler(
       }
 
       // Prepare update data
-      const updateData: any = {
+      const updateData: Partial<typeof projects.$inferInsert> = {
         updatedAt: new Date().toISOString(),
       };
 
