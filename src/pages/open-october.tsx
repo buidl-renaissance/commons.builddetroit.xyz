@@ -944,17 +944,54 @@ export default function OpenOctober() {
         </Container>
       </Section>
 
-      {/* Project Guidelines & Collaboration */}
+      {/* How We Build Together */}
       <Section>
         <Container>
           <SectionTitle>How We Build Together</SectionTitle>
           <SectionDescription>
-            Clear expectations, collaborative principles, and shared outcomes that make Open October successful.
+            No expectations, but clear direction. We&apos;re not here to force outcomes—we&apos;re here to create space for meaningful collaboration.
           </SectionDescription>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
             <Card>
-              <CardTitle>🔍 Project Criteria</CardTitle>
+              <CardTitle>🌟 The North Star</CardTitle>
+              <CardDescription>
+                <strong>Breaking down silos</strong> across disciplines
+                <br /><br />
+                <strong>Building in the open</strong> where knowledge and tools are shared
+                <br /><br />
+                <strong>Creating a digital commons for Detroit</strong> — a working space that archives, shares, and expands on the technology and learnings we produce
+                <br /><br />
+                <strong>Strengthening relationships</strong> by working side by side as one cross-functional team
+              </CardDescription>
+            </Card>
+
+            <Card>
+              <CardTitle>🎯 The Spirit</CardTitle>
+              <CardDescription>
+                <strong>Take it seriously, but don&apos;t take yourself too seriously</strong> — We&apos;re building for ArtNight, but this is also a chance to experiment and have fun
+                <br /><br />
+                <strong>Collaborative sandbox</strong> — The more open you are with your ideas, the more others can build on them
+                <br /><br />
+                <strong>Learning to work together differently</strong> — We&apos;re not just coding, designing, or organizing
+              </CardDescription>
+            </Card>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+            <Card>
+              <CardTitle>🏗️ What We&apos;re Building</CardTitle>
+              <CardDescription>
+                <strong>Open technology stacks</strong> that anyone can adopt
+                <br /><br />
+                <strong>A network of creators, builders, and organizers</strong> with shared resources
+                <br /><br />
+                <strong>A foundation for building businesses and creative projects together</strong>, rooted in collaboration and transparency
+              </CardDescription>
+            </Card>
+
+            <Card>
+              <CardTitle>💡 Project Approach</CardTitle>
               <CardDescription>
                 <strong>Contribute to Detroit Open Commons</strong> — Open source, open data, permissionless
                 <br /><br />
@@ -965,51 +1002,10 @@ export default function OpenOctober() {
                 <strong>Interactive outputs</strong> — Others can engage with code, data, designs, documentation
               </CardDescription>
             </Card>
-
-            <Card>
-              <CardTitle>👥 Participation Expectations</CardTitle>
-              <CardDescription>
-                <strong>Attend key events</strong> — Kickoff Day, Merge Party, and at least one Open Build Day
-                <br /><br />
-                <strong>Communicate openly</strong> — Life happens, but ghosting is not community
-                <br /><br />
-                <strong>Respect time & contributions</strong> — Honor each other&apos;s pace of learning
-                <br /><br />
-                <strong>Commitment to Commons</strong> — Participation is a commitment to shared success
-              </CardDescription>
-            </Card>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
-            <Card>
-              <CardTitle>📜 Code of Collaboration</CardTitle>
-              <CardDescription>
-                <strong>Openness</strong> — Projects contribute back to the Commons
-                <br /><br />
-                <strong>Respect</strong> — Honor time, contributions, and shared goals
-                <br /><br />
-                <strong>Permissionlessness</strong> — Anyone can fork, remix, or extend projects
-                <br /><br />
-                <strong>Accountability</strong> — Non-communication affects future invitations until trust is re-earned
-              </CardDescription>
-            </Card>
-
-            <Card>
-              <CardTitle>📦 Expected Outcomes</CardTitle>
-              <CardDescription>
-                <strong>5 new Commons projects</strong> — Initiated and documented for ongoing development
-                <br /><br />
-                <strong>Reusable playbook</strong> — Framework for future Open Commons build cycles
-                <br /><br />
-                <strong>Sustained momentum</strong> — Ongoing collaboration in Detroit&apos;s open ecosystem
-                <br /><br />
-                <strong>Community growth</strong> — Stronger connections between creators and builders
-              </CardDescription>
-            </Card>
           </div>
 
           <AboutQuote style={{ marginTop: "3rem" }}>
-            &quot;Participation is a commitment to the Commons.&quot;
+            &quot;Technology is becoming increasingly cheap. What matters most—and will only grow in value—are relationships.&quot;
           </AboutQuote>
         </Container>
       </Section>
