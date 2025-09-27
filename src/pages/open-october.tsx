@@ -394,6 +394,52 @@ const ScheduleDescription = styled.p<{ theme: ThemeType }>`
   opacity: 0.9;
 `;
 
+const HeroDatesContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1rem 0 3rem 0;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+    margin: 1rem 0 1rem 0;
+  }
+`;
+
+const HeroDateItem = styled.div<{ theme: ThemeType }>`
+  text-align: center;
+  font-family: ${({ theme }) => theme.fonts.mono};
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  font-size: 0.9rem;
+  opacity: 0.9;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const HeroDateNumber = styled.div`
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: ${openOctoberColors.goldenrod};
+  margin-bottom: 0.2rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+`;
+
+const HeroDateLabel = styled.div`
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+  }
+`;
+
 
 const TreasuryWidget = styled.div<{ theme: ThemeType }>`
   background: linear-gradient(
@@ -685,7 +731,7 @@ export default function OpenOctober() {
         />
         <meta
           property="og:image"
-          content="https://thebarefoot.dev/images/open-october-featured.png"
+          content="https://thebarefoot.dev/images/open-october-featured.jpg"
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -706,7 +752,7 @@ export default function OpenOctober() {
         />
         <meta
           name="twitter:image"
-          content="https://thebarefoot.dev/images/open-october-featured.png"
+          content="https://thebarefoot.dev/images/open-october-featured.jpg"
         />
         <meta
           name="twitter:image:alt"
@@ -729,24 +775,32 @@ export default function OpenOctober() {
 
           <SubHeadline>Connect • Build • Merge</SubHeadline>
 
-          {/* <HeroDatesContainer>
+          <HeroDatesContainer>
             <HeroDateItem>
-              <HeroDateNumber>Oct 7</HeroDateNumber>
-              <HeroDateLabel>Kickoff</HeroDateLabel>
+              <HeroDateNumber>Oct 1st</HeroDateNumber>
+              <HeroDateLabel>KICKOFF</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 14</HeroDateNumber>
-              <HeroDateLabel>Build #1</HeroDateLabel>
+              <HeroDateNumber>Oct 7th</HeroDateNumber>
+              <HeroDateLabel>BUILD #1</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 21</HeroDateNumber>
-              <HeroDateLabel>Build #2</HeroDateLabel>
+              <HeroDateNumber>Oct 14th</HeroDateNumber>
+              <HeroDateLabel>BUILD #2</HeroDateLabel>
             </HeroDateItem>
             <HeroDateItem>
-              <HeroDateNumber>Oct 28</HeroDateNumber>
-              <HeroDateLabel>Merge Party</HeroDateLabel>
+              <HeroDateNumber>Oct 21st</HeroDateNumber>
+              <HeroDateLabel>BUILD #3</HeroDateLabel>
             </HeroDateItem>
-          </HeroDatesContainer> */}
+            <HeroDateItem>
+              <HeroDateNumber>Oct 28th</HeroDateNumber>
+              <HeroDateLabel>BUILD #4</HeroDateLabel>
+            </HeroDateItem>
+            <HeroDateItem>
+              <HeroDateNumber>Oct 30th</HeroDateNumber>
+              <HeroDateLabel>MERGE PARTY</HeroDateLabel>
+            </HeroDateItem>
+          </HeroDatesContainer>
 
           <HeroSubHeadlineStyled>
             Building the open commons of Detroit together.
