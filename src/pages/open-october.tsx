@@ -846,23 +846,7 @@ export default function OpenOctober() {
 
           <ScheduleContainer>
             <ScheduleItem>
-              <ScheduleDate>October 1st • Submission Deadline</ScheduleDate>
-              <ScheduleTitle>
-                <GitIcon>init</GitIcon> Project Proposals Due
-              </ScheduleTitle>
-              <ScheduleDescription>
-                • <strong>Submit your project proposals</strong> using our <Link href="/submit-project" passHref legacyBehavior><a style={{color: openOctoberColors.goldenrod, textDecoration: 'underline'}}>submission form</a></Link>
-                <br />
-                • Include project name, description, and 4-week scope
-                <br />
-                • Define how others can contribute
-                <br />
-                • <strong>5 projects will be selected</strong> for Open October
-              </ScheduleDescription>
-            </ScheduleItem>
-
-            <ScheduleItem>
-              <ScheduleDate>October 2nd • Kickoff Day</ScheduleDate>
+              <ScheduleDate>October 1st • Kickoff Day</ScheduleDate>
               <ScheduleTitle>
                 <GitIcon>add</GitIcon> Projects Introduced & Teams Formed
               </ScheduleTitle>
