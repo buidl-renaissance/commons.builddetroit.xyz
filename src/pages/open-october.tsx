@@ -81,10 +81,6 @@ const HeroTreeImage = styled(Image)`
   }
 `;
 
-
-
-
-
 const MainHeadline = styled.h1<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.mono};
   font-size: clamp(3rem, 6vw, 4rem);
@@ -359,7 +355,7 @@ const ScheduleItem = styled.div<{ theme: ThemeType }>`
   background: rgba(255, 255, 255, 0.1);
   border-left: 4px solid ${openOctoberColors.burnOrange};
   border-radius: 0 8px 8px 0;
-  padding: 1.5rem;
+  padding: 1rem;
   margin-bottom: 1.5rem;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
