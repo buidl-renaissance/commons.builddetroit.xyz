@@ -76,8 +76,8 @@ const HeroTreeContainer = styled.div`
 const HeroTreeImage = styled(Image)`
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
   @media (max-width: 768px) {
-    width: 256px;
-    height: 256px;
+    width: 128px;
+    height: 128px;
   }
 `;
 
