@@ -611,7 +611,7 @@ const ContactEmail = styled.a`
 const HeroSubHeadlineStyled = styled(SubHeadline)`
   margin-bottom: 2rem;
   font-weight: 500;
-  font-size: 1.2rem;
+  font-size: 1.8rem;
   @media (max-width: 768px) {
     font-size: 1.4rem;
     margin-top: 2rem;
