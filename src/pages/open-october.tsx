@@ -70,7 +70,7 @@ const HeroContent = styled.div`
 
 const HeroTreeContainer = styled.div`
   text-align: center;
-  margin-top: 1rem;
+  margin-bottom: 1rem;
 `;
 
 const HeroTreeImage = styled(Image)`
@@ -89,7 +89,7 @@ const MainHeadline = styled.h1<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.mono};
   font-size: clamp(3rem, 6vw, 4rem);
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
   letter-spacing: 3px;
   line-height: 1.1;
   background: linear-gradient(
@@ -111,7 +111,7 @@ const MainHeadline = styled.h1<{ theme: ThemeType }>`
 const SubHeadline = styled.h2<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.body};
   font-size: clamp(1.1rem, 3vw, 1.6rem);
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
   line-height: 1.6;
   opacity: 0.9;
   max-width: 700px;
@@ -767,15 +767,16 @@ export default function OpenOctober() {
       {/* Hero Section */}
       <HeroSection>
         <HeroContent>
-          <MainHeadline>Open October</MainHeadline>
           <HeroTreeContainer>
             <HeroTreeImage
               src="/images/open-october-tree.png"
               alt="Open October Tree - Git branching graph merging into a data tree"
-              width={300}
-              height={300}
+              width={150}
+              height={150}
             />
           </HeroTreeContainer>
+          
+          <MainHeadline>Open October</MainHeadline>
 
           <SubHeadline>Connect • Build • Merge</SubHeadline>
 
