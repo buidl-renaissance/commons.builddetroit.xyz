@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import type { ThemeType } from "@/styles/theme";
 import FooterComponent from "@/components/Footer";
+import TreasuryBalance from "@/components/TreasuryBalance";
 
 // October-themed color extensions with civic colors
 const openOctoberColors = {
@@ -437,49 +438,6 @@ const HeroDateLabel = styled.div`
 `;
 
 
-const TreasuryWidget = styled.div<{ theme: ThemeType }>`
-  background: linear-gradient(
-    135deg,
-    ${({ theme }) => theme.colors.asphaltBlack},
-    #1a1a1a
-  );
-  border: 2px solid ${openOctoberColors.githubGreen};
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  margin: 2rem 0;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(
-      90deg,
-      ${openOctoberColors.githubGreen},
-      ${openOctoberColors.goldenrod},
-      ${openOctoberColors.githubGreen}
-    );
-  }
-`;
-
-const TreasuryAmount = styled.div<{ theme: ThemeType }>`
-  font-family: ${({ theme }) => theme.fonts.mono};
-  font-size: 2rem;
-  color: ${openOctoberColors.githubGreen};
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-`;
-
-const TreasuryLabel = styled.div<{ theme: ThemeType }>`
-  font-family: ${({ theme }) => theme.fonts.body};
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.8;
-`;
 
 const PizzaIcon = styled.span`
   font-size: 1.2rem;
@@ -634,14 +592,6 @@ const SponsorshipCTAContainer = styled.div`
   margin-top: 3rem;
 `;
 
-const CommunityLink = styled.a`
-  color: ${openOctoberColors.githubGreen};
-  text-decoration: none;
-  font-size: 0.9rem;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 export default function OpenOctober() {
   const [formData, setFormData] = useState({
@@ -1199,19 +1149,10 @@ export default function OpenOctober() {
           </SponsorshipCTAContainer>
 
           {/* Treasury Transparency */}
-          <TreasuryWidget>
-            <TreasuryAmount>$0 USDC</TreasuryAmount>
-            <TreasuryLabel>Transparent Treasury Balance</TreasuryLabel>
-            <div style={{ marginTop: "1rem" }}>
-              <Link
-                href="https://etherscan.io/address/0x..."
-                passHref
-                legacyBehavior
-              >
-                <CommunityLink>View on Etherscan →</CommunityLink>
-              </Link>
-            </div>
-          </TreasuryWidget>
+          <TreasuryBalance 
+            address="0x84Da1546238937296355A0F3217Ee4163E2ECC42"
+            chainId={8453}
+          />
         </Container>
       </Section>
 
