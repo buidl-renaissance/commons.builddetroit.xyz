@@ -102,69 +102,24 @@ export default function TreasuryBalance({ address, chainId = 8453 }: TreasuryBal
           throw new Error(data.error.message);
         }
 
-        // Calculate total USD value from token balances
-        let totalUsdValue = 0;
+        // Look specifically for USDC balance
+        let usdcBalance = 0;
         
         if (data.result && data.result.tokenBalances) {
-          // Get token prices from CoinGecko
-          const tokenAddresses = data.result.tokenBalances
-            .filter((token: { tokenBalance: string }) => token.tokenBalance !== '0x0000000000000000000000000000000000000000000000000000000000000000')
-            .map((token: { contractAddress: string }) => token.contractAddress);
+          // USDC contract address on Base: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+          const usdcContractAddress = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
           
-          if (tokenAddresses.length > 0) {
-            // Get token prices (simplified - in production you'd want to map contract addresses to CoinGecko IDs)
-            const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,ethereum&vs_currencies=usd');
-            const priceData = await priceResponse.json();
-            
-            for (const token of data.result.tokenBalances as Array<{ tokenBalance: string; contractAddress: string }>) {
-              if (token.tokenBalance !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-                // Convert hex balance to decimal
-                const balance = parseInt(token.tokenBalance, 16);
-                const decimals = 18; // Most tokens use 18 decimals
-                const tokenAmount = balance / Math.pow(10, decimals);
-                
-                // For now, assume USDC (0xA0b86a33E6441b8c4C8C0C4C0C4C0C4C0C4C0C4C) or ETH
-                let price = 0;
-                if (token.contractAddress.toLowerCase() === '0xa0b86a33e6441b8c4c8c0c4c0c4c0c4c0c4c0c4c') {
-                  price = priceData['usd-coin']?.usd || 1;
-                } else {
-                  price = priceData.ethereum?.usd || 0;
-                }
-                
-                totalUsdValue += tokenAmount * price;
-              }
+          for (const token of data.result.tokenBalances as Array<{ tokenBalance: string; contractAddress: string }>) {
+            if (token.contractAddress.toLowerCase() === usdcContractAddress.toLowerCase()) {
+              // Convert hex balance to decimal (USDC has 6 decimals)
+              const balance = parseInt(token.tokenBalance, 16);
+              usdcBalance = balance / Math.pow(10, 6); // USDC has 6 decimals
+              break;
             }
           }
         }
         
-        // If no token balances, get ETH balance
-        if (totalUsdValue === 0) {
-          const ethResponse = await fetch(alchemyUrl, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              id: 1,
-              jsonrpc: "2.0",
-              method: "eth_getBalance",
-              params: [address, "latest"]
-            }),
-          });
-          
-          const ethData = await ethResponse.json();
-          if (ethData.result) {
-            const weiBalance = parseInt(ethData.result, 16);
-            const ethBalance = weiBalance / Math.pow(10, 18);
-            const ethPriceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-            const ethPriceData = await ethPriceResponse.json();
-            const ethPrice = ethPriceData.ethereum?.usd || 0;
-            totalUsdValue = ethBalance * ethPrice;
-          }
-        }
-        
-        setBalance(`$${totalUsdValue.toFixed(2)} USD`);
+        setBalance(`$${usdcBalance.toFixed(2)} USDC`);
       } catch (err) {
         console.error('Error fetching balance:', err);
         setError('Unable to fetch balance');
