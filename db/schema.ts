@@ -96,3 +96,34 @@ export const builderInvitations = sqliteTable("builder_invitations", {
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
+
+// Expenses for tracking receipts
+export const expenses = sqliteTable("expenses", {
+  id: integer("id").primaryKey(),
+  title: text("title").notNull(),
+  merchant: text("merchant"),
+  category: text("category"),
+  amountCents: integer("amount_cents"),
+  currency: text("currency").default("USD"),
+  expenseDate: text("expense_date"),
+  notes: text("notes"),
+  receiptUrl: text("receipt_url"),
+  metadata: text("metadata"), // JSON string for raw model output
+  payoutStatus: text("payout_status").default("pending"), // pending, processing, completed, failed
+  payoutTxHash: text("payout_tx_hash"), // Transaction hash when payout is sent
+  payoutAmountCents: integer("payout_amount_cents"), // Amount sent in payout
+  payoutDate: text("payout_date"), // When payout was processed
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Additional images for expenses (proof of items obtained/used)
+export const expenseImages = sqliteTable("expense_images", {
+  id: integer("id").primaryKey(),
+  expenseId: integer("expense_id").notNull().references(() => expenses.id, { onDelete: "cascade" }),
+  imageUrl: text("image_url").notNull(),
+  description: text("description"), // Optional description of what the image shows
+  imageType: text("image_type").default("proof"), // proof, receipt, documentation, etc.
+  uploadedBy: text("uploaded_by"), // Email or identifier of who uploaded the image
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
