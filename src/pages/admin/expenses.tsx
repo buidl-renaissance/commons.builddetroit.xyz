@@ -423,7 +423,7 @@ export default function AdminExpenses() {
   const [success, setSuccess] = useState<string | null>(null);
   const [processingPayouts, setProcessingPayouts] = useState<Set<number>>(new Set());
   const [uploadingImages, setUploadingImages] = useState<Set<number>>(new Set());
-  const [editingImage, setEditingImage] = useState<number | null>(null);
+  // const [editingImage, setEditingImage] = useState<number | null>(null);
 
   useEffect(() => {
     fetchExpenses();
@@ -438,7 +438,7 @@ export default function AdminExpenses() {
       } else {
         setError('Failed to fetch expenses');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch expenses');
     }
   };
@@ -488,7 +488,7 @@ export default function AdminExpenses() {
       } else {
         setError(data.error || 'Failed to upload receipt');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to upload receipt');
     } finally {
       setIsUploading(false);
@@ -548,8 +548,8 @@ export default function AdminExpenses() {
       } else {
         setError(result.error || 'Failed to send payout');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send payout');
+    } catch {
+      setError('Failed to send payout');
     } finally {
       setProcessingPayouts(prev => {
         const newSet = new Set(prev);
@@ -595,7 +595,7 @@ export default function AdminExpenses() {
       } else {
         setError(data.error || 'Failed to upload image');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to upload image');
     } finally {
       setUploadingImages(prev => {
@@ -620,7 +620,7 @@ export default function AdminExpenses() {
       } else {
         setError(data.error || 'Failed to delete image');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to delete image');
     }
   };
@@ -736,7 +736,7 @@ export default function AdminExpenses() {
           fontSize: '0.9rem',
           color: '#007bff'
         }}>
-          💡 <strong>MetaMask Required:</strong> To send payouts, you'll need MetaMask installed and connected to the Base network. 
+          💡 <strong>MetaMask Required:</strong> To send payouts, you&apos;ll need MetaMask installed and connected to the Base network. 
           Make sure you have USDC in your wallet for the transaction amount.
         </div>
         {expenses.length === 0 ? (
