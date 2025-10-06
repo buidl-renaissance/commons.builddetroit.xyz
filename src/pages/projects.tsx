@@ -38,11 +38,11 @@ const ProjectsGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: 1fr;
   }
 `;
 
@@ -50,65 +50,20 @@ const ProjectCard = styled.div`
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(34, 35, 36, 0.1);
-  padding: 0;
+  padding: 2rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
-  display: flex;
-  flex-direction: row;
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 48px rgba(34, 35, 36, 0.15);
   }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
 `;
 
 const ProjectCardContent = styled.div`
-  padding: 2rem;
-  flex: 1;
-  min-width: 0; /* Prevents flex item from overflowing */
-`;
-
-const ProjectIframeContainer = styled.div`
-  width: 60%;
-  height: 700px;
-  border-left: 2px solid ${({ theme }) => theme.colors.rustedSteel}20;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    height: 600px;
-    border-left: none;
-    border-bottom: 2px solid ${({ theme }) => theme.colors.rustedSteel}20;
-  }
-
-  @media (max-width: 480px) {
-    height: 600px;
-  }
-`;
-
-const ProjectIframe = styled.iframe`
   width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
 `;
 
-const IframeOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: transparent;
-  z-index: 1;
-  pointer-events: none;
-`;
 
 const ProjectHeader = styled.div`
   margin-bottom: 1.5rem;
@@ -140,9 +95,10 @@ const ProjectEmail = styled.p`
 const ProjectDescription = styled.p`
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-size: 1rem;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  font-weight: 400;
 `;
 
 const ProjectLinks = styled.div`
@@ -305,19 +261,19 @@ export default function ProjectsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchActiveProjects();
+    fetchProjects();
   }, []);
 
-  const fetchActiveProjects = async () => {
+  const fetchProjects = async () => {
     try {
       const response = await fetch('/api/projects');
       if (response.ok) {
         const data = await response.json();
-        // Filter for active projects only
-        const activeProjects = data.projects.filter((project: Project) => 
-          project.status === 'active'
+        // Filter for approved and active projects
+        const visibleProjects = data.projects.filter((project: Project) => 
+          project.status === 'approved' || project.status === 'active'
         );
-        setProjects(activeProjects);
+        setProjects(visibleProjects);
       } else {
         setError('Failed to load projects');
       }
@@ -333,16 +289,16 @@ export default function ProjectsPage() {
     return (
       <ThemeProvider theme={theme}>
         <Head>
-          <title>Active Projects - Detroit Commons</title>
+          <title>Projects - Detroit Commons</title>
         </Head>
         <Container>
           <Header>
-            <Title>Active Projects</Title>
+            <Title>Projects</Title>
             <Subtitle>
-              Discover the innovative projects currently being built by the Detroit Commons community.
+              Discover the innovative projects from the Detroit Commons community.
             </Subtitle>
           </Header>
-          <LoadingState>Loading active projects...</LoadingState>
+          <LoadingState>Loading projects...</LoadingState>
         </Container>
       </ThemeProvider>
     );
@@ -356,7 +312,7 @@ export default function ProjectsPage() {
         </Head>
         <Container>
           <Header>
-            <Title>Active Projects</Title>
+            <Title>Projects</Title>
           </Header>
           <ErrorState>{error}</ErrorState>
         </Container>
@@ -367,14 +323,14 @@ export default function ProjectsPage() {
   return (
     <ThemeProvider theme={theme}>
       <Head>
-        <title>Active Projects - Detroit Commons</title>
-        <meta name="description" content="Discover active projects from the Detroit Commons builder community" />
+        <title>Projects - Detroit Commons</title>
+        <meta name="description" content="Discover approved and active projects from the Detroit Commons builder community" />
       </Head>
       <Container>
         <Header>
-          <Title>Active Projects</Title>
+          <Title>Projects</Title>
           <Subtitle>
-            Discover the innovative projects that are currently being built by the Detroit Commons community.
+            Discover the innovative projects from the Detroit Commons community.
           </Subtitle>
         </Header>
 
@@ -431,24 +387,15 @@ export default function ProjectsPage() {
                     <ProjectDate>
                       Started: {new Date(project.createdAt).toLocaleDateString()}
                     </ProjectDate>
-                    <StatusBadge>Active</StatusBadge>
+                    <StatusBadge>{project.status.charAt(0).toUpperCase() + project.status.slice(1)}</StatusBadge>
                   </ProjectMeta>
                 </ProjectCardContent>
-
-                <ProjectIframeContainer>
-                  <ProjectIframe
-                    src={project.homepageLink || project.roadmapLink || 'https://commons.buildetroit.xyz'}
-                    title={`${project.name} - Project Preview`}
-                    loading="lazy"
-                  />
-                  <IframeOverlay />
-                </ProjectIframeContainer>
               </ProjectCard>
             ))}
           </ProjectsGrid>
         ) : (
           <EmptyState>
-            No active projects yet. Check back soon for exciting new projects from our builder community!
+            No projects yet. Check back soon for exciting new projects from our builder community!
           </EmptyState>
         )}
       </Container>

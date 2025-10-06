@@ -47,8 +47,8 @@ const Table = styled.table`
 `;
 
 const TableHeader = styled.th`
-  background-color: ${({ theme }) => theme.colors.rustedSteel}20;
-  color: ${({ theme }) => theme.colors.asphaltBlack};
+  background-color: ${({ theme }) => theme.colors.asphaltBlack};
+  color: ${({ theme }) => theme.colors.creamyBeige};
   font-family: ${({ theme }) => theme.fonts.body};
   font-weight: 600;
   padding: 1rem;
@@ -60,50 +60,51 @@ const TableHeader = styled.th`
 
 const TableCell = styled.td`
   padding: 1rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.rustedSteel}20;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.rustedSteel}40;
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.asphaltBlack};
   vertical-align: top;
 `;
 
 const StatusBadge = styled.span<{ status: string }>`
-  padding: 0.3rem 0.8rem;
+  padding: 0.4rem 0.9rem;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   
   ${({ status, theme }) => {
     switch (status) {
       case 'draft':
         return `
-          background-color: #fff3cd;
-          color: #856404;
+          background-color: #ffc107;
+          color: #000;
         `;
       case 'submitted':
         return `
-          background-color: #d1ecf1;
-          color: #0c5460;
+          background-color: #17a2b8;
+          color: #fff;
         `;
       case 'approved':
         return `
-          background-color: #d4edda;
-          color: #155724;
+          background-color: #28a745;
+          color: #fff;
         `;
       case 'rejected':
         return `
-          background-color: #f8d7da;
-          color: #721c24;
+          background-color: #dc3545;
+          color: #fff;
         `;
       case 'in_review':
         return `
-          background-color: #e2e3e5;
-          color: #383d41;
+          background-color: #6c757d;
+          color: #fff;
         `;
       default:
         return `
-          background-color: ${theme.colors.rustedSteel}20;
-          color: ${theme.colors.rustedSteel};
+          background-color: ${theme.colors.asphaltBlack};
+          color: ${theme.colors.creamyBeige};
         `;
     }
   }}
@@ -165,7 +166,8 @@ const ProjectName = styled.div`
 
 const ProjectLead = styled.div`
   font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.rustedSteel};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  opacity: 0.7;
 `;
 
 const ProjectDescription = styled.div`
@@ -201,11 +203,21 @@ const Modal = styled.div`
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
+
+  @media (max-width: 768px) {
+    max-width: 95vw;
+    max-height: 90vh;
+    margin: 0 1rem;
+  }
 `;
 
 const ModalHeader = styled.div`
   padding: 2rem 2rem 1rem;
   border-bottom: 1px solid ${({ theme }) => theme.colors.rustedSteel}20;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem 1rem;
+  }
 `;
 
 const ModalTitle = styled.h2`
@@ -215,10 +227,19 @@ const ModalTitle = styled.h2`
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+  }
 `;
 
 const ModalBody = styled.div`
   padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
 
 const FormGroup = styled.div`
@@ -238,7 +259,7 @@ const Label = styled.label`
 const Select = styled.select`
   font-family: ${({ theme }) => theme.fonts.body};
   padding: 0.75rem;
-  border: 2px solid ${({ theme }) => theme.colors.rustedSteel}60;
+  border: 2px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 6px;
   font-size: 1rem;
   background-color: white;
@@ -249,14 +270,14 @@ const Select = styled.select`
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.neonOrange};
-    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.neonOrange}20;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.neonOrange}40;
   }
 `;
 
 const TextArea = styled.textarea`
   font-family: ${({ theme }) => theme.fonts.body};
   padding: 0.75rem;
-  border: 2px solid ${({ theme }) => theme.colors.rustedSteel}60;
+  border: 2px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 6px;
   font-size: 1rem;
   background-color: white;
@@ -269,7 +290,7 @@ const TextArea = styled.textarea`
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.neonOrange};
-    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.neonOrange}20;
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.neonOrange}40;
   }
 `;
 
@@ -278,6 +299,12 @@ const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
 `;
 
 const ErrorMessage = styled.div`
@@ -303,9 +330,129 @@ const SuccessMessage = styled.div`
 const LoadingState = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  color: ${({ theme }) => theme.colors.rustedSteel};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   font-family: ${({ theme }) => theme.fonts.body};
   font-size: 1.1rem;
+  font-weight: 500;
+`;
+
+const TeamMembersList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+`;
+
+const TeamMemberItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+`;
+
+const TeamMemberInput = styled.input`
+  font-family: ${({ theme }) => theme.fonts.body};
+  padding: 0.5rem;
+  border: 1px solid ${({ theme }) => theme.colors.asphaltBlack};
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: white;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  flex: 1;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.neonOrange}40;
+  }
+`;
+
+const RemoveButton = styled.button`
+  background-color: ${({ theme }) => theme.colors.brickRed};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #dc3545;
+  }
+`;
+
+const AddButton = styled.button`
+  background-color: ${({ theme }) => theme.colors.neonOrange};
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.neonYellow};
+    color: ${({ theme }) => theme.colors.asphaltBlack};
+  }
+`;
+
+const ProjectDetailsBox = styled.div`
+  padding: 1rem;
+  background-color: #ffffff;
+  border: 2px solid ${({ theme }) => theme.colors.asphaltBlack};
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+
+  div {
+    margin-bottom: 0.75rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    color: ${({ theme }) => theme.colors.asphaltBlack};
+    font-weight: 700;
+    margin-right: 0.5rem;
+  }
+
+  a {
+    color: ${({ theme }) => theme.colors.neonOrange};
+    text-decoration: none;
+    font-weight: 600;
+    word-break: break-all;
+
+    &:hover {
+      color: ${({ theme }) => theme.colors.asphaltBlack};
+      text-decoration: underline;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    
+    strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      margin-right: 0;
+    }
+    
+    div {
+      margin-bottom: 1rem;
+    }
+  }
 `;
 
 interface Project {
@@ -340,7 +487,8 @@ export default function AdminProjects() {
 
   const [reviewData, setReviewData] = useState({
     status: '',
-    reviewNotes: ''
+    reviewNotes: '',
+    teamMembers: [] as string[]
   });
 
   useEffect(() => {
@@ -368,7 +516,8 @@ export default function AdminProjects() {
     setSelectedProject(project);
     setReviewData({
       status: project.status,
-      reviewNotes: project.reviewNotes || ''
+      reviewNotes: project.reviewNotes || '',
+      teamMembers: project.teamMembers || []
     });
     setShowModal(true);
   };
@@ -388,6 +537,7 @@ export default function AdminProjects() {
         body: JSON.stringify({
           status: reviewData.status,
           reviewNotes: reviewData.reviewNotes,
+          teamMembers: reviewData.teamMembers,
           reviewedBy: 'admin@commons.builddetroit.xyz', // TODO: Get from auth context
           reviewedAt: new Date().toISOString()
         }),
@@ -402,7 +552,7 @@ export default function AdminProjects() {
       setSuccess(`Project "${selectedProject.name}" status updated successfully!`);
       setShowModal(false);
       setSelectedProject(null);
-      setReviewData({ status: '', reviewNotes: '' });
+      setReviewData({ status: '', reviewNotes: '', teamMembers: [] });
       
       // Refresh projects list
       fetchProjects();
@@ -417,8 +567,29 @@ export default function AdminProjects() {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedProject(null);
-    setReviewData({ status: '', reviewNotes: '' });
+    setReviewData({ status: '', reviewNotes: '', teamMembers: [] });
     setError('');
+  };
+
+  const handleTeamMemberChange = (index: number, value: string) => {
+    setReviewData(prev => ({
+      ...prev,
+      teamMembers: prev.teamMembers.map((member, i) => i === index ? value : member)
+    }));
+  };
+
+  const addTeamMember = () => {
+    setReviewData(prev => ({
+      ...prev,
+      teamMembers: [...prev.teamMembers, '']
+    }));
+  };
+
+  const removeTeamMember = (index: number) => {
+    setReviewData(prev => ({
+      ...prev,
+      teamMembers: prev.teamMembers.filter((_, i) => i !== index)
+    }));
   };
 
   const formatDate = (dateString: string) => {
@@ -482,13 +653,14 @@ export default function AdminProjects() {
             }}>
               <h2 style={{
                 fontFamily: 'var(--font-heading)',
-                color: 'var(--color-asphalt-black)',
+                color: '#222324',
                 margin: '0',
-                fontSize: '1.5rem'
+                fontSize: '1.5rem',
+                fontWeight: '700'
               }}>
                 Project Submissions ({statusCounts.total})
               </h2>
-              <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--color-rusted-steel)' }}>
+              <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: '#444', fontWeight: '600' }}>
                 <span>Draft: {statusCounts.draft}</span>
                 <span>Submitted: {statusCounts.submitted}</span>
                 <span>In Review: {statusCounts.in_review}</span>
@@ -503,7 +675,6 @@ export default function AdminProjects() {
                   <TableHeader>Project</TableHeader>
                   <TableHeader>Lead</TableHeader>
                   <TableHeader>Status</TableHeader>
-                  <TableHeader>Submitted</TableHeader>
                   <TableHeader>Reviewed</TableHeader>
                   <TableHeader>Actions</TableHeader>
                 </tr>
@@ -517,7 +688,7 @@ export default function AdminProjects() {
                     </TableCell>
                     <TableCell>
                       <div>{project.leadName}</div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--color-rusted-steel)' }}>
+                      <div style={{ fontSize: '0.85rem', color: '#555', fontWeight: '500' }}>
                         {project.leadEmail}
                       </div>
                     </TableCell>
@@ -527,14 +698,11 @@ export default function AdminProjects() {
                       </StatusBadge>
                     </TableCell>
                     <TableCell>
-                      {project.submittedAt ? formatDate(project.submittedAt) : '-'}
-                    </TableCell>
-                    <TableCell>
                       {project.reviewedAt ? (
                         <div>
                           <div>{formatDate(project.reviewedAt)}</div>
                           {project.reviewedBy && (
-                            <div style={{ fontSize: '0.85rem', color: 'var(--color-rusted-steel)' }}>
+                            <div style={{ fontSize: '0.85rem', color: '#555', fontWeight: '500' }}>
                               by {project.reviewedBy}
                             </div>
                           )}
@@ -565,13 +733,7 @@ export default function AdminProjects() {
               <ModalBody>
                 <FormGroup>
                   <Label>Project Details</Label>
-                  <div style={{ 
-                    padding: '1rem', 
-                    backgroundColor: 'var(--color-creamy-beige)40',
-                    borderRadius: '6px',
-                    fontSize: '0.9rem',
-                    lineHeight: '1.4'
-                  }}>
+                  <ProjectDetailsBox>
                     <div><strong>Lead:</strong> {selectedProject.leadName} ({selectedProject.leadEmail})</div>
                     <div><strong>Description:</strong> {selectedProject.description}</div>
                     {selectedProject.roadmapLink && (
@@ -580,7 +742,10 @@ export default function AdminProjects() {
                     {selectedProject.homepageLink && (
                       <div><strong>Homepage:</strong> <a href={selectedProject.homepageLink} target="_blank" rel="noopener noreferrer">{selectedProject.homepageLink}</a></div>
                     )}
-                  </div>
+                    {selectedProject.teamMembers && selectedProject.teamMembers.length > 0 && (
+                      <div><strong>Current Team Members:</strong> {selectedProject.teamMembers.join(', ')}</div>
+                    )}
+                  </ProjectDetailsBox>
                 </FormGroup>
 
                 <FormGroup>
@@ -596,6 +761,28 @@ export default function AdminProjects() {
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
                   </Select>
+                </FormGroup>
+
+                <FormGroup>
+                  <Label>Team Members</Label>
+                  <TeamMembersList>
+                    {reviewData.teamMembers.map((member, index) => (
+                      <TeamMemberItem key={index}>
+                        <TeamMemberInput
+                          type="text"
+                          value={member}
+                          onChange={(e) => handleTeamMemberChange(index, e.target.value)}
+                          placeholder="Enter team member name"
+                        />
+                        <RemoveButton onClick={() => removeTeamMember(index)}>
+                          Remove
+                        </RemoveButton>
+                      </TeamMemberItem>
+                    ))}
+                  </TeamMembersList>
+                  <AddButton onClick={addTeamMember}>
+                    Add Team Member
+                  </AddButton>
                 </FormGroup>
 
                 <FormGroup>

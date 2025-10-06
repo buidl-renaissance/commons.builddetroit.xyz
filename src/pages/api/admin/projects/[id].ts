@@ -8,6 +8,7 @@ interface ProjectUpdateData {
   reviewNotes?: string;
   reviewedBy?: string;
   reviewedAt?: string;
+  teamMembers?: string[];
 }
 
 export default async function handler(
@@ -31,7 +32,7 @@ export default async function handler(
 
   if (req.method === 'PATCH') {
     try {
-      const { status, reviewNotes, reviewedBy, reviewedAt }: ProjectUpdateData = req.body;
+      const { status, reviewNotes, reviewedBy, reviewedAt, teamMembers }: ProjectUpdateData = req.body;
 
       // Validate status if provided
       const validStatuses = ['draft', 'submitted', 'in_review', 'approved', 'rejected'];
@@ -50,6 +51,11 @@ export default async function handler(
       if (reviewNotes !== undefined) updateData.reviewNotes = reviewNotes;
       if (reviewedBy) updateData.reviewedBy = reviewedBy;
       if (reviewedAt) updateData.reviewedAt = reviewedAt;
+      if (teamMembers !== undefined) {
+        // Filter out empty strings and stringify for database storage
+        const filteredTeamMembers = teamMembers.filter(member => member.trim() !== '');
+        updateData.teamMembers = JSON.stringify(filteredTeamMembers);
+      }
 
       // If status is being changed to 'submitted' and it wasn't submitted before, set submittedAt
       if (status === 'submitted') {
