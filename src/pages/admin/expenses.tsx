@@ -10,6 +10,10 @@ const Container = styled.div<{ theme: ThemeType }>`
   padding: 2rem;
   font-family: ${({ theme }) => theme.fonts.body};
   color: ${({ theme }) => theme.colors.creamyBeige};
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
 
 const Header = styled.div<{ theme: ThemeType }>`
@@ -21,19 +25,27 @@ const Title = styled.h1<{ theme: ThemeType }>`
   font-size: 2.5rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
   margin-bottom: 0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+  }
 `;
 
 const Subtitle = styled.p<{ theme: ThemeType }>`
   color: ${({ theme }) => theme.colors.creamyBeige};
   opacity: 0.8;
   font-size: 1.1rem;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const UploadSection = styled.div<{ theme: ThemeType }>`
-  background: linear-gradient(135deg, ${({ theme }) => theme.colors.asphaltBlack}, #1a1a1a);
+  /* background: linear-gradient(135deg, ${({ theme }) => theme.colors.asphaltBlack}, #1a1a1a);
   border: 2px solid ${({ theme }) => theme.colors.creamyBeige};
   border-radius: 12px;
-  padding: 2rem;
+  padding: 2rem; */
   margin-bottom: 3rem;
 `;
 
@@ -42,6 +54,10 @@ const UploadTitle = styled.h2<{ theme: ThemeType }>`
   font-size: 1.5rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const UploadArea = styled.div<{ theme: ThemeType; isDragOver: boolean }>`
@@ -58,18 +74,30 @@ const UploadArea = styled.div<{ theme: ThemeType; isDragOver: boolean }>`
     border-color: ${({ theme }) => theme.colors.creamyBeige};
     background: rgba(255, 255, 255, 0.02);
   }
+
+  @media (max-width: 768px) {
+    padding: 2rem 1rem;
+  }
 `;
 
 const UploadText = styled.div<{ theme: ThemeType }>`
   color: ${({ theme }) => theme.colors.creamyBeige};
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const UploadSubtext = styled.div<{ theme: ThemeType }>`
   color: ${({ theme }) => theme.colors.creamyBeige};
   opacity: 0.6;
   font-size: 0.9rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
 `;
 
 const HiddenInput = styled.input`
@@ -92,10 +120,10 @@ const LoadingSpinner = styled.div<{ theme: ThemeType }>`
 `;
 
 const ExpensesList = styled.div<{ theme: ThemeType }>`
-  background: linear-gradient(135deg, ${({ theme }) => theme.colors.asphaltBlack}, #1a1a1a);
+  /* background: linear-gradient(135deg, ${({ theme }) => theme.colors.asphaltBlack}, #1a1a1a);
   border: 2px solid ${({ theme }) => theme.colors.creamyBeige};
   border-radius: 12px;
-  padding: 2rem;
+  padding: 2rem; */
 `;
 
 const ExpensesTitle = styled.h2<{ theme: ThemeType }>`
@@ -103,6 +131,10 @@ const ExpensesTitle = styled.h2<{ theme: ThemeType }>`
   font-size: 1.5rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const ExpenseCard = styled.div<{ theme: ThemeType }>`
@@ -117,45 +149,114 @@ const ExpenseCard = styled.div<{ theme: ThemeType }>`
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.2);
   }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
 
 const ExpenseHeader = styled.div<{ theme: ThemeType }>`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+`;
+
+const ExpenseHeaderLeft = styled.div<{ theme: ThemeType }>`
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
 `;
 
 const ExpenseTitle = styled.h3<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
-  margin: 0;
+  margin: 0 0 0.5rem 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+`;
+
+const ExpenseMetadata = styled.div<{ theme: ThemeType }>`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  opacity: 0.7;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    gap: 0.5rem;
+  }
 `;
 
 const ExpenseAmount = styled.div<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.mono};
-  font-size: 1.1rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  font-size: 1.5rem;
+  color: ${({ theme }) => theme.colors.neonOrange};
   font-weight: bold;
+  text-align: right;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+    text-align: left;
+  }
 `;
 
 const ExpenseDetails = styled.div<{ theme: ThemeType }>`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+    flex-direction: column;
+  }
 `;
 
 const ExpenseDetail = styled.div<{ theme: ThemeType }>`
   color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.8;
+  opacity: 0.9;
   font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0; /* Allow text truncation */
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
 `;
 
 const ExpenseLabel = styled.span<{ theme: ThemeType }>`
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: ${({ theme }) => theme.colors.creamyBeige};
+  opacity: 0.6;
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+  }
+`;
+
+const ExpenseValue = styled.span<{ theme: ThemeType }>`
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  word-break: break-word;
 `;
 
 const ErrorMessage = styled.div<{ theme: ThemeType }>`
@@ -201,9 +302,17 @@ const PayoutButton = styled.button<{ theme: ThemeType; status: string; disabled?
   cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
   transition: all 0.3s ease;
   margin-top: 0.5rem;
+  width: 100%;
+  max-width: 300px;
 
   &:hover:not(:disabled) {
     opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
   }
 `;
 
@@ -252,6 +361,10 @@ const ImageUploadArea = styled.div<{ theme: ThemeType }>`
     border-color: ${({ theme }) => theme.colors.creamyBeige};
     background: rgba(255, 255, 255, 0.05);
   }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+  }
 `;
 
 const ImageUploadText = styled.div<{ theme: ThemeType }>`
@@ -271,6 +384,11 @@ const ImageGrid = styled.div<{ theme: ThemeType }>`
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 1rem;
   margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+  }
 `;
 
 const ImageItem = styled.div<{ theme: ThemeType }>`
@@ -279,6 +397,11 @@ const ImageItem = styled.div<{ theme: ThemeType }>`
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 120px;
+
+  @media (max-width: 768px) {
+    min-height: 100px;
+  }
 `;
 
 const ImagePreview = styled.img<{ theme: ThemeType }>`
@@ -290,6 +413,10 @@ const ImagePreview = styled.img<{ theme: ThemeType }>`
 
   &:hover {
     transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    height: 100px;
   }
 `;
 
@@ -388,7 +515,11 @@ export default function AdminExpenses() {
       const response = await fetch('/api/expenses');
       const data = await response.json();
       if (data.success) {
-        setExpenses(data.expenses);
+        // Sort by most recent first
+        const sortedExpenses = data.expenses.sort((a: Expense, b: Expense) => {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setExpenses(sortedExpenses);
       } else {
         setError('Failed to fetch expenses');
       }
@@ -695,7 +826,14 @@ export default function AdminExpenses() {
           expenses.map((expense) => (
             <ExpenseCard key={expense.id}>
               <ExpenseHeader>
-                <ExpenseTitle>{expense.title}</ExpenseTitle>
+                <ExpenseHeaderLeft>
+                  <ExpenseTitle>{expense.title}</ExpenseTitle>
+                  <ExpenseMetadata>
+                    <span>📅 {expense.expenseDate ? formatDate(expense.expenseDate) : formatDate(expense.createdAt)}</span>
+                    {expense.merchant && <span>• {expense.merchant}</span>}
+                    {expense.category && <span>• {expense.category}</span>}
+                  </ExpenseMetadata>
+                </ExpenseHeaderLeft>
                 {expense.amountCents && (
                   <ExpenseAmount>
                     {formatAmount(expense.amountCents, expense.currency)}
@@ -704,57 +842,47 @@ export default function AdminExpenses() {
               </ExpenseHeader>
               
               <ExpenseDetails>
-                {expense.merchant && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Merchant:</ExpenseLabel> {expense.merchant}
-                  </ExpenseDetail>
-                )}
-                {expense.category && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Category:</ExpenseLabel> {expense.category}
-                  </ExpenseDetail>
-                )}
-                {expense.expenseDate && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Date:</ExpenseLabel> {formatDate(expense.expenseDate)}
-                  </ExpenseDetail>
-                )}
                 {expense.notes && (
                   <ExpenseDetail>
-                    <ExpenseLabel>Notes:</ExpenseLabel> {expense.notes}
+                    <ExpenseLabel>Notes</ExpenseLabel>
+                    <ExpenseValue>{expense.notes}</ExpenseValue>
                   </ExpenseDetail>
                 )}
                 {expense.receiptUrl && (
                   <ExpenseDetail>
-                    <ExpenseLabel>Receipt:</ExpenseLabel>{' '}
-                    <a 
-                      href={expense.receiptUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ color: '#28a745', textDecoration: 'none' }}
-                    >
-                      View Image
-                    </a>
+                    <ExpenseLabel>Receipt</ExpenseLabel>
+                    <ExpenseValue>
+                      <a 
+                        href={expense.receiptUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ color: '#28a745', textDecoration: 'underline' }}
+                      >
+                        View Original Receipt
+                      </a>
+                    </ExpenseValue>
                   </ExpenseDetail>
                 )}
-                <ExpenseDetail>
-                  <ExpenseLabel>Added:</ExpenseLabel> {formatDate(expense.createdAt)}
-                </ExpenseDetail>
                 {expense.payoutStatus && (
                   <ExpenseDetail>
-                    <ExpenseLabel>Payout Status:</ExpenseLabel>
-                    <PayoutStatus status={expense.payoutStatus}>
-                      {expense.payoutStatus}
-                    </PayoutStatus>
-                    {expense.payoutTxHash && (
-                      <TransactionLink 
-                        href={`https://basescan.org/tx/${expense.payoutTxHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View Transaction
-                      </TransactionLink>
-                    )}
+                    <ExpenseLabel>Payout Status</ExpenseLabel>
+                    <ExpenseValue>
+                      <PayoutStatus status={expense.payoutStatus}>
+                        {expense.payoutStatus}
+                      </PayoutStatus>
+                      {expense.payoutTxHash && (
+                        <>
+                          {' • '}
+                          <TransactionLink 
+                            href={`https://basescan.org/tx/${expense.payoutTxHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View TX
+                          </TransactionLink>
+                        </>
+                      )}
+                    </ExpenseValue>
                   </ExpenseDetail>
                 )}
               </ExpenseDetails>
@@ -789,31 +917,15 @@ export default function AdminExpenses() {
                 </div>
               )}
 
-              {/* Additional Images Section */}
-              <div style={{ marginTop: '1.5rem' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  marginBottom: '1rem' 
-                }}>
-                  <ExpenseTitle style={{ fontSize: '1rem', margin: 0 }}>
-                    Proof Images ({expense.images?.length || 0})
-                  </ExpenseTitle>
-                  {/* <Button 
-                    onClick={() => document.getElementById(`image-input-${expense.id}`)?.click()}
-                    disabled={uploadingImages.has(expense.id)}
-                  >
-                    {uploadingImages.has(expense.id) ? (
-                      <>
-                        <LoadingSpinner />
-                        Uploading...
-                      </>
-                    ) : (
-                      'Add Image'
-                    )}
-                  </Button> */}
-                </div>
+              {/* Proof Images Section */}
+              <div style={{ 
+                marginTop: '1.5rem', 
+                paddingTop: '1.5rem',
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <ExpenseDetail style={{ marginBottom: '1rem' }}>
+                  <ExpenseLabel>Proof Images ({expense.images?.length || 0})</ExpenseLabel>
+                </ExpenseDetail>
 
                 <HiddenInput
                   id={`image-input-${expense.id}`}
