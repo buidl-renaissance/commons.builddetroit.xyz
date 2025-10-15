@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { compressImage, getBase64SizeMB } from '@/lib/imageCompression';
 
 const ProfilePictureContainer = styled.div`
   display: flex;
@@ -145,13 +146,16 @@ export default function ProfileImageUploadComponent({
   }, [value]);
 
   const uploadImage = async (file: File): Promise<string> => {
-    // Convert file to base64 for upload API
-    const reader = new FileReader();
-    const base64Data = await new Promise<string>((resolve, reject) => {
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+    // Compress image before uploading to stay within Vercel's 4.5MB limit
+    const compressedData = await compressImage(file, {
+      maxWidth: 800,  // Profile images can be smaller
+      maxHeight: 800,
+      quality: 0.85,
+      maxSizeMB: 1, // Profile images can be even smaller
     });
+
+    const compressedSize = getBase64SizeMB(compressedData);
+    console.log(`Compressed profile image size: ${compressedSize.toFixed(2)}MB`);
 
     // Upload the file using the upload API
     const uploadResponse = await fetch('/api/upload', {
@@ -160,7 +164,7 @@ export default function ProfileImageUploadComponent({
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        file: base64Data,
+        file: compressedData,
         fileName: `profile-${Date.now()}.${file.name.split('.').pop()}`,
         fileType: file.type,
         folder: 'profiles'

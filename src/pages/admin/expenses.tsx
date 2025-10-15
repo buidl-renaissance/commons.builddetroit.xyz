@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import type { ThemeType } from '@/styles/theme';
 import { sendUSDCPayout, checkMetaMaskConnection, getCurrentNetwork, switchToBaseNetwork } from '@/lib/metamask-usdc';
+import { compressImage, getBase64SizeMB } from '@/lib/imageCompression';
 
 const Container = styled.div<{ theme: ThemeType }>`
   max-width: 1200px;
@@ -73,31 +74,6 @@ const UploadSubtext = styled.div<{ theme: ThemeType }>`
 
 const HiddenInput = styled.input`
   display: none;
-`;
-
-const Button = styled.button<{ theme: ThemeType; primary?: boolean; disabled?: boolean }>`
-  background: ${({ theme, primary, disabled }) => 
-    disabled ? 'rgba(255, 255, 255, 0.1)' :
-    primary ? theme.colors.creamyBeige : 'transparent'};
-  color: ${({ theme, primary, disabled }) => 
-    disabled ? 'rgba(255, 255, 255, 0.3)' :
-    primary ? theme.colors.asphaltBlack : theme.colors.creamyBeige};
-  border: 2px solid ${({ theme, disabled }) => 
-    disabled ? 'rgba(255, 255, 255, 0.1)' : theme.colors.creamyBeige};
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-family: ${({ theme }) => theme.fonts.body};
-  font-size: 1rem;
-  cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
-  transition: all 0.3s ease;
-  margin-top: 1rem;
-
-  &:hover:not(:disabled) {
-    background: ${({ theme, primary }) => 
-      primary ? 'rgba(255, 255, 255, 0.9)' : theme.colors.creamyBeige};
-    color: ${({ theme, primary }) => 
-      primary ? theme.colors.asphaltBlack : theme.colors.asphaltBlack};
-  }
 `;
 
 const LoadingSpinner = styled.div<{ theme: ThemeType }>`
@@ -365,26 +341,6 @@ const ImageDescription = styled.div<{ theme: ThemeType }>`
   word-break: break-word;
 `;
 
-const ImageTypeBadge = styled.span<{ theme: ThemeType; type?: string }>`
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  background: ${({ type }) => 
-    type === 'proof' ? 'rgba(40, 167, 69, 0.2)' :
-    type === 'receipt' ? 'rgba(0, 123, 255, 0.2)' :
-    type === 'documentation' ? 'rgba(255, 193, 7, 0.2)' :
-    'rgba(108, 117, 125, 0.2)'};
-  color: ${({ type }) => 
-    type === 'proof' ? '#28a745' :
-    type === 'receipt' ? '#007bff' :
-    type === 'documentation' ? '#ffc107' :
-    '#6c757d'};
-  margin-bottom: 0.5rem;
-`;
-
 interface ExpenseImage {
   id: number;
   expenseId: number;
@@ -422,8 +378,6 @@ export default function AdminExpenses() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [processingPayouts, setProcessingPayouts] = useState<Set<number>>(new Set());
-  const [uploadingImages, setUploadingImages] = useState<Set<number>>(new Set());
-  // const [editingImage, setEditingImage] = useState<number | null>(null);
 
   useEffect(() => {
     fetchExpenses();
@@ -449,23 +403,21 @@ export default function AdminExpenses() {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      setError('File size must be less than 10MB');
-      return;
-    }
-
     setIsUploading(true);
     setError(null);
     setSuccess(null);
 
     try {
-      // Convert file to base64
-      const reader = new FileReader();
-      const base64Data = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+      // Compress image before uploading to stay within Vercel's 4.5MB limit
+      const compressedData = await compressImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.8,
+        maxSizeMB: 2, // Target 2MB to stay well under Vercel's limits
       });
+
+      const compressedSize = getBase64SizeMB(compressedData);
+      console.log(`Compressed receipt size: ${compressedSize.toFixed(2)}MB`);
 
       const response = await fetch('/api/expenses', {
         method: 'POST',
@@ -474,7 +426,7 @@ export default function AdminExpenses() {
         },
         body: JSON.stringify({
           action: 'upload',
-          file: base64Data,
+          file: compressedData,
           fileName: `receipt-${Date.now()}.${file.name.split('.').pop()}`,
           fileType: file.type,
         }),
@@ -488,8 +440,9 @@ export default function AdminExpenses() {
       } else {
         setError(data.error || 'Failed to upload receipt');
       }
-    } catch {
-      setError('Failed to upload receipt');
+    } catch (error) {
+      console.error('Upload error:', error);
+      setError('Failed to upload receipt. Please try a smaller file.');
     } finally {
       setIsUploading(false);
     }
@@ -560,17 +513,19 @@ export default function AdminExpenses() {
   };
 
   const handleImageUpload = async (expenseId: number, file: File, description?: string, imageType?: string) => {
-    setUploadingImages(prev => new Set(prev).add(expenseId));
     setError(null);
 
     try {
-      // Convert file to base64
-      const reader = new FileReader();
-      const base64Data = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+      // Compress image before uploading to stay within Vercel's 4.5MB limit
+      const compressedData = await compressImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.8,
+        maxSizeMB: 2, // Target 2MB to stay well under Vercel's limits
       });
+
+      const compressedSize = getBase64SizeMB(compressedData);
+      console.log(`Compressed image size: ${compressedSize.toFixed(2)}MB`);
 
       const response = await fetch('/api/expense-images', {
         method: 'POST',
@@ -579,7 +534,7 @@ export default function AdminExpenses() {
         },
         body: JSON.stringify({
           expenseId,
-          file: base64Data,
+          file: compressedData,
           fileName: `proof-${Date.now()}.${file.name.split('.').pop()}`,
           fileType: file.type,
           description: description || '',
@@ -595,14 +550,9 @@ export default function AdminExpenses() {
       } else {
         setError(data.error || 'Failed to upload image');
       }
-    } catch {
-      setError('Failed to upload image');
-    } finally {
-      setUploadingImages(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(expenseId);
-        return newSet;
-      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      setError('Failed to upload image. Please try a smaller file.');
     }
   };
 
@@ -717,9 +667,7 @@ export default function AdminExpenses() {
           accept="image/*"
           onChange={handleFileInput}
         />
-        <Button disabled={isUploading}>
-          {isUploading ? 'Processing...' : 'Select File'}
-        </Button>
+
         
         {error && <ErrorMessage>{error}</ErrorMessage>}
         {success && <SuccessMessage>{success}</SuccessMessage>}
@@ -852,7 +800,7 @@ export default function AdminExpenses() {
                   <ExpenseTitle style={{ fontSize: '1rem', margin: 0 }}>
                     Proof Images ({expense.images?.length || 0})
                   </ExpenseTitle>
-                  <Button 
+                  {/* <Button 
                     onClick={() => document.getElementById(`image-input-${expense.id}`)?.click()}
                     disabled={uploadingImages.has(expense.id)}
                   >
@@ -864,7 +812,7 @@ export default function AdminExpenses() {
                     ) : (
                       'Add Image'
                     )}
-                  </Button>
+                  </Button> */}
                 </div>
 
                 <HiddenInput
@@ -874,10 +822,10 @@ export default function AdminExpenses() {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const description = prompt('Describe what this image shows (optional):');
-                      const imageType = prompt('Image type (proof, receipt, documentation) [default: proof]:') || 'proof';
-                      handleImageUpload(expense.id, file, description || undefined, imageType);
+                      handleImageUpload(expense.id, file);
                     }
+                    // Reset input so same file can be uploaded again if needed
+                    e.target.value = '';
                   }}
                 />
 
@@ -910,20 +858,30 @@ export default function AdminExpenses() {
                           </ImageActions>
                         </ImageOverlay>
                         <ImageDescription>
-                          {image.imageType && (
-                            <ImageTypeBadge type={image.imageType}>
-                              {image.imageType}
-                            </ImageTypeBadge>
-                          )}
-                          {image.description && (
-                            <div>{image.description}</div>
-                          )}
-                          <div style={{ fontSize: '0.7rem', opacity: 0.6, marginTop: '0.25rem' }}>
+                          <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
                             {formatDate(image.createdAt)}
                           </div>
                         </ImageDescription>
                       </ImageItem>
                     ))}
+                    {/* Add New Image Button */}
+                    <ImageItem 
+                      style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.05)' }}
+                      onClick={() => document.getElementById(`image-input-${expense.id}`)?.click()}
+                    >
+                      <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        height: '100%',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        fontSize: '2rem'
+                      }}>
+                        <div>+</div>
+                        <div style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>Add Image</div>
+                      </div>
+                    </ImageItem>
                   </ImageGrid>
                 )}
 
@@ -932,10 +890,10 @@ export default function AdminExpenses() {
                     onClick={() => document.getElementById(`image-input-${expense.id}`)?.click()}
                   >
                     <ImageUploadText>
-                      📸 Upload proof images
+                      📸 Click to upload proof images
                     </ImageUploadText>
                     <ImageUploadSubtext>
-                      Show items obtained, receipts, or documentation
+                      JPG, PNG, and other image formats
                     </ImageUploadSubtext>
                   </ImageUploadArea>
                 )}
