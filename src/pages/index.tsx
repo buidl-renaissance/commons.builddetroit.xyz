@@ -676,6 +676,9 @@ export default function Home() {
         <ContentSection>
           <CTATitle>Explore the Commons</CTATitle>
           <CTAGrid style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+            <CTAButton href="/roadmap" role="button">
+              🗺️ Roadmap
+            </CTAButton>
             <CTAButton href="/builders" role="button">
               Meet the Builders
             </CTAButton>
