@@ -493,9 +493,21 @@ interface Expense {
   payoutTxHash?: string;
   payoutAmountCents?: number;
   payoutDate?: string;
+  submittedBy?: number;
+  payoutAddress?: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedBy?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
   createdAt: string;
   updatedAt: string;
   images?: ExpenseImage[];
+  submitter?: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
 
 export default function AdminExpenses() {
@@ -505,14 +517,17 @@ export default function AdminExpenses() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [processingPayouts, setProcessingPayouts] = useState<Set<number>>(new Set());
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [processingApprovals, setProcessingApprovals] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchExpenses();
-  }, []);
+  }, [activeFilter]);
 
   const fetchExpenses = async () => {
     try {
-      const response = await fetch('/api/expenses');
+      const url = activeFilter === 'all' ? '/api/expenses' : `/api/expenses?status=${activeFilter}`;
+      const response = await fetch(url);
       const data = await response.json();
       if (data.success) {
         // Sort by most recent first
@@ -604,7 +619,7 @@ export default function AdminExpenses() {
       // Send USDC transaction via MetaMask
       const result = await sendUSDCPayout(
         expense.amountCents,
-        '0x3C6eF34939aaA850bA787cB775128746f86b8661' // Recipient address
+        expense.payoutAddress || '0x3C6eF34939aaA850bA787cB775128746f86b8661' // Use expense's payout address or fallback
       );
 
       if (result.success && result.txHash) {
@@ -636,6 +651,81 @@ export default function AdminExpenses() {
       setError('Failed to send payout');
     } finally {
       setProcessingPayouts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(expenseId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleApprove = async (expenseId: number) => {
+    setProcessingApprovals(prev => new Set(prev).add(expenseId));
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'approve',
+          expenseId: expenseId,
+          approvedBy: 'admin@detroitcommons.xyz', // TODO: Get from auth context
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccess('Expense approved successfully!');
+        fetchExpenses();
+      } else {
+        setError(data.error || 'Failed to approve expense');
+      }
+    } catch {
+      setError('Failed to approve expense');
+    } finally {
+      setProcessingApprovals(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(expenseId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleReject = async (expenseId: number, reason?: string) => {
+    setProcessingApprovals(prev => new Set(prev).add(expenseId));
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'reject',
+          expenseId: expenseId,
+          rejectedBy: 'admin@detroitcommons.xyz', // TODO: Get from auth context
+          rejectionReason: reason,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccess('Expense rejected successfully!');
+        fetchExpenses();
+      } else {
+        setError(data.error || 'Failed to reject expense');
+      }
+    } catch {
+      setError('Failed to reject expense');
+    } finally {
+      setProcessingApprovals(prev => {
         const newSet = new Set(prev);
         newSet.delete(expenseId);
         return newSet;
@@ -805,7 +895,102 @@ export default function AdminExpenses() {
       </UploadSection>
 
       <ExpensesList>
-        <ExpensesTitle>Recent Expenses ({expenses.length})</ExpensesTitle>
+        <ExpensesTitle>Expense Management ({expenses.length})</ExpensesTitle>
+        
+        {/* Filter Tabs */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.5rem', 
+          marginBottom: '1.5rem', 
+          flexWrap: 'wrap' 
+        }}>
+          <button
+            onClick={() => setActiveFilter('all')}
+            style={{
+              background: activeFilter === 'all' ? '#ff6b35' : 'transparent',
+              color: activeFilter === 'all' ? '#1a1a1a' : '#f5f5dc',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '0.85rem'
+            }}
+          >
+            All ({expenses.length})
+          </button>
+          <button
+            onClick={() => setActiveFilter('pending_approval')}
+            style={{
+              background: activeFilter === 'pending_approval' ? '#ff6b35' : 'transparent',
+              color: activeFilter === 'pending_approval' ? '#1a1a1a' : '#f5f5dc',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '0.85rem'
+            }}
+          >
+            Pending Approval ({expenses.filter(e => e.payoutStatus === 'pending_approval').length})
+          </button>
+          <button
+            onClick={() => setActiveFilter('pending')}
+            style={{
+              background: activeFilter === 'pending' ? '#ff6b35' : 'transparent',
+              color: activeFilter === 'pending' ? '#1a1a1a' : '#f5f5dc',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '0.85rem'
+            }}
+          >
+            Approved ({expenses.filter(e => e.payoutStatus === 'pending').length})
+          </button>
+          <button
+            onClick={() => setActiveFilter('completed')}
+            style={{
+              background: activeFilter === 'completed' ? '#ff6b35' : 'transparent',
+              color: activeFilter === 'completed' ? '#1a1a1a' : '#f5f5dc',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '0.85rem'
+            }}
+          >
+            Paid ({expenses.filter(e => e.payoutStatus === 'completed').length})
+          </button>
+          <button
+            onClick={() => setActiveFilter('rejected')}
+            style={{
+              background: activeFilter === 'rejected' ? '#ff6b35' : 'transparent',
+              color: activeFilter === 'rejected' ? '#1a1a1a' : '#f5f5dc',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              fontSize: '0.85rem'
+            }}
+          >
+            Rejected ({expenses.filter(e => e.payoutStatus === 'rejected').length})
+          </button>
+        </div>
+
         <div style={{ 
           background: 'rgba(0, 123, 255, 0.1)', 
           border: '1px solid rgba(0, 123, 255, 0.3)', 
@@ -832,6 +1017,7 @@ export default function AdminExpenses() {
                     <span>📅 {expense.expenseDate ? formatDate(expense.expenseDate) : formatDate(expense.createdAt)}</span>
                     {expense.merchant && <span>• {expense.merchant}</span>}
                     {expense.category && <span>• {expense.category}</span>}
+                    {expense.submitter && <span>• 👤 {expense.submitter.name}</span>}
                   </ExpenseMetadata>
                 </ExpenseHeaderLeft>
                 {expense.amountCents && (
@@ -863,6 +1049,14 @@ export default function AdminExpenses() {
                     </ExpenseValue>
                   </ExpenseDetail>
                 )}
+                {expense.payoutAddress && (
+                  <ExpenseDetail>
+                    <ExpenseLabel>Payout Address</ExpenseLabel>
+                    <ExpenseValue style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                      {expense.payoutAddress}
+                    </ExpenseValue>
+                  </ExpenseDetail>
+                )}
                 {expense.payoutStatus && (
                   <ExpenseDetail>
                     <ExpenseLabel>Payout Status</ExpenseLabel>
@@ -885,10 +1079,92 @@ export default function AdminExpenses() {
                     </ExpenseValue>
                   </ExpenseDetail>
                 )}
+                {expense.approvedBy && (
+                  <ExpenseDetail>
+                    <ExpenseLabel>Approved By</ExpenseLabel>
+                    <ExpenseValue>{expense.approvedBy}</ExpenseValue>
+                  </ExpenseDetail>
+                )}
+                {expense.rejectedBy && (
+                  <ExpenseDetail>
+                    <ExpenseLabel>Rejected By</ExpenseLabel>
+                    <ExpenseValue>{expense.rejectedBy}</ExpenseValue>
+                  </ExpenseDetail>
+                )}
+                {expense.rejectionReason && (
+                  <ExpenseDetail>
+                    <ExpenseLabel>Rejection Reason</ExpenseLabel>
+                    <ExpenseValue>{expense.rejectionReason}</ExpenseValue>
+                  </ExpenseDetail>
+                )}
               </ExpenseDetails>
               
-              {/* Payout Button */}
-              {expense.amountCents && expense.amountCents > 0 && (
+              {/* Approval/Rejection Buttons for pending_approval */}
+              {expense.payoutStatus === 'pending_approval' && (
+                <div style={{ 
+                  marginTop: '1rem', 
+                  display: 'flex', 
+                  gap: '1rem', 
+                  flexWrap: 'wrap' 
+                }}>
+                  <button
+                    onClick={() => handleApprove(expense.id)}
+                    disabled={processingApprovals.has(expense.id)}
+                    style={{
+                      background: 'rgba(40, 167, 69, 0.2)',
+                      color: '#28a745',
+                      border: '1px solid #28a745',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '4px',
+                      cursor: processingApprovals.has(expense.id) ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.3s ease',
+                      fontSize: '0.9rem',
+                      opacity: processingApprovals.has(expense.id) ? 0.5 : 1
+                    }}
+                  >
+                    {processingApprovals.has(expense.id) ? (
+                      <>
+                        <LoadingSpinner />
+                        Approving...
+                      </>
+                    ) : (
+                      '✓ Approve'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const reason = prompt('Rejection reason (optional):');
+                      if (reason !== null) {
+                        handleReject(expense.id, reason);
+                      }
+                    }}
+                    disabled={processingApprovals.has(expense.id)}
+                    style={{
+                      background: 'rgba(220, 53, 69, 0.2)',
+                      color: '#dc3545',
+                      border: '1px solid #dc3545',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '4px',
+                      cursor: processingApprovals.has(expense.id) ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.3s ease',
+                      fontSize: '0.9rem',
+                      opacity: processingApprovals.has(expense.id) ? 0.5 : 1
+                    }}
+                  >
+                    {processingApprovals.has(expense.id) ? (
+                      <>
+                        <LoadingSpinner />
+                        Rejecting...
+                      </>
+                    ) : (
+                      '✗ Reject'
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Payout Button for approved expenses */}
+              {expense.payoutStatus === 'pending' && expense.amountCents && expense.amountCents > 0 && (
                 <div style={{ marginTop: '1rem' }}>
                   <PayoutButton
                     status={expense.payoutStatus || 'pending'}

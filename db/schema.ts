@@ -30,6 +30,8 @@ export const members = sqliteTable("members", {
   instagram: text("instagram"), // Instagram profile URL
   other_links: text("other_links"), // JSON array of other links
   modificationKey: text("modification_key").notNull().unique(), // For email-based modifications
+  payoutAddress: text("payout_address"), // Default wallet address for expense payouts
+  payoutAddressVerified: integer("payout_address_verified", { mode: "boolean" }).default(false), // Track if address is verified
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -109,10 +111,17 @@ export const expenses = sqliteTable("expenses", {
   notes: text("notes"),
   receiptUrl: text("receipt_url"),
   metadata: text("metadata"), // JSON string for raw model output
-  payoutStatus: text("payout_status").default("pending"), // pending, processing, completed, failed
+  payoutStatus: text("payout_status").default("pending_approval"), // pending_approval, pending, processing, completed, failed, rejected
   payoutTxHash: text("payout_tx_hash"), // Transaction hash when payout is sent
   payoutAmountCents: integer("payout_amount_cents"), // Amount sent in payout
   payoutDate: text("payout_date"), // When payout was processed
+  submittedBy: integer("submitted_by"), // References members.id
+  payoutAddress: text("payout_address"), // Wallet address for this specific expense payout
+  approvedBy: text("approved_by"), // Admin email who approved
+  approvedAt: text("approved_at"), // Approval timestamp
+  rejectedBy: text("rejected_by"), // Admin email who rejected
+  rejectedAt: text("rejected_at"), // Rejection timestamp
+  rejectionReason: text("rejection_reason"), // Reason for rejection
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });

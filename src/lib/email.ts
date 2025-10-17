@@ -529,3 +529,331 @@ export async function sendWelcomeEmail(
     html,
   });
 }
+
+/**
+ * Send expense submission notification to admins
+ */
+export async function sendExpenseSubmissionNotification({
+  expenseTitle,
+  amount,
+  currency,
+  submitterName,
+  submitterEmail
+}: {
+  expenseTitle: string;
+  amount: number;
+  currency: string;
+  submitterName: string;
+  submitterEmail: string;
+}) {
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',') || ['admin@detroitcommons.xyz'];
+  const adminUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/expenses`;
+  
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Expense Submission - Detroit Commons</title>
+      <style>
+        body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #FF4F00, #FFD700); color: white; padding: 30px; text-align: center; }
+        .content { background: #f9f9f9; padding: 30px; }
+        .button { display: inline-block; background: #FF4F00; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+        .button:hover { background: #e04500; color: white !important; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; padding: 20px; }
+        .expense-details { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 20px; margin: 20px 0; }
+        .amount { font-size: 24px; font-weight: bold; color: #FF4F00; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>💰 New Expense Submission</h1>
+          <p>Requires Admin Review</p>
+        </div>
+        
+        <div class="content">
+          <h2>Expense Details</h2>
+          
+          <div class="expense-details">
+            <p><strong>Title:</strong> ${expenseTitle}</p>
+            <p><strong>Amount:</strong> <span class="amount">${new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount)}</span></p>
+            <p><strong>Submitted by:</strong> ${submitterName} (${submitterEmail})</p>
+            <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          
+          <p>This expense has been submitted and is waiting for your approval. Please review the details and approve or reject the expense.</p>
+          
+          <a href="${adminUrl}" class="button">Review Expense</a>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+          
+          <p>Questions? Reply to this email or visit <a href="https://commons.buildetroit.xyz">commons.buildetroit.xyz</a></p>
+        </div>
+        
+        <div class="footer">
+          <p>Detroit Commons - Building in the Open</p>
+          <p>This email was sent because a new expense was submitted for review.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  // Send to all admin emails
+  const emailPromises = adminEmails.map(email => 
+    sendEmail({
+      to: email.trim(),
+      subject: `New Expense Submission: ${expenseTitle}`,
+      html,
+    })
+  );
+
+  return Promise.all(emailPromises);
+}
+
+/**
+ * Send expense approval notification to submitter
+ */
+export async function sendExpenseApprovalNotification({
+  submitterEmail,
+  submitterName,
+  expenseTitle,
+  amount,
+  currency
+}: {
+  submitterEmail: string;
+  submitterName: string;
+  expenseTitle: string;
+  amount: number;
+  currency: string;
+}) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Expense Approved - Detroit Commons</title>
+      <style>
+        body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 30px; text-align: center; }
+        .content { background: #f9f9f9; padding: 30px; }
+        .button { display: inline-block; background: #28a745; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+        .button:hover { background: #218838; color: white !important; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; padding: 20px; }
+        .expense-details { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 20px; margin: 20px 0; }
+        .amount { font-size: 24px; font-weight: bold; color: #28a745; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>✅ Expense Approved!</h1>
+          <p>Ready for Payout</p>
+        </div>
+        
+        <div class="content">
+          <h2>Hi ${submitterName}!</h2>
+          
+          <p>Great news! Your expense has been approved and is ready for payout.</p>
+          
+          <div class="expense-details">
+            <p><strong>Title:</strong> ${expenseTitle}</p>
+            <p><strong>Amount:</strong> <span class="amount">${new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount)}</span></p>
+            <p><strong>Status:</strong> Approved and ready for payout</p>
+            <p><strong>Approved:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          
+          <p>Your expense will be processed for payout soon. You'll receive another notification when the payment is sent.</p>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+          
+          <p>Questions? Reply to this email or visit <a href="https://commons.buildetroit.xyz">commons.buildetroit.xyz</a></p>
+        </div>
+        
+        <div class="footer">
+          <p>Detroit Commons - Building in the Open</p>
+          <p>This email was sent because your expense was approved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: submitterEmail,
+    subject: `Expense Approved: ${expenseTitle}`,
+    html,
+  });
+}
+
+/**
+ * Send expense rejection notification to submitter
+ */
+export async function sendExpenseRejectionNotification({
+  submitterEmail,
+  submitterName,
+  expenseTitle,
+  rejectionReason
+}: {
+  submitterEmail: string;
+  submitterName: string;
+  expenseTitle: string;
+  rejectionReason?: string;
+}) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Expense Rejected - Detroit Commons</title>
+      <style>
+        body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #dc3545, #fd7e14); color: white; padding: 30px; text-align: center; }
+        .content { background: #f9f9f9; padding: 30px; }
+        .button { display: inline-block; background: #dc3545; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+        .button:hover { background: #c82333; color: white !important; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; padding: 20px; }
+        .expense-details { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 20px; margin: 20px 0; }
+        .rejection-reason { background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; padding: 15px; margin: 15px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>❌ Expense Rejected</h1>
+          <p>Needs Revision</p>
+        </div>
+        
+        <div class="content">
+          <h2>Hi ${submitterName}!</h2>
+          
+          <p>Unfortunately, your expense submission has been rejected and will not be processed for payout.</p>
+          
+          <div class="expense-details">
+            <p><strong>Title:</strong> ${expenseTitle}</p>
+            <p><strong>Status:</strong> Rejected</p>
+            <p><strong>Rejected:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          
+          ${rejectionReason ? `
+            <div class="rejection-reason">
+              <h3>Reason for Rejection:</h3>
+              <p>${rejectionReason}</p>
+            </div>
+          ` : ''}
+          
+          <p>If you have questions about this rejection or would like to submit a revised expense, please contact us.</p>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+          
+          <p>Questions? Reply to this email or visit <a href="https://commons.buildetroit.xyz">commons.buildetroit.xyz</a></p>
+        </div>
+        
+        <div class="footer">
+          <p>Detroit Commons - Building in the Open</p>
+          <p>This email was sent because your expense was rejected.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: submitterEmail,
+    subject: `Expense Rejected: ${expenseTitle}`,
+    html,
+  });
+}
+
+/**
+ * Send expense payout notification to submitter
+ */
+export async function sendExpensePayoutNotification({
+  submitterEmail,
+  submitterName,
+  expenseTitle,
+  amount,
+  currency,
+  txHash
+}: {
+  submitterEmail: string;
+  submitterName: string;
+  expenseTitle: string;
+  amount: number;
+  currency: string;
+  txHash: string;
+}) {
+  const txUrl = `https://basescan.org/tx/${txHash}`;
+  
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Expense Paid - Detroit Commons</title>
+      <style>
+        body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 30px; text-align: center; }
+        .content { background: #f9f9f9; padding: 30px; }
+        .button { display: inline-block; background: #28a745; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+        .button:hover { background: #218838; color: white !important; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; padding: 20px; }
+        .expense-details { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 20px; margin: 20px 0; }
+        .amount { font-size: 24px; font-weight: bold; color: #28a745; }
+        .tx-hash { font-family: monospace; background: #f8f9fa; padding: 8px; border-radius: 4px; word-break: break-all; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>💰 Expense Paid!</h1>
+          <p>Payment Sent Successfully</p>
+        </div>
+        
+        <div class="content">
+          <h2>Hi ${submitterName}!</h2>
+          
+          <p>Great news! Your expense has been paid out successfully.</p>
+          
+          <div class="expense-details">
+            <p><strong>Title:</strong> ${expenseTitle}</p>
+            <p><strong>Amount:</strong> <span class="amount">${new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount)}</span></p>
+            <p><strong>Status:</strong> Paid</p>
+            <p><strong>Paid:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Transaction Hash:</strong> <span class="tx-hash">${txHash}</span></p>
+          </div>
+          
+          <p>You can view the transaction on BaseScan:</p>
+          
+          <a href="${txUrl}" class="button">View Transaction</a>
+          
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+          
+          <p>Questions? Reply to this email or visit <a href="https://commons.buildetroit.xyz">commons.buildetroit.xyz</a></p>
+        </div>
+        
+        <div class="footer">
+          <p>Detroit Commons - Building in the Open</p>
+          <p>This email was sent because your expense was paid out.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: submitterEmail,
+    subject: `Expense Paid: ${expenseTitle}`,
+    html,
+  });
+}

@@ -247,6 +247,7 @@ interface MemberData {
   instagram: string;
   other_links: string;
   profilePicture: string;
+  payoutAddress?: string;
 }
 
 interface Invitation {
@@ -270,6 +271,15 @@ interface Project {
   reviewNotes?: string;
 }
 
+interface Expense {
+  id: number;
+  title: string;
+  amountCents?: number;
+  currency: string;
+  payoutStatus?: string;
+  createdAt: string;
+}
+
 export default function BuilderPage() {
   const router = useRouter();
   const { key } = router.query;
@@ -277,6 +287,7 @@ export default function BuilderPage() {
   const [memberData, setMemberData] = useState<MemberData | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -286,6 +297,7 @@ export default function BuilderPage() {
       fetchMemberData(key as string);
       fetchInvitations(key as string);
       fetchProjects(key as string);
+      fetchExpenses(key as string);
     }
   }, [key]);
 
@@ -336,6 +348,23 @@ export default function BuilderPage() {
       }
     } catch (err) {
       console.error('Failed to load projects:', err);
+    }
+  };
+
+  const fetchExpenses = async (modificationKey: string) => {
+    try {
+      // First get the member data to get the ID
+      const memberResponse = await fetch(`/api/builders/${modificationKey}`);
+      if (memberResponse.ok) {
+        const memberData = await memberResponse.json();
+        const response = await fetch(`/api/expenses?builderId=${memberData.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setExpenses(data.expenses || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load expenses:', err);
     }
   };
 
@@ -487,6 +516,58 @@ export default function BuilderPage() {
             <Button href={`/builder/${key}/submit-project`}>
               Submit New Project
             </Button>
+          </div>
+        </ActionCard>
+
+        <ActionCard>
+          <CardTitle>Expenses</CardTitle>
+          <CardDescription>
+            Submit and track your expense reimbursements.
+          </CardDescription>
+          {expenses.length > 0 ? (
+            <ItemList>
+              {expenses.slice(0, 3).map((expense) => (
+                <ItemCard key={expense.id}>
+                  <ItemHeader>
+                    <ItemName>{expense.title}</ItemName>
+                    <StatusBadge status={expense.payoutStatus || 'pending_approval'}>
+                      {expense.payoutStatus?.replace('_', ' ') || 'pending approval'}
+                    </StatusBadge>
+                  </ItemHeader>
+                  <ItemDetails>
+                    <div>
+                      <strong>Amount:</strong> {expense.amountCents ? 
+                        new Intl.NumberFormat('en-US', {
+                          style: 'currency',
+                          currency: expense.currency,
+                        }).format(expense.amountCents / 100) : 'N/A'
+                      }
+                    </div>
+                    <div><strong>Submitted:</strong> {new Date(expense.createdAt).toLocaleDateString()}</div>
+                  </ItemDetails>
+                </ItemCard>
+              ))}
+              {expenses.length > 3 && (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '0.5rem', 
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontSize: '0.9rem'
+                }}>
+                  +{expenses.length - 3} more expenses
+                </div>
+              )}
+            </ItemList>
+          ) : (
+            <EmptyState>No expenses yet</EmptyState>
+          )}
+          <div style={{ marginTop: '1rem' }}>
+            <Button href={`/builder/${key}/expenses`}>
+              Manage Expenses
+            </Button>
+            <SecondaryButton href={`/builder/${key}/expenses`}>
+              Submit New Expense
+            </SecondaryButton>
           </div>
         </ActionCard>
 

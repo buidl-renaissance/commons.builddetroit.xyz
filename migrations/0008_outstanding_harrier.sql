@@ -1,0 +1,3 @@
+-- Migration 0008 was already applied successfully
+-- This file was emptied but the schema changes are already in the database
+-- No-op migration to maintain consistency

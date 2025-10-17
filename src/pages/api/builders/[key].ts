@@ -53,7 +53,7 @@ export default async function handler(
         error: 'Internal server error. Please try again later.',
       });
     }
-  } else if (req.method === 'PUT') {
+  } else if (req.method === 'PUT' || req.method === 'PATCH') {
     try {
       const {
         name,
@@ -66,6 +66,8 @@ export default async function handler(
         twitter,
         instagram,
         other_links,
+        payoutAddress,
+        payoutAddressVerified,
       } = req.body;
 
       // Validate required fields - only name is required for modification
@@ -96,6 +98,8 @@ export default async function handler(
         twitter: twitter?.trim() || null,
         instagram: instagram?.trim() || null,
         other_links: other_links && other_links.length > 0 ? JSON.stringify(other_links.filter((link: string) => link.trim())) : null,
+        payoutAddress: payoutAddress?.trim() || null,
+        payoutAddressVerified: payoutAddressVerified || false,
       };
 
       // Only update email if provided
@@ -126,7 +130,7 @@ export default async function handler(
       });
     }
   } else {
-    res.setHeader('Allow', ['GET', 'PUT']);
+    res.setHeader('Allow', ['GET', 'PUT', 'PATCH']);
     res.status(405).json({
       error: `Method ${req.method} not allowed`,
     });

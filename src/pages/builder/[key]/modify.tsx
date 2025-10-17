@@ -231,6 +231,7 @@ interface FormData {
   instagram: string;
   otherLinks: string;
   profilePicture: string;
+  payoutAddress: string;
 }
 
 interface BuilderData {
@@ -246,6 +247,8 @@ interface BuilderData {
   instagram: string;
   other_links: string;
   profilePicture: string;
+  payoutAddress?: string;
+  payoutAddressVerified?: boolean;
 }
 
 export default function ModifyBuilderPage() {
@@ -264,6 +267,7 @@ export default function ModifyBuilderPage() {
     instagram: '',
     otherLinks: '',
     profilePicture: '',
+    payoutAddress: '',
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -294,6 +298,7 @@ export default function ModifyBuilderPage() {
           instagram: data.instagram || '',
           otherLinks: data.other_links || '',
           profilePicture: data.profilePicture || '',
+          payoutAddress: data.payoutAddress || '',
         });
         setProfilePictureUrl(data.profilePicture || '');
       } else {
@@ -526,6 +531,31 @@ export default function ModifyBuilderPage() {
                   onChange={handleInputChange}
                   rows={3}
                 />
+              </div>
+            </FormSection>
+
+            <SectionTitle>Payout Settings</SectionTitle>
+            <FormSection>
+              <div>
+                <Label htmlFor="payoutAddress">Default Payout Address</Label>
+                <Input
+                  id="payoutAddress"
+                  name="payoutAddress"
+                  type="text"
+                  placeholder="0x..."
+                  value={formData.payoutAddress}
+                  onChange={handleInputChange}
+                />
+                <p style={{ 
+                  fontSize: '0.85rem', 
+                  color: '#666', 
+                  marginTop: '0.5rem',
+                  lineHeight: '1.4'
+                }}>
+                  Your default wallet address for expense reimbursements. 
+                  Payments are sent in USDC on the Base network. 
+                  You can override this address when submitting individual expenses.
+                </p>
               </div>
             </FormSection>
 
