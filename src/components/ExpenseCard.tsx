@@ -88,38 +88,7 @@ const EditIconButton = styled.button<{ theme: ThemeType }>`
   }
 `;
 
-const ApprovalActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-`;
 
-const ApprovalButton = styled.button<{ theme: ThemeType; variant?: 'approve' | 'reject' }>`
-  background: ${({ variant }) => 
-    variant === 'reject' ? 'rgba(220, 53, 69, 0.2)' : 'rgba(40, 167, 69, 0.2)'};
-  color: ${({ variant }) => 
-    variant === 'reject' ? '#dc3545' : '#28a745'};
-  border: 1px solid ${({ variant }) => 
-    variant === 'reject' ? 'rgba(220, 53, 69, 0.3)' : 'rgba(40, 167, 69, 0.3)'};
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  &:hover {
-    background: ${({ variant }) => 
-      variant === 'reject' ? 'rgba(220, 53, 69, 0.3)' : 'rgba(40, 167, 69, 0.3)'};
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
 
 
 const ExpenseAmount = styled.div<{ theme: ThemeType }>`
@@ -129,6 +98,79 @@ const ExpenseAmount = styled.div<{ theme: ThemeType }>`
   font-weight: bold;
   text-align: right;
   white-space: nowrap;
+`;
+
+const BuilderInfo = styled.div<{ theme: ThemeType }>`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+`;
+
+const BuilderAvatar = styled.div<{ theme: ThemeType }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.neonOrange};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  font-weight: bold;
+  font-size: 0.8rem;
+`;
+
+const DropdownContainer = styled.div<{ theme: ThemeType }>`
+  position: relative;
+  display: inline-block;
+`;
+
+const DropdownButton = styled.button<{ theme: ThemeType }>`
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+  }
+`;
+
+const DropdownMenu = styled.div<{ theme: ThemeType }>`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 200px;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+`;
+
+const DropdownItem = styled.div<{ theme: ThemeType }>`
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 const StatusBadge = styled.span<{ status: string }>`
@@ -379,27 +421,34 @@ interface ExpenseCardProps {
   expense: Expense;
   builders?: Builder[];
   onUpdateExpense?: (expenseId: number, updates: Partial<Expense>) => Promise<void>;
+  showBuilderInfo?: boolean;
+  showActions?: boolean;
   showEditForm?: boolean;
   onEditClick?: (expenseId: number) => void;
   onCancelEdit?: () => void;
   editingExpenseId?: number | null;
-  onApprove?: (expense: Expense) => void;
-  onReject?: (expense: Expense) => void;
+  customActions?: Array<{
+    label: string;
+    icon?: string;
+    onClick: (expense: Expense) => void;
+  }>;
 }
 
 export default function ExpenseCard({
   expense,
   builders = [],
   onUpdateExpense,
+  showBuilderInfo = true,
+  showActions = true,
   showEditForm = false,
   onEditClick,
   onCancelEdit,
   editingExpenseId,
-  onApprove,
-  onReject
+  customActions = []
 }: ExpenseCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localExpense, setLocalExpense] = useState(expense);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const formatAmount = (amountCents: number, currency: string) => {
     const amount = amountCents / 100;
@@ -495,20 +544,6 @@ export default function ExpenseCard({
               📎 View Original Receipt
             </ReceiptLink>
           )}
-          {localExpense.payoutStatus === 'pending_approval' && (onApprove || onReject) && (
-            <ApprovalActions>
-              {onApprove && (
-                <ApprovalButton onClick={() => onApprove(expense)}>
-                  ✓ Approve
-                </ApprovalButton>
-              )}
-              {onReject && (
-                <ApprovalButton variant="reject" onClick={() => onReject(expense)}>
-                  ✕ Reject
-                </ApprovalButton>
-              )}
-            </ApprovalActions>
-          )}
         </ExpenseHeaderLeft>
         {localExpense.amountCents && (
           <ExpenseAmount>
@@ -518,7 +553,7 @@ export default function ExpenseCard({
       </ExpenseHeader>
 
       {/* Builder Info */}
-      {/* {showBuilderInfo && localExpense.submitter && (
+      {showBuilderInfo && localExpense.submitter && (
         <BuilderInfo>
           <BuilderAvatar>
             {localExpense.submitter.name.charAt(0).toUpperCase()}
@@ -527,8 +562,43 @@ export default function ExpenseCard({
             <div style={{ fontWeight: '600' }}>{localExpense.submitter.name}</div>
             <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{localExpense.submitter.email}</div>
           </div>
+          {showActions && (
+            <div style={{ marginLeft: 'auto' }}>
+              <DropdownContainer>
+                <DropdownButton onClick={() => setShowDropdown(!showDropdown)}>
+                  ⋯ Actions
+                </DropdownButton>
+                {showDropdown && (
+                  <DropdownMenu>
+                    <DropdownItem onClick={() => { handleEditClick(); setShowDropdown(false); }}>
+                      ✏️ Edit Expense
+                    </DropdownItem>
+                    {onUpdateExpense && (
+                      <DropdownItem onClick={() => { 
+                        onUpdateExpense(expense.id, { submittedBy: undefined });
+                        setShowDropdown(false);
+                      }}>
+                        🔄 Reassign to Guest
+                      </DropdownItem>
+                    )}
+                    {customActions.map((action, index) => (
+                      <DropdownItem 
+                        key={index}
+                        onClick={() => { 
+                          action.onClick(expense);
+                          setShowDropdown(false);
+                        }}
+                      >
+                        {action.icon && `${action.icon} `}{action.label}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                )}
+              </DropdownContainer>
+            </div>
+          )}
         </BuilderInfo>
-      )} */}
+      )}
 
       {/* Edit Form */}
       {showEditForm && isCurrentlyEditing && (
