@@ -9,6 +9,7 @@ const ExpenseCardContainer = styled.div`
   padding: 1.5rem;
   margin-bottom: 1rem;
   transition: all 0.3s ease;
+  position: relative;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -48,6 +49,26 @@ const ExpenseMetadata = styled.div`
   span {
     white-space: nowrap;
   }
+`;
+
+const ReceiptLink = styled.a`
+  color: #28a745;
+  text-decoration: underline;
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-top: 0.25rem;
+  
+  &:hover {
+    color: #3cdb5c;
+  }
+`;
+
+const BottomActionsContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const ExpenseAmount = styled.div<{ theme: ThemeType }>`
@@ -475,6 +496,15 @@ export default function ExpenseCard({
       <ExpenseHeader>
         <ExpenseHeaderLeft>
           <ExpenseTitle>{localExpense.title}</ExpenseTitle>
+          {localExpense.receiptUrl && (
+            <ReceiptLink 
+              href={localExpense.receiptUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              📎 View Original Receipt
+            </ReceiptLink>
+          )}
           <ExpenseMetadata>
             <span>📅 {localExpense.expenseDate ? formatDate(localExpense.expenseDate) : formatDate(localExpense.createdAt)}</span>
             {localExpense.merchant && <span>• {localExpense.merchant}</span>}
@@ -494,7 +524,7 @@ export default function ExpenseCard({
         )}
       </ExpenseHeader>
 
-      {/* Builder Info and Actions */}
+      {/* Builder Info */}
       {showBuilderInfo && localExpense.submitter && (
         <BuilderInfo>
           <BuilderAvatar>
@@ -504,41 +534,6 @@ export default function ExpenseCard({
             <div style={{ fontWeight: '600' }}>{localExpense.submitter.name}</div>
             <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{localExpense.submitter.email}</div>
           </div>
-          {showActions && (
-            <div style={{ marginLeft: 'auto' }}>
-              <DropdownContainer>
-                <DropdownButton onClick={() => setShowDropdown(!showDropdown)}>
-                  ⋯ Actions
-                </DropdownButton>
-                {showDropdown && (
-                  <DropdownMenu>
-                    <DropdownItem onClick={() => { handleEditClick(); setShowDropdown(false); }}>
-                      ✏️ Edit Expense
-                    </DropdownItem>
-                    {onUpdateExpense && (
-                      <DropdownItem onClick={() => { 
-                        onUpdateExpense(expense.id, { submittedBy: undefined });
-                        setShowDropdown(false);
-                      }}>
-                        🔄 Reassign to Guest
-                      </DropdownItem>
-                    )}
-                    {customActions.map((action, index) => (
-                      <DropdownItem 
-                        key={index}
-                        onClick={() => { 
-                          action.onClick(expense);
-                          setShowDropdown(false);
-                        }}
-                      >
-                        {action.icon && `${action.icon} `}{action.label}
-                      </DropdownItem>
-                    ))}
-                  </DropdownMenu>
-                )}
-              </DropdownContainer>
-            </div>
-          )}
         </BuilderInfo>
       )}
 
@@ -666,21 +661,6 @@ export default function ExpenseCard({
             <ExpenseValue>{localExpense.notes}</ExpenseValue>
           </ExpenseDetail>
         )}
-        {localExpense.receiptUrl && (
-          <ExpenseDetail>
-            <ExpenseLabel>Receipt</ExpenseLabel>
-            <ExpenseValue>
-              <a 
-                href={localExpense.receiptUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{ color: '#28a745', textDecoration: 'underline' }}
-              >
-                View Original Receipt
-              </a>
-            </ExpenseValue>
-          </ExpenseDetail>
-        )}
         {localExpense.payoutAddress && (
           <ExpenseDetail>
             <ExpenseLabel>Payout Address</ExpenseLabel>
@@ -708,6 +688,45 @@ export default function ExpenseCard({
           </ExpenseDetail>
         )}
       </ExpenseDetails>
+
+      {/* Actions at Bottom Right */}
+      {showActions && (customActions.length > 0 || showEditForm) && (
+        <BottomActionsContainer>
+          <DropdownContainer>
+            <DropdownButton onClick={() => setShowDropdown(!showDropdown)}>
+              ⋯ Actions
+            </DropdownButton>
+            {showDropdown && (
+              <DropdownMenu>
+                {showEditForm && (
+                  <DropdownItem onClick={() => { handleEditClick(); setShowDropdown(false); }}>
+                    ✏️ Edit Expense
+                  </DropdownItem>
+                )}
+                {onUpdateExpense && localExpense.submitter && (
+                  <DropdownItem onClick={() => { 
+                    onUpdateExpense(expense.id, { submittedBy: undefined });
+                    setShowDropdown(false);
+                  }}>
+                    🔄 Reassign to Guest
+                  </DropdownItem>
+                )}
+                {customActions.map((action, index) => (
+                  <DropdownItem 
+                    key={index}
+                    onClick={() => { 
+                      action.onClick(expense);
+                      setShowDropdown(false);
+                    }}
+                  >
+                    {action.icon && `${action.icon} `}{action.label}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            )}
+          </DropdownContainer>
+        </BottomActionsContainer>
+      )}
     </ExpenseCardContainer>
   );
 }
