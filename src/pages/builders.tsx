@@ -304,7 +304,7 @@ export default function Builders() {
         throw new Error(data.error || 'Failed to fetch builders');
       }
       
-      setBuilders(data);
+      setBuilders(data.builders || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
