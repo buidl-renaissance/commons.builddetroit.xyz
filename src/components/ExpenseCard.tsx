@@ -3,17 +3,18 @@ import styled from 'styled-components';
 import type { ThemeType } from '@/styles/theme';
 
 const ExpenseCardContainer = styled.div`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 0.75rem;
   transition: all 0.3s ease;
   position: relative;
+  box-shadow: 0 2px 8px rgba(34, 35, 36, 0.1);
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(34, 35, 36, 0.15);
+    border-color: ${({ theme }) => theme.colors.neonOrange};
   }
 `;
 
@@ -21,7 +22,6 @@ const ExpenseHeader = styled.div<{ theme: ThemeType }>`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.5rem;
   gap: 0.75rem;
 `;
 
@@ -34,14 +34,17 @@ const TitleRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  min-height: 1.5rem;
+  margin: 0 0 0.6rem 0;
 `;
 
 const ExpenseTitle = styled.h3<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.heading};
   font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  margin: 0 0 0.35rem 0;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   word-break: break-word;
+  font-weight: 600;
 `;
 
 const ExpenseMetadata = styled.div`
@@ -49,8 +52,10 @@ const ExpenseMetadata = styled.div`
   gap: 0.4rem;
   align-items: center;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  opacity: 0.7;
   flex-wrap: wrap;
+  font-weight: 500;
 
   span {
     white-space: nowrap;
@@ -72,7 +77,7 @@ const ReceiptLink = styled.a`
 const EditIconButton = styled.button<{ theme: ThemeType }>`
   background: transparent;
   border: none;
-  color: white;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   padding: 0;
   cursor: pointer;
   display: flex;
@@ -85,6 +90,7 @@ const EditIconButton = styled.button<{ theme: ThemeType }>`
 
   &:hover {
     opacity: 1;
+    color: ${({ theme }) => theme.colors.neonOrange};
   }
 `;
 
@@ -103,44 +109,23 @@ const ExpenseAmount = styled.div<{ theme: ThemeType }>`
 
 const StatusBadge = styled.span<{ status: string }>`
   display: inline-block;
-  padding: 0.2rem 0.6rem;
-  border-radius: 10px;
+  padding: 0.2rem 0.3rem;
+  border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   background: ${({ status }) => {
-    switch (status) {
-      case 'pending_approval': return 'rgba(255, 193, 7, 0.2)';
-      case 'pending': return 'rgba(0, 123, 255, 0.2)';
-      case 'processing': return 'rgba(255, 193, 7, 0.2)';
-      case 'completed': return 'rgba(40, 167, 69, 0.2)';
-      case 'failed': return 'rgba(220, 53, 69, 0.2)';
-      case 'rejected': return 'rgba(220, 53, 69, 0.2)';
-      default: return 'rgba(108, 117, 125, 0.2)';
-    }
+    const isPaid = status === 'completed';
+    return isPaid ? 'rgba(40, 167, 69, 0.2)' : 'rgba(255, 193, 7, 0.2)';
   }};
   color: ${({ status }) => {
-    switch (status) {
-      case 'pending_approval': return '#ffc107';
-      case 'pending': return '#007bff';
-      case 'processing': return '#ffc107';
-      case 'completed': return '#28a745';
-      case 'failed': return '#dc3545';
-      case 'rejected': return '#dc3545';
-      default: return '#6c757d';
-    }
+    const isPaid = status === 'completed';
+    return isPaid ? '#28a745' : '#ffc107';
   }};
   border: 1px solid ${({ status }) => {
-    switch (status) {
-      case 'pending_approval': return 'rgba(255, 193, 7, 0.3)';
-      case 'pending': return 'rgba(0, 123, 255, 0.3)';
-      case 'processing': return 'rgba(255, 193, 7, 0.3)';
-      case 'completed': return 'rgba(40, 167, 69, 0.3)';
-      case 'failed': return 'rgba(220, 53, 69, 0.3)';
-      case 'rejected': return 'rgba(220, 53, 69, 0.3)';
-      default: return 'rgba(108, 117, 125, 0.3)';
-    }
+    const isPaid = status === 'completed';
+    return isPaid ? 'rgba(40, 167, 69, 0.3)' : 'rgba(255, 193, 7, 0.3)';
   }};
 `;
 
@@ -149,13 +134,13 @@ const ExpenseDetails = styled.div<{ theme: ThemeType }>`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
 `;
 
 const ExpenseDetail = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   opacity: 0.9;
   font-size: 0.85rem;
+  font-weight: 500;
 `;
 
 const ExpenseLabel = styled.span<{ theme: ThemeType }>`
@@ -163,15 +148,16 @@ const ExpenseLabel = styled.span<{ theme: ThemeType }>`
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   opacity: 0.7;
   display: block;
   margin-bottom: 0.25rem;
 `;
 
 const ExpenseValue = styled.span<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   word-break: break-word;
+  font-weight: 500;
 `;
 
 const EditForm = styled.div<{ theme: ThemeType }>`
@@ -179,9 +165,10 @@ const EditForm = styled.div<{ theme: ThemeType }>`
   flex-direction: column;
   gap: 0.6rem;
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: ${({ theme }) => theme.colors.creamyBeige};
   border-radius: 6px;
   margin-top: 0.5rem;
+  border: 1px solid ${({ theme }) => theme.colors.asphaltBlack};
 `;
 
 const FormRow = styled.div<{ theme: ThemeType }>`
@@ -203,17 +190,17 @@ const FormGroup = styled.div<{ theme: ThemeType }>`
 const FormLabel = styled.label<{ theme: ThemeType }>`
   font-size: 0.8rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
 
 const FormInput = styled.input<{ theme: ThemeType }>`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 6px;
   padding: 0.6rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   font-size: 0.95rem;
   transition: all 0.2s ease;
 
@@ -224,16 +211,17 @@ const FormInput = styled.input<{ theme: ThemeType }>`
   }
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+    color: ${({ theme }) => theme.colors.asphaltBlack};
+    opacity: 0.5;
   }
 `;
 
 const FormSelect = styled.select<{ theme: ThemeType }>`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 6px;
   padding: 0.6rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   font-size: 0.95rem;
   transition: all 0.2s ease;
 
@@ -244,17 +232,17 @@ const FormSelect = styled.select<{ theme: ThemeType }>`
   }
 
   option {
-    background: ${({ theme }) => theme.colors.asphaltBlack};
-    color: ${({ theme }) => theme.colors.creamyBeige};
+    background: white;
+    color: ${({ theme }) => theme.colors.asphaltBlack};
   }
 `;
 
 const FormTextArea = styled.textarea<{ theme: ThemeType }>`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 6px;
   padding: 0.6rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   font-size: 0.95rem;
   min-height: 70px;
   resize: vertical;
@@ -267,7 +255,8 @@ const FormTextArea = styled.textarea<{ theme: ThemeType }>`
   }
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+    color: ${({ theme }) => theme.colors.asphaltBlack};
+    opacity: 0.5;
   }
 `;
 
@@ -282,9 +271,9 @@ const FormButton = styled.button<{ theme: ThemeType; variant?: 'primary' | 'seco
   background: ${({ variant, theme }) => 
     variant === 'secondary' ? 'transparent' : theme.colors.neonOrange};
   color: ${({ variant, theme }) => 
-    variant === 'secondary' ? theme.colors.creamyBeige : theme.colors.asphaltBlack};
+    variant === 'secondary' ? theme.colors.asphaltBlack : theme.colors.asphaltBlack};
   border: 2px solid ${({ variant, theme }) => 
-    variant === 'secondary' ? theme.colors.rustedSteel : theme.colors.neonOrange};
+    variant === 'secondary' ? theme.colors.asphaltBlack : theme.colors.neonOrange};
   padding: 0.6rem 1.2rem;
   border-radius: 6px;
   font-family: ${({ theme }) => theme.fonts.body};
@@ -297,9 +286,9 @@ const FormButton = styled.button<{ theme: ThemeType; variant?: 'primary' | 'seco
 
   &:hover:not(:disabled) {
     background: ${({ variant, theme }) => 
-      variant === 'secondary' ? theme.colors.rustedSteel : theme.colors.neonYellow};
+      variant === 'secondary' ? theme.colors.asphaltBlack : theme.colors.neonYellow};
     color: ${({ variant, theme }) => 
-      variant === 'secondary' ? theme.colors.creamyBeige : theme.colors.asphaltBlack};
+      variant === 'secondary' ? 'white' : theme.colors.asphaltBlack};
     transform: translateY(-2px);
   }
 
@@ -434,6 +423,11 @@ export default function ExpenseCard({
       <ExpenseHeader>
         <ExpenseHeaderLeft>
           <TitleRow>
+            {localExpense.payoutStatus && (
+              <StatusBadge status={localExpense.payoutStatus}>
+                {localExpense.payoutStatus === 'completed' ? 'PAID' : 'UNPAID'}
+              </StatusBadge>
+            )}
             <ExpenseTitle>{localExpense.title}</ExpenseTitle>
             {showEditForm && (
               <EditIconButton onClick={handleEditClick} title="Edit expense">
@@ -446,11 +440,6 @@ export default function ExpenseCard({
             {localExpense.merchant && <span>• {localExpense.merchant}</span>}
             {localExpense.category && <span>• {localExpense.category}</span>}
             {localExpense.submitter && <span>• 👤 {localExpense.submitter.name}</span>}
-            {localExpense.payoutStatus && (
-              <StatusBadge status={localExpense.payoutStatus}>
-                {localExpense.payoutStatus.replace('_', ' ')}
-              </StatusBadge>
-            )}
           </ExpenseMetadata>
           {localExpense.receiptUrl && (
             <ReceiptLink 
