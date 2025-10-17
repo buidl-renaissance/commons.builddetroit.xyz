@@ -8,11 +8,18 @@ export default async function handler(
 ) {
   if (req.method === 'GET') {
     try {
-      // Get all builders (members)
+      // Get all builders (members) with all their profile information
       const builders = await db.select({
         id: members.id,
         name: members.name,
         email: members.email,
+        bio: members.bio,
+        profilePicture: members.profilePicture,
+        website: members.website,
+        linkedin: members.linkedin,
+        github: members.github,
+        twitter: members.twitter,
+        createdAt: members.createdAt,
       }).from(members);
 
       return res.status(200).json({
