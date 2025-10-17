@@ -1167,12 +1167,8 @@ export default function AdminExpenses() {
               {expense.payoutStatus === 'pending' && expense.amountCents && expense.amountCents > 0 && (
                 <div style={{ marginTop: '1rem' }}>
                   <PayoutButton
-                    status={expense.payoutStatus || 'pending'}
-                    disabled={
-                      expense.payoutStatus === 'completed' || 
-                      expense.payoutStatus === 'processing' ||
-                      processingPayouts.has(expense.id)
-                    }
+                    status={expense.payoutStatus}
+                    disabled={processingPayouts.has(expense.id)}
                     onClick={() => handlePayout(expense.id)}
                   >
                     {processingPayouts.has(expense.id) ? (
@@ -1180,14 +1176,27 @@ export default function AdminExpenses() {
                         <LoadingSpinner />
                         Processing...
                       </>
-                    ) : expense.payoutStatus === 'completed' ? (
+                    ) : (
+                      'Pay with MetaMask'
+                    )}
+                  </PayoutButton>
+                </div>
+              )}
+              
+              {/* Show payout status for completed/failed */}
+              {(expense.payoutStatus === 'completed' || expense.payoutStatus === 'processing' || expense.payoutStatus === 'failed') && expense.amountCents && expense.amountCents > 0 && (
+                <div style={{ marginTop: '1rem' }}>
+                  <PayoutButton
+                    status={expense.payoutStatus}
+                    disabled={true}
+                    onClick={() => {}}
+                  >
+                    {expense.payoutStatus === 'completed' ? (
                       'Paid Out'
                     ) : expense.payoutStatus === 'processing' ? (
                       'Processing...'
-                    ) : expense.payoutStatus === 'failed' ? (
-                      'Retry Payout'
                     ) : (
-                      'Pay with MetaMask'
+                      'Failed - Retry in Admin'
                     )}
                   </PayoutButton>
                 </div>
