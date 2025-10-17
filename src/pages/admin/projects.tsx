@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import styled, { ThemeProvider } from 'styled-components';
-import { theme } from '../../styles/theme';
+import styled from 'styled-components';
+import AdminLayout from '@/components/AdminLayout';
 
 const Container = styled.div`
-  min-height: 100vh;
-  background-color: ${({ theme }) => theme.colors.creamyBeige};
-  padding: 2rem 1rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 `;
 
 const Header = styled.div`
-  max-width: 1400px;
-  margin: 0 auto 3rem;
+  margin-bottom: 3rem;
   text-align: center;
 `;
 
@@ -33,8 +32,6 @@ const Subtitle = styled.p`
 `;
 
 const ProjectsList = styled.div`
-  max-width: 1400px;
-  margin: 0 auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(34, 35, 36, 0.1);
@@ -621,9 +618,9 @@ export default function AdminProjects() {
   const statusCounts = getStatusCounts();
 
   return (
-    <ThemeProvider theme={theme}>
+    <AdminLayout>
       <Head>
-        <title>Manage Projects - Detroit Commons</title>
+        <title>Projects - Admin</title>
         <meta name="description" content="Admin panel for managing submitted projects" />
       </Head>
 
@@ -811,6 +808,6 @@ export default function AdminProjects() {
           </ModalOverlay>
         )}
       </Container>
-    </ThemeProvider>
+    </AdminLayout>
   );
 }

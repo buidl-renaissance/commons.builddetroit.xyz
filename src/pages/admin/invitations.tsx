@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
+import AdminLayout from '@/components/AdminLayout';
 import ProfileImageUpload from '@/components/ProfileImageUpload';
 
 const Container = styled.div`
-  min-height: 100vh;
-  background-color: ${({ theme }) => theme.colors.creamyBeige};
-  padding: 2rem 1rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 `;
 
 const Header = styled.div`
-  max-width: 1200px;
-  margin: 0 auto 3rem;
+  margin-bottom: 3rem;
   text-align: center;
 `;
 
@@ -378,9 +378,9 @@ export default function AdminInvitations() {
   };
 
   return (
-    <>
+    <AdminLayout>
       <Head>
-        <title>Manage Invitations - Detroit Commons</title>
+        <title>Invitations - Admin</title>
         <meta name="description" content="Manage builder invitations" />
       </Head>
 
@@ -567,6 +567,6 @@ export default function AdminInvitations() {
           )}
         </InvitationsList>
       </Container>
-    </>
+    </AdminLayout>
   );
 }

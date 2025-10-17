@@ -1,46 +1,44 @@
 import { useState, useEffect, useCallback } from 'react';
+import Head from 'next/head';
 import styled from 'styled-components';
-import type { ThemeType } from '@/styles/theme';
+import AdminLayout from '@/components/AdminLayout';
 import ExpenseCard from '@/components/ExpenseCard';
 
-const Container = styled.div<{ theme: ThemeType }>`
+const Container = styled.div`
+  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  font-family: ${({ theme }) => theme.fonts.body};
-  color: ${({ theme }) => theme.colors.creamyBeige};
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
 `;
 
-const Header = styled.div<{ theme: ThemeType }>`
+const Header = styled.div`
   margin-bottom: 2rem;
 `;
 
-const Title = styled.h1<{ theme: ThemeType }>`
+const Title = styled.h1`
   font-family: ${({ theme }) => theme.fonts.heading};
   font-size: 2.5rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 
   @media (max-width: 768px) {
     font-size: 1.8rem;
   }
 `;
 
-const Subtitle = styled.p<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.8;
+const Subtitle = styled.p`
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   font-size: 1.1rem;
+  opacity: 0.7;
+  font-weight: 500;
 
   @media (max-width: 768px) {
     font-size: 1rem;
   }
 `;
 
-const FilterTabs = styled.div<{ theme: ThemeType }>`
+const FilterTabs = styled.div`
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
@@ -49,11 +47,11 @@ const FilterTabs = styled.div<{ theme: ThemeType }>`
 
 const FilterTab = styled.button<{ active: boolean }>`
   background: ${({ active, theme }) => 
-    active ? theme.colors.neonOrange : 'rgba(255, 255, 255, 0.1)'};
+    active ? theme.colors.neonOrange : 'white'};
   color: ${({ active, theme }) => 
-    active ? theme.colors.asphaltBlack : theme.colors.creamyBeige};
-  border: 2px solid ${({ active }) => 
-    active ? '#ff6b35' : 'rgba(255, 255, 255, 0.2)'};
+    active ? 'white' : theme.colors.asphaltBlack};
+  border: 2px solid ${({ active, theme }) => 
+    active ? theme.colors.neonOrange : theme.colors.asphaltBlack};
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-family: 'Inter', sans-serif;
@@ -76,30 +74,32 @@ const FilterTab = styled.button<{ active: boolean }>`
   }
 `;
 
-const Section = styled.div<{ theme: ThemeType }>`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+const Section = styled.div`
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 12px;
   padding: 2rem;
   margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(34, 35, 36, 0.1);
 
   @media (max-width: 768px) {
     padding: 1.5rem;
   }
 `;
 
-const SectionTitle = styled.h2<{ theme: ThemeType }>`
+const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
   font-size: 1.5rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   margin-bottom: 1.5rem;
+  font-weight: 600;
 
   @media (max-width: 768px) {
     font-size: 1.2rem;
   }
 `;
 
-const ExpensesList = styled.div<{ theme: ThemeType }>`
+const ExpensesList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -134,7 +134,7 @@ const Message = styled.div<{ success?: boolean; error?: boolean }>`
   };
 `;
 
-const UploadButton = styled.button<{ theme: ThemeType }>`
+const UploadButton = styled.button`
   background: ${({ theme }) => theme.colors.neonOrange};
   color: ${({ theme }) => theme.colors.asphaltBlack};
   border: none;
@@ -180,12 +180,13 @@ const Modal = styled.div<{ isOpen: boolean }>`
   padding: 1rem;
 `;
 
-const ModalContent = styled.div<{ theme: ThemeType }>`
-  background: ${({ theme }) => theme.colors.asphaltBlack};
-  border: 2px solid ${({ theme }) => theme.colors.creamyBeige};
+const ModalContent = styled.div`
+  background: white;
+  border: 2px solid ${({ theme }) => theme.colors.asphaltBlack};
   border-radius: 12px;
   padding: 2rem;
   max-width: 600px;
+  box-shadow: 0 8px 32px rgba(34, 35, 36, 0.2);
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -195,49 +196,53 @@ const ModalContent = styled.div<{ theme: ThemeType }>`
   }
 `;
 
-const ModalHeader = styled.div<{ theme: ThemeType }>`
+const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 `;
 
-const ModalTitle = styled.h2<{ theme: ThemeType }>`
+const ModalTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.heading};
   font-size: 1.5rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   margin: 0;
+  font-weight: 600;
 
   @media (max-width: 768px) {
     font-size: 1.2rem;
   }
 `;
 
-const CloseButton = styled.button<{ theme: ThemeType }>`
+const CloseButton = styled.button`
   background: transparent;
   border: none;
-  color: ${({ theme }) => theme.colors.creamyBeige};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0.5rem;
   line-height: 1;
   transition: all 0.2s ease;
+  opacity: 0.7;
 
   &:hover {
     color: ${({ theme }) => theme.colors.neonOrange};
     transform: scale(1.1);
+    opacity: 1;
   }
 `;
 
-const UploadArea = styled.div<{ theme: ThemeType; isDragOver: boolean }>`
+const UploadArea = styled.div<{ isDragOver: boolean }>`
   border: 2px dashed ${({ theme, isDragOver }) => 
-    isDragOver ? theme.colors.neonOrange : 'rgba(255, 255, 255, 0.3)'};
+    isDragOver ? theme.colors.neonOrange : theme.colors.asphaltBlack};
   border-radius: 8px;
   padding: 3rem 2rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: ${({ isDragOver }) => isDragOver ? 'rgba(255, 79, 0, 0.1)' : 'transparent'};
+  background: ${({ isDragOver }) => isDragOver ? 'rgba(255, 79, 0, 0.1)' : 'white'};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.neonOrange};
@@ -254,8 +259,8 @@ const UploadIcon = styled.div`
   margin-bottom: 1rem;
 `;
 
-const UploadText = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
+const UploadText = styled.div`
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -265,10 +270,11 @@ const UploadText = styled.div<{ theme: ThemeType }>`
   }
 `;
 
-const UploadSubtext = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
+const UploadSubtext = styled.div`
+  color: ${({ theme }) => theme.colors.asphaltBlack};
   opacity: 0.6;
   font-size: 0.9rem;
+  font-weight: 500;
 
   @media (max-width: 768px) {
     font-size: 0.85rem;
@@ -539,10 +545,16 @@ export default function AdminExpenses() {
 
 
   return (
+    <AdminLayout>
+      <Head>
+        <title>Expenses - Admin</title>
+        <meta name="description" content="Admin panel for managing expense submissions" />
+      </Head>
+      
     <Container>
       <Header>
-        <Title>Expense Management</Title>
-        <Subtitle>Review, approve, and manage expense submissions</Subtitle>
+          <Title>Expense Management</Title>
+          <Subtitle>Review, approve, and manage expense submissions</Subtitle>
       </Header>
 
       {error && <Message error>{error}</Message>}
@@ -647,5 +659,6 @@ export default function AdminExpenses() {
         </ModalContent>
       </Modal>
     </Container>
+    </AdminLayout>
   );
 }
