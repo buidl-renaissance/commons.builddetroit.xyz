@@ -1035,71 +1035,20 @@ export default function BuilderExpenses() {
         <Section>
           <SectionTitle>Submit New Expense</SectionTitle>
           
-          {/* Receipt Upload Section */}
-          <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ 
-              fontFamily: theme.fonts.heading,
-              fontSize: '1.2rem',
-              marginBottom: '1rem',
-              color: 'white'
-            }}>
-              Upload Receipt
-            </h3>
-            <UploadArea
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onClick={() => document.getElementById('receipt-upload')?.click()}
-              isDragOver={isDragOver}
-            >
-              <input
-                id="receipt-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleFileInput}
-                style={{ display: 'none' }}
-              />
-              {isUploading ? (
-                <div style={{ textAlign: 'center' }}>
-                  <LoadingSpinner />
-                  <p style={{ marginTop: '1rem', color: theme.colors.rustedSteel }}>
-                    Analyzing receipt...
-                  </p>
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ 
-                    fontSize: '1.1rem', 
-                    marginBottom: '0.5rem',
-                    color: 'white'
-                  }}>
-                    📷 Upload Receipt
-                  </p>
-                  <p style={{ 
-                    fontSize: '0.9rem', 
-                    color: theme.colors.rustedSteel,
-                    marginBottom: '1rem'
-                  }}>
-                    Drag and drop or click to upload
-                  </p>
-                  <p style={{ 
-                    fontSize: '0.8rem', 
-                    color: theme.colors.rustedSteel,
-                    lineHeight: '1.4'
-                  }}>
-                    We&apos;ll automatically extract expense details from your receipt
-                  </p>
-                </div>
-              )}
-            </UploadArea>
-          </div>
+          <p style={{ marginBottom: '1.5rem', color: theme.colors.creamyBeige, opacity: 0.8 }}>
+            Upload a receipt image and we&apos;ll automatically extract the expense details for you.
+          </p>
+          
+          <Button onClick={() => setShowSubmitModal(true)}>
+            📤 Upload Receipt & Submit Expense
+          </Button>
           
           {error && (
-            <Message error>{error}</Message>
+            <Message error style={{ marginTop: '1rem' }}>{error}</Message>
           )}
           
           {success && (
-            <Message success>{success}</Message>
+            <Message success style={{ marginTop: '1rem' }}>{success}</Message>
           )}
         </Section>
 
@@ -1167,14 +1116,76 @@ export default function BuilderExpenses() {
             <CloseButton onClick={() => setShowSubmitModal(false)}>
               ×
             </CloseButton>
-            <ModalHeader>
-              <ModalTitle>Review & Submit Expense</ModalTitle>
-              <ModalSubtitle>
-                Please review the details extracted from your receipt and make any necessary changes.
-              </ModalSubtitle>
-            </ModalHeader>
+            
+            {!formData.title ? (
+              // Step 1: Upload Receipt
+              <>
+                <ModalHeader>
+                  <ModalTitle>Upload Receipt</ModalTitle>
+                  <ModalSubtitle>
+                    Upload a receipt image and we&apos;ll automatically extract the expense details.
+                  </ModalSubtitle>
+                </ModalHeader>
 
-            <ModalForm onSubmit={handleSubmit}>
+                <UploadArea
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onClick={() => document.getElementById('modal-receipt-upload')?.click()}
+                  isDragOver={isDragOver}
+                >
+                  <input
+                    id="modal-receipt-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileInput}
+                    style={{ display: 'none' }}
+                  />
+                  {isUploading ? (
+                    <div style={{ textAlign: 'center' }}>
+                      <LoadingSpinner />
+                      <p style={{ marginTop: '1rem', color: theme.colors.rustedSteel }}>
+                        Analyzing receipt...
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ 
+                        fontSize: '3rem', 
+                        marginBottom: '1rem'
+                      }}>
+                        📷
+                      </p>
+                      <p style={{ 
+                        fontSize: '1.1rem', 
+                        marginBottom: '0.5rem',
+                        color: theme.colors.asphaltBlack,
+                        fontWeight: 600
+                      }}>
+                        Drop receipt here or click to browse
+                      </p>
+                      <p style={{ 
+                        fontSize: '0.9rem', 
+                        color: theme.colors.rustedSteel,
+                        lineHeight: '1.4'
+                      }}>
+                        Supports JPG, PNG, and other image formats
+                      </p>
+                    </div>
+                  )}
+                </UploadArea>
+              </>
+            ) : (
+              // Step 2: Review & Submit
+              <>
+                <ModalHeader>
+                  <ModalTitle>Review & Submit Expense</ModalTitle>
+                  <ModalSubtitle>
+                    Please review the details extracted from your receipt and make any necessary changes.
+                  </ModalSubtitle>
+                </ModalHeader>
+
+                <ModalForm onSubmit={handleSubmit}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <ModalFormGroup>
                   <ModalLabel htmlFor="modal-title">Title *</ModalLabel>
@@ -1308,7 +1319,9 @@ export default function BuilderExpenses() {
                   )}
                 </ModalButton>
               </ModalActions>
-            </ModalForm>
+                </ModalForm>
+              </>
+            )}
           </ModalContent>
         </ModalOverlay>
       )}

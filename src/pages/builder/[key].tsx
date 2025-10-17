@@ -563,11 +563,8 @@ export default function BuilderPage() {
           )}
           <div style={{ marginTop: '1rem' }}>
             <Button href={`/builder/${key}/expenses`}>
-              Manage Expenses
-            </Button>
-            <SecondaryButton href={`/builder/${key}/expenses`}>
               Submit New Expense
-            </SecondaryButton>
+            </Button>
           </div>
         </ActionCard>
 

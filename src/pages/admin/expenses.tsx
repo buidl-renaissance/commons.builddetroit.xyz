@@ -76,6 +76,29 @@ const FilterTab = styled.button<{ active: boolean }>`
   }
 `;
 
+const Section = styled.div<{ theme: ThemeType }>`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+`;
+
+const SectionTitle = styled.h2<{ theme: ThemeType }>`
+  font-family: ${({ theme }) => theme.fonts.heading};
+  font-size: 1.5rem;
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+`;
+
 const ExpensesList = styled.div<{ theme: ThemeType }>`
   display: flex;
   flex-direction: column;
@@ -168,7 +191,7 @@ const ModalContent = styled.div<{ theme: ThemeType }>`
   overflow-y: auto;
 
   @media (max-width: 768px) {
-    padding: 1.5rem;
+  padding: 1.5rem;
   }
 `;
 
@@ -529,40 +552,43 @@ export default function AdminExpenses() {
         📤 Upload New Receipt
       </UploadButton>
 
-      <FilterTabs>
-        <FilterTab
-          active={activeFilter === 'all'}
-          onClick={() => setActiveFilter('all')}
-        >
-          All Expenses
-        </FilterTab>
-        <FilterTab
-          active={activeFilter === 'pending_approval'}
-          onClick={() => setActiveFilter('pending_approval')}
-        >
-          Pending Approval
-        </FilterTab>
-        <FilterTab
-          active={activeFilter === 'pending'}
-          onClick={() => setActiveFilter('pending')}
-        >
-          Approved (Pending Payout)
-        </FilterTab>
-        <FilterTab
-          active={activeFilter === 'completed'}
-          onClick={() => setActiveFilter('completed')}
-        >
-          Completed
-        </FilterTab>
-        <FilterTab
-          active={activeFilter === 'rejected'}
-          onClick={() => setActiveFilter('rejected')}
-        >
-          Rejected
-        </FilterTab>
-      </FilterTabs>
+      <Section>
+        <SectionTitle>Expense Submissions</SectionTitle>
+        
+        <FilterTabs>
+          <FilterTab
+            active={activeFilter === 'all'}
+            onClick={() => setActiveFilter('all')}
+          >
+            All Expenses
+          </FilterTab>
+          <FilterTab
+            active={activeFilter === 'pending_approval'}
+            onClick={() => setActiveFilter('pending_approval')}
+          >
+            Pending Approval
+          </FilterTab>
+          <FilterTab
+            active={activeFilter === 'pending'}
+            onClick={() => setActiveFilter('pending')}
+          >
+            Approved (Pending Payout)
+          </FilterTab>
+          <FilterTab
+            active={activeFilter === 'completed'}
+            onClick={() => setActiveFilter('completed')}
+          >
+            Completed
+          </FilterTab>
+          <FilterTab
+            active={activeFilter === 'rejected'}
+            onClick={() => setActiveFilter('rejected')}
+          >
+            Rejected
+          </FilterTab>
+        </FilterTabs>
 
-      <ExpensesList>
+        <ExpensesList>
         {expenses.length === 0 ? (
           <div style={{ color: 'rgba(255, 255, 255, 0.6)', textAlign: 'center', padding: '2rem' }}>
             No expenses found for the selected filter.
@@ -595,7 +621,8 @@ export default function AdminExpenses() {
             />
           ))
         )}
-      </ExpensesList>
+        </ExpensesList>
+      </Section>
 
       <Modal isOpen={isUploadModalOpen}>
         <ModalContent>
@@ -606,29 +633,29 @@ export default function AdminExpenses() {
             </CloseButton>
           </ModalHeader>
 
-          <UploadArea
-            isDragOver={isDragOver}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onClick={() => document.getElementById('file-input')?.click()}
-          >
+        <UploadArea
+          isDragOver={isDragOver}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => document.getElementById('file-input')?.click()}
+        >
             <UploadIcon>
               {isUploading ? '⏳' : '📸'}
             </UploadIcon>
-            <UploadText>
+          <UploadText>
               {isUploading ? 'Analyzing receipt...' : 'Drop receipt image here or click to browse'}
-            </UploadText>
-            <UploadSubtext>
+          </UploadText>
+          <UploadSubtext>
               Supports JPG, PNG, and other image formats. AI will extract expense details.
-            </UploadSubtext>
-          </UploadArea>
+          </UploadSubtext>
+        </UploadArea>
 
-          <HiddenInput
-            id="file-input"
-            type="file"
-            accept="image/*"
-            onChange={handleFileInput}
+        <HiddenInput
+          id="file-input"
+          type="file"
+          accept="image/*"
+          onChange={handleFileInput}
             disabled={isUploading}
           />
         </ModalContent>
