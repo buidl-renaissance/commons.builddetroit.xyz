@@ -56,6 +56,25 @@ interface RejectExpenseData {
   rejectionReason?: string;
 }
 
+interface UpdatePayoutAddressData {
+  expenseId: number;
+  payoutAddress: string;
+  modificationKey: string;
+}
+
+interface UpdateExpenseData {
+  expenseId: number;
+  title?: string;
+  merchant?: string;
+  category?: string;
+  amountCents?: number;
+  currency?: string;
+  expenseDate?: string;
+  notes?: string;
+  payoutAddress?: string;
+  submittedBy?: number;
+}
+
 interface OpenAIReceiptAnalysis {
   title: string;
   merchant?: string;
@@ -247,7 +266,7 @@ export default async function handler(
             submitterName: submitter[0].name,
             expenseTitle: expenseData.title,
             amount: expenseData.amountCents! / 100,
-            currency: expenseData.currency,
+            currency: expenseData.currency || 'USD',
             txHash: txHash!
           });
         }
@@ -426,7 +445,7 @@ export default async function handler(
             submitterName: submitter[0].name,
             expenseTitle: expenseData.title,
             amount: expenseData.amountCents! / 100,
-            currency: expenseData.currency
+            currency: expenseData.currency || 'USD'
           });
         }
       } catch (emailError) {
@@ -526,6 +545,132 @@ export default async function handler(
         error: error instanceof Error ? error.message : 'Failed to reject expense'
       });
     }
+
+  } else if (req.method === 'POST' && req.body.action === 'update_payout_address') {
+    try {
+      const { expenseId, payoutAddress, modificationKey }: UpdatePayoutAddressData = req.body;
+
+      if (!expenseId || !payoutAddress || !modificationKey) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: expenseId, payoutAddress, modificationKey'
+        });
+      }
+
+      if (!isValidModificationKey(modificationKey)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid modification key format'
+        });
+      }
+
+      // Verify the expense belongs to the builder
+      const expenseData = await db.select()
+        .from(expenses)
+        .where(eq(expenses.id, expenseId))
+        .limit(1);
+
+      if (expenseData.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Expense not found'
+        });
+      }
+
+      // Get the builder to verify ownership
+      const builder = await db.select()
+        .from(members)
+        .where(eq(members.modificationKey, modificationKey))
+        .limit(1);
+
+      if (builder.length === 0) {
+        return res.status(403).json({
+          success: false,
+          error: 'Invalid modification key'
+        });
+      }
+
+      if (expenseData[0].submittedBy !== builder[0].id) {
+        return res.status(403).json({
+          success: false,
+          error: 'You can only edit your own expenses'
+        });
+      }
+
+      // Update the payout address
+      await db.update(expenses)
+        .set({
+          payoutAddress: payoutAddress.trim(),
+          updatedAt: new Date().toISOString()
+        })
+        .where(eq(expenses.id, expenseId));
+
+      return res.status(200).json({
+        success: true,
+        message: 'Payout address updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating payout address:', error);
+      return res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update payout address'
+      });
+    }
+
+  } else if (req.method === 'POST' && req.body.action === 'update') {
+    try {
+      const { 
+        expenseId, 
+        title, 
+        merchant, 
+        category, 
+        amountCents, 
+        currency, 
+        expenseDate, 
+        notes, 
+        payoutAddress, 
+        submittedBy 
+      }: UpdateExpenseData = req.body;
+
+      if (!expenseId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required field: expenseId'
+        });
+      }
+
+      // Build update object with only provided fields
+      const updateData: any = {
+        updatedAt: new Date().toISOString()
+      };
+
+      if (title !== undefined) updateData.title = title.trim();
+      if (merchant !== undefined) updateData.merchant = merchant?.trim() || null;
+      if (category !== undefined) updateData.category = category?.trim() || null;
+      if (amountCents !== undefined) updateData.amountCents = amountCents;
+      if (currency !== undefined) updateData.currency = currency;
+      if (expenseDate !== undefined) updateData.expenseDate = expenseDate;
+      if (notes !== undefined) updateData.notes = notes?.trim() || null;
+      if (payoutAddress !== undefined) updateData.payoutAddress = payoutAddress?.trim() || null;
+      if (submittedBy !== undefined) updateData.submittedBy = submittedBy;
+
+      // Update the expense
+      await db.update(expenses)
+        .set(updateData)
+        .where(eq(expenses.id, expenseId));
+
+      return res.status(200).json({
+        success: true,
+        message: 'Expense updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      return res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update expense'
+      });
+    }
+
   } else if (req.method === 'GET') {
     try {
       const { builderId, status } = req.query;

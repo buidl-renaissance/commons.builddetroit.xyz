@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled, { ThemeProvider } from 'styled-components';
 import { theme, ThemeType } from '../../../styles/theme';
+import { compressImage, getBase64SizeMB } from '@/lib/imageCompression';
+import ExpenseCard from '@/components/ExpenseCard';
 
 const Container = styled.div<{ theme: ThemeType }>`
   max-width: 1200px;
@@ -225,25 +227,31 @@ const LoadingSpinner = styled.div<{ theme: ThemeType }>`
   }
 `;
 
-const Message = styled.div<{ theme: ThemeType; success?: boolean }>`
+const Message = styled.div<{ theme: ThemeType; success?: boolean; error?: boolean }>`
   padding: 1rem;
   border-radius: 6px;
   font-family: ${({ theme }) => theme.fonts.body};
   font-size: 0.9rem;
   margin-bottom: 1rem;
-  background: ${({ success, theme }) => 
+  background: ${({ success, error, theme }) => 
     success 
       ? 'rgba(40, 167, 69, 0.1)' 
+      : error 
+      ? 'rgba(220, 53, 69, 0.1)'
       : 'rgba(220, 53, 69, 0.1)'
   };
-  border: 1px solid ${({ success, theme }) => 
+  border: 1px solid ${({ success, error, theme }) => 
     success 
       ? 'rgba(40, 167, 69, 0.3)' 
+      : error 
+      ? 'rgba(220, 53, 69, 0.3)'
       : 'rgba(220, 53, 69, 0.3)'
   };
-  color: ${({ success, theme }) => 
+  color: ${({ success, error, theme }) => 
     success 
       ? '#28a745' 
+      : error 
+      ? '#dc3545'
       : '#dc3545'
   };
 `;
@@ -396,6 +404,266 @@ const EmptyState = styled.div<{ theme: ThemeType }>`
   font-size: 0.9rem;
 `;
 
+const UploadArea = styled.div<{ theme: ThemeType; isDragOver: boolean }>`
+  border: 2px dashed ${({ isDragOver, theme }) => 
+    isDragOver ? theme.colors.neonOrange : theme.colors.rustedSteel};
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: ${({ isDragOver, theme }) => 
+    isDragOver ? `${theme.colors.neonOrange}10` : 'transparent'};
+  
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    background-color: ${({ theme }) => `${theme.colors.neonOrange}05`};
+  }
+`;
+
+const EditButton = styled.button<{ theme: ThemeType }>`
+  background: none;
+  border: 1px solid ${({ theme }) => theme.colors.rustedSteel};
+  color: ${({ theme }) => theme.colors.rustedSteel};
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    color: ${({ theme }) => theme.colors.neonOrange};
+  }
+`;
+
+const EditForm = styled.div<{ theme: ThemeType }>`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+  
+  input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid ${({ theme }) => theme.colors.rustedSteel};
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  
+  button {
+    padding: 0.5rem 1rem;
+    background-color: ${({ theme }) => theme.colors.neonOrange};
+    color: ${({ theme }) => theme.colors.asphaltBlack};
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    
+    &:hover {
+      background-color: ${({ theme }) => theme.colors.neonYellow};
+    }
+  }
+`;
+
+const ModalOverlay = styled.div<{ theme: ThemeType }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+`;
+
+const ModalContent = styled.div<{ theme: ThemeType }>`
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+`;
+
+const ModalHeader = styled.div<{ theme: ThemeType }>`
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const ModalTitle = styled.h2<{ theme: ThemeType }>`
+  font-family: ${({ theme }) => theme.fonts.heading};
+  font-size: 1.5rem;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  margin: 0 0 0.5rem 0;
+`;
+
+const ModalSubtitle = styled.p<{ theme: ThemeType }>`
+  color: ${({ theme }) => theme.colors.rustedSteel};
+  font-size: 0.9rem;
+  margin: 0;
+`;
+
+const ModalForm = styled.form<{ theme: ThemeType }>`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const ModalFormGroup = styled.div<{ theme: ThemeType }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const ModalLabel = styled.label<{ theme: ThemeType }>`
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const ModalInput = styled.input<{ theme: ThemeType }>`
+  background: white;
+  border: 2px solid ${({ theme }) => theme.colors.rustedSteel}60;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  font-size: 1rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.neonOrange}20;
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.rustedSteel}80;
+  }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.rustedSteel}CC;
+  }
+`;
+
+const ModalSelect = styled.select<{ theme: ThemeType }>`
+  background: white;
+  border: 2px solid ${({ theme }) => theme.colors.rustedSteel}60;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  font-size: 1rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.neonOrange}20;
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.rustedSteel}80;
+  }
+`;
+
+const ModalTextArea = styled.textarea<{ theme: ThemeType }>`
+  background: white;
+  border: 2px solid ${({ theme }) => theme.colors.rustedSteel}60;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  font-size: 1rem;
+  min-height: 80px;
+  resize: vertical;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.neonOrange}20;
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.rustedSteel}80;
+  }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.rustedSteel}CC;
+  }
+`;
+
+const ModalButton = styled.button<{ theme: ThemeType; variant?: 'primary' | 'secondary' }>`
+  background: ${({ variant, theme }) => 
+    variant === 'secondary' ? 'transparent' : theme.colors.neonOrange};
+  color: ${({ variant, theme }) => 
+    variant === 'secondary' ? theme.colors.asphaltBlack : theme.colors.asphaltBlack};
+  border: 2px solid ${({ variant, theme }) => 
+    variant === 'secondary' ? theme.colors.rustedSteel : theme.colors.neonOrange};
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  &:hover:not(:disabled) {
+    background: ${({ variant, theme }) => 
+      variant === 'secondary' ? theme.colors.rustedSteel : theme.colors.neonYellow};
+    color: ${({ variant, theme }) => 
+      variant === 'secondary' ? 'white' : theme.colors.asphaltBlack};
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;
+
+const ModalActions = styled.div<{ theme: ThemeType }>`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+`;
+
+const CloseButton = styled.button<{ theme: ThemeType }>`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.rustedSteel};
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: ${({ theme }) => theme.colors.asphaltBlack};
+  }
+`;
+
 interface Expense {
   id: number;
   title: string;
@@ -432,9 +700,13 @@ export default function BuilderExpenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [editingExpense, setEditingExpense] = useState<number | null>(null);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -445,6 +717,11 @@ export default function BuilderExpenses() {
     currency: 'USD',
     expenseDate: '',
     notes: '',
+    payoutAddress: ''
+  });
+  
+  // Edit expense state
+  const [editFormData, setEditFormData] = useState({
     payoutAddress: ''
   });
 
@@ -491,6 +768,69 @@ export default function BuilderExpenses() {
     }
   };
 
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    setIsUploading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      // Compress image before uploading to stay within Vercel's 4.5MB limit
+      const compressedData = await compressImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.8,
+        maxSizeMB: 2, // Target 2MB to stay well under Vercel's limits
+      });
+
+      const compressedSize = getBase64SizeMB(compressedData);
+      console.log(`Compressed receipt size: ${compressedSize.toFixed(2)}MB`);
+
+      const response = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'upload',
+          file: compressedData,
+          fileName: `receipt-${Date.now()}.${file.name.split('.').pop()}`,
+          fileType: file.type,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update the form with AI-extracted data
+        setFormData(prev => ({
+          ...prev,
+          title: data.analysis.title || '',
+          merchant: data.analysis.merchant || '',
+          category: data.analysis.category || '',
+          amount: data.analysis.amount ? (data.analysis.amount / 100).toString() : '',
+          currency: data.analysis.currency || 'USD',
+          expenseDate: data.analysis.date || '',
+          notes: data.analysis.notes || '',
+          payoutAddress: memberData?.payoutAddress || ''
+        }));
+        setSuccess('Receipt uploaded and analyzed successfully!');
+        setShowSubmitModal(true);
+      } else {
+        setError(data.error || 'Failed to upload receipt');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setError('Failed to upload receipt. Please try a smaller file.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -532,6 +872,7 @@ export default function BuilderExpenses() {
           notes: '',
           payoutAddress: memberData?.payoutAddress || ''
         });
+        setShowSubmitModal(false);
         fetchExpenses(key as string);
       } else {
         setError(data.error || 'Failed to submit expense');
@@ -541,6 +882,70 @@ export default function BuilderExpenses() {
       setError('Failed to submit expense. Please try again.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleUpdatePayoutAddress = async (expenseId: number) => {
+    setSubmitting(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'update_payout_address',
+          expenseId: expenseId,
+          payoutAddress: editFormData.payoutAddress,
+          modificationKey: key
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccess('Payout address updated successfully!');
+        setEditingExpense(null);
+        setEditFormData({ payoutAddress: '' });
+        fetchExpenses(key as string);
+      } else {
+        setError(data.error || 'Failed to update payout address');
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      setError('Failed to update payout address. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
     }
   };
 
@@ -629,124 +1034,73 @@ export default function BuilderExpenses() {
 
         <Section>
           <SectionTitle>Submit New Expense</SectionTitle>
-          <Form onSubmit={handleSubmit}>
-            <FormRow>
-              <FormGroup>
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Brief description of the expense"
-                  required
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="merchant">Merchant</Label>
-                <Input
-                  id="merchant"
-                  type="text"
-                  value={formData.merchant}
-                  onChange={(e) => setFormData(prev => ({ ...prev, merchant: e.target.value }))}
-                  placeholder="Store or business name"
-                />
-              </FormGroup>
-            </FormRow>
-
-            <FormRow>
-              <FormGroup>
-                <Label htmlFor="category">Category</Label>
-                <Select
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                >
-                  <option value="">Select category</option>
-                  <option value="Food">Food</option>
-                  <option value="Office Supplies">Office Supplies</option>
-                  <option value="Travel">Travel</option>
-                  <option value="Equipment">Equipment</option>
-                  <option value="Software">Software</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Other">Other</option>
-                </Select>
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="amount">Amount *</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.amount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                  placeholder="0.00"
-                  required
-                />
-              </FormGroup>
-            </FormRow>
-
-            <FormRow>
-              <FormGroup>
-                <Label htmlFor="currency">Currency</Label>
-                <Select
-                  id="currency"
-                  value={formData.currency}
-                  onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
-                >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                </Select>
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="expenseDate">Expense Date</Label>
-                <Input
-                  id="expenseDate"
-                  type="date"
-                  value={formData.expenseDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, expenseDate: e.target.value }))}
-                />
-              </FormGroup>
-            </FormRow>
-
-            <FormGroup>
-              <Label htmlFor="payoutAddress">Payout Address *</Label>
-              <Input
-                id="payoutAddress"
-                type="text"
-                value={formData.payoutAddress}
-                onChange={(e) => setFormData(prev => ({ ...prev, payoutAddress: e.target.value }))}
-                placeholder="0x..."
-                required
+          
+          {/* Receipt Upload Section */}
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ 
+              fontFamily: theme.fonts.heading,
+              fontSize: '1.2rem',
+              marginBottom: '1rem',
+              color: theme.colors.asphaltBlack
+            }}>
+              Upload Receipt
+            </h3>
+            <UploadArea
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onClick={() => document.getElementById('receipt-upload')?.click()}
+              isDragOver={isDragOver}
+            >
+              <input
+                id="receipt-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileInput}
+                style={{ display: 'none' }}
               />
-            </FormGroup>
-
-            <FormGroup>
-              <Label htmlFor="notes">Notes</Label>
-              <TextArea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="Additional details about this expense"
-              />
-            </FormGroup>
-
-            {error && <Message>{error}</Message>}
-            {success && <Message success>{success}</Message>}
-
-            <Button type="submit" disabled={submitting}>
-              {submitting ? (
-                <>
+              {isUploading ? (
+                <div style={{ textAlign: 'center' }}>
                   <LoadingSpinner />
-                  Submitting...
-                </>
+                  <p style={{ marginTop: '1rem', color: theme.colors.rustedSteel }}>
+                    Analyzing receipt...
+                  </p>
+                </div>
               ) : (
-                'Submit Expense'
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ 
+                    fontSize: '1.1rem', 
+                    marginBottom: '0.5rem',
+                    color: theme.colors.asphaltBlack
+                  }}>
+                    📷 Upload Receipt
+                  </p>
+                  <p style={{ 
+                    fontSize: '0.9rem', 
+                    color: theme.colors.rustedSteel,
+                    marginBottom: '1rem'
+                  }}>
+                    Drag and drop or click to upload
+                  </p>
+                  <p style={{ 
+                    fontSize: '0.8rem', 
+                    color: theme.colors.rustedSteel,
+                    lineHeight: '1.4'
+                  }}>
+                    We&apos;ll automatically extract expense details from your receipt
+                  </p>
+                </div>
               )}
-            </Button>
-          </Form>
+            </UploadArea>
+          </div>
+          
+          {error && (
+            <Message error>{error}</Message>
+          )}
+          
+          {success && (
+            <Message success>{success}</Message>
+          )}
         </Section>
 
         <Section>
@@ -794,24 +1148,14 @@ export default function BuilderExpenses() {
             </EmptyState>
           ) : (
             filteredExpenses.map((expense) => (
-              <ExpenseCard key={expense.id}>
-                <ExpenseHeader>
-                  <div>
-                    <ExpenseTitle>{expense.title}</ExpenseTitle>
-                    <StatusBadge status={expense.payoutStatus || 'pending_approval'}>
-                      {expense.payoutStatus?.replace('_', ' ') || 'pending approval'}
-                    </StatusBadge>
-                  </div>
-                  {expense.amountCents && (
-                    <ExpenseAmount>
-                      {formatAmount(expense.amountCents, expense.currency)}
-                    </ExpenseAmount>
-                  )}
-                </ExpenseHeader>
-                
-                <ExpenseDetails>
-                  {expense.merchant && (
-                    <ExpenseDetail>
+              <ExpenseCard
+                key={expense.id}
+                expense={expense}
+                showBuilderInfo={false}
+                showActions={false}
+                showEditForm={false}
+              />
+            ))
                       <ExpenseLabel>Merchant</ExpenseLabel>
                       <ExpenseValue>{expense.merchant}</ExpenseValue>
                     </ExpenseDetail>
@@ -828,14 +1172,75 @@ export default function BuilderExpenses() {
                       {expense.expenseDate ? formatDate(expense.expenseDate) : formatDate(expense.createdAt)}
                     </ExpenseValue>
                   </ExpenseDetail>
-                  {expense.payoutAddress && (
-                    <ExpenseDetail>
-                      <ExpenseLabel>Payout Address</ExpenseLabel>
-                      <ExpenseValue style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                        {expense.payoutAddress}
-                      </ExpenseValue>
-                    </ExpenseDetail>
-                  )}
+                  <ExpenseDetail>
+                    <ExpenseLabel>Payout Address</ExpenseLabel>
+                    {editingExpense === expense.id ? (
+                      <EditForm>
+                        <input
+                          type="text"
+                          value={editFormData.payoutAddress}
+                          onChange={(e) => setEditFormData({ payoutAddress: e.target.value })}
+                          placeholder="0x..."
+                          style={{ 
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            color: theme.colors.creamyBeige,
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem'
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleUpdatePayoutAddress(expense.id)}
+                          disabled={submitting}
+                          style={{ 
+                            background: theme.colors.neonOrange,
+                            color: theme.colors.asphaltBlack,
+                            border: 'none',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {submitting ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingExpense(null);
+                            setEditFormData({ payoutAddress: '' });
+                          }}
+                          style={{ 
+                            background: 'transparent',
+                            color: theme.colors.rustedSteel,
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </EditForm>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <ExpenseValue style={{ fontFamily: 'monospace', fontSize: '0.8rem', flex: 1 }}>
+                          {expense.payoutAddress || 'Not set'}
+                        </ExpenseValue>
+                        <EditButton
+                          onClick={() => {
+                            setEditingExpense(expense.id);
+                            setEditFormData({ payoutAddress: expense.payoutAddress || '' });
+                          }}
+                        >
+                          Edit
+                        </EditButton>
+                      </div>
+                    )}
+                  </ExpenseDetail>
                   {expense.approvedBy && (
                     <ExpenseDetail>
                       <ExpenseLabel>Approved By</ExpenseLabel>
@@ -867,6 +1272,159 @@ export default function BuilderExpenses() {
           )}
         </Section>
       </Container>
+
+      {/* Submit Modal */}
+      {showSubmitModal && (
+        <ModalOverlay onClick={() => setShowSubmitModal(false)}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <CloseButton onClick={() => setShowSubmitModal(false)}>
+              ×
+            </CloseButton>
+            <ModalHeader>
+              <ModalTitle>Review & Submit Expense</ModalTitle>
+              <ModalSubtitle>
+                Please review the details extracted from your receipt and make any necessary changes.
+              </ModalSubtitle>
+            </ModalHeader>
+
+            <ModalForm onSubmit={handleSubmit}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <ModalFormGroup>
+                  <ModalLabel htmlFor="modal-title">Title *</ModalLabel>
+                  <ModalInput
+                    id="modal-title"
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Brief description of the expense"
+                    required
+                  />
+                </ModalFormGroup>
+                <ModalFormGroup>
+                  <ModalLabel htmlFor="modal-merchant">Merchant</ModalLabel>
+                  <ModalInput
+                    id="modal-merchant"
+                    type="text"
+                    value={formData.merchant}
+                    onChange={(e) => setFormData(prev => ({ ...prev, merchant: e.target.value }))}
+                    placeholder="Store or business name"
+                  />
+                </ModalFormGroup>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <ModalFormGroup>
+                  <ModalLabel htmlFor="modal-category">Category</ModalLabel>
+                  <ModalSelect
+                    id="modal-category"
+                    value={formData.category}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                  >
+                    <option value="">Select category</option>
+                    <option value="Food">Food</option>
+                    <option value="Office Supplies">Office Supplies</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Software">Software</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Other">Other</option>
+                  </ModalSelect>
+                </ModalFormGroup>
+                <ModalFormGroup>
+                  <ModalLabel htmlFor="modal-amount">Amount *</ModalLabel>
+                  <ModalInput
+                    id="modal-amount"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.amount}
+                    onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                    placeholder="0.00"
+                    required
+                  />
+                </ModalFormGroup>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <ModalFormGroup>
+                  <ModalLabel htmlFor="modal-currency">Currency</ModalLabel>
+                  <ModalSelect
+                    id="modal-currency"
+                    value={formData.currency}
+                    onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
+                  >
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </ModalSelect>
+                </ModalFormGroup>
+                <ModalFormGroup>
+                  <ModalLabel htmlFor="modal-date">Expense Date</ModalLabel>
+                  <ModalInput
+                    id="modal-date"
+                    type="date"
+                    value={formData.expenseDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, expenseDate: e.target.value }))}
+                  />
+                </ModalFormGroup>
+              </div>
+
+              <ModalFormGroup>
+                <ModalLabel htmlFor="modal-payout">Payout Address *</ModalLabel>
+                <ModalInput
+                  id="modal-payout"
+                  type="text"
+                  value={formData.payoutAddress}
+                  onChange={(e) => setFormData(prev => ({ ...prev, payoutAddress: e.target.value }))}
+                  placeholder="0x..."
+                  required
+                />
+                <p style={{ 
+                  fontSize: '0.8rem', 
+                  color: theme.colors.rustedSteel, 
+                  marginTop: '0.5rem',
+                  lineHeight: '1.4'
+                }}>
+                  Your default payout address is pre-filled. You can change it for this specific expense.
+                </p>
+              </ModalFormGroup>
+
+              <ModalFormGroup>
+                <ModalLabel htmlFor="modal-notes">Notes</ModalLabel>
+                <ModalTextArea
+                  id="modal-notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="Additional details about this expense"
+                />
+              </ModalFormGroup>
+
+              <ModalActions>
+                <ModalButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowSubmitModal(false)}
+                >
+                  Cancel
+                </ModalButton>
+                <ModalButton
+                  type="submit"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <LoadingSpinner />
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Expense'
+                  )}
+                </ModalButton>
+              </ModalActions>
+            </ModalForm>
+          </ModalContent>
+        </ModalOverlay>
+      )}
     </ThemeProvider>
   );
 }

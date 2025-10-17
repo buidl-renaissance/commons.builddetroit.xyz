@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import type { ThemeType } from '@/styles/theme';
-import { sendUSDCPayout, checkMetaMaskConnection, getCurrentNetwork, switchToBaseNetwork } from '@/lib/metamask-usdc';
-import { compressImage, getBase64SizeMB } from '@/lib/imageCompression';
+import ExpenseCard from '@/components/ExpenseCard';
 
 const Container = styled.div<{ theme: ThemeType }>`
   max-width: 1200px;
@@ -41,441 +40,82 @@ const Subtitle = styled.p<{ theme: ThemeType }>`
   }
 `;
 
-const UploadSection = styled.div<{ theme: ThemeType }>`
-  /* background: linear-gradient(135deg, ${({ theme }) => theme.colors.asphaltBlack}, #1a1a1a);
-  border: 2px solid ${({ theme }) => theme.colors.creamyBeige};
-  border-radius: 12px;
-  padding: 2rem; */
-  margin-bottom: 3rem;
+const FilterTabs = styled.div<{ theme: ThemeType }>`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
 `;
 
-const UploadTitle = styled.h2<{ theme: ThemeType }>`
-  font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: 1.5rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  margin-bottom: 1rem;
-
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-  }
-`;
-
-const UploadArea = styled.div<{ theme: ThemeType; isDragOver: boolean }>`
-  border: 2px dashed ${({ theme, isDragOver }) => 
-    isDragOver ? theme.colors.creamyBeige : 'rgba(255, 255, 255, 0.3)'};
-  border-radius: 8px;
-  padding: 3rem;
-  text-align: center;
+const FilterTab = styled.button<{ active: boolean }>`
+  background: ${({ active, theme }) => 
+    active ? theme.colors.neonOrange : 'rgba(255, 255, 255, 0.1)'};
+  color: ${({ active, theme }) => 
+    active ? theme.colors.asphaltBlack : theme.colors.creamyBeige};
+  border: 2px solid ${({ active }) => 
+    active ? '#ff6b35' : 'rgba(255, 255, 255, 0.2)'};
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: ${({ isDragOver }) => isDragOver ? 'rgba(255, 255, 255, 0.05)' : 'transparent'};
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.creamyBeige};
-    background: rgba(255, 255, 255, 0.02);
+    background: ${({ active }) => 
+      active ? '#ffd700' : '#ff6b35'};
+    color: #1a1a1a;
+    transform: translateY(-2px);
   }
 
-  @media (max-width: 768px) {
-    padding: 2rem 1rem;
-  }
-`;
-
-const UploadText = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-`;
-
-const UploadSubtext = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.6;
-  font-size: 0.9rem;
-
-  @media (max-width: 768px) {
-    font-size: 0.85rem;
-  }
-`;
-
-const HiddenInput = styled.input`
-  display: none;
-`;
-
-const LoadingSpinner = styled.div<{ theme: ThemeType }>`
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: ${({ theme }) => theme.colors.creamyBeige};
-  animation: spin 1s ease-in-out infinite;
-  margin-right: 0.5rem;
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+  &:active {
+    transform: translateY(0);
   }
 `;
 
 const ExpensesList = styled.div<{ theme: ThemeType }>`
-  /* background: linear-gradient(135deg, ${({ theme }) => theme.colors.asphaltBlack}, #1a1a1a);
-  border: 2px solid ${({ theme }) => theme.colors.creamyBeige};
-  border-radius: 12px;
-  padding: 2rem; */
-`;
-
-const ExpensesTitle = styled.h2<{ theme: ThemeType }>`
-  font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: 1.5rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  margin-bottom: 1.5rem;
-
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-  }
-`;
-
-const ExpenseCard = styled.div<{ theme: ThemeType }>`
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const ExpenseHeader = styled.div<{ theme: ThemeType }>`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-`;
-
-const ExpenseHeaderLeft = styled.div<{ theme: ThemeType }>`
-  flex: 1;
-  min-width: 0; /* Allow text truncation */
-`;
-
-const ExpenseTitle = styled.h3<{ theme: ThemeType }>`
-  font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: 1.3rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  margin: 0 0 0.5rem 0;
-
-  @media (max-width: 768px) {
-    font-size: 1.1rem;
-  }
-`;
-
-const ExpenseMetadata = styled.div<{ theme: ThemeType }>`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.7;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-    gap: 0.5rem;
-  }
-`;
-
-const ExpenseAmount = styled.div<{ theme: ThemeType }>`
-  font-family: ${({ theme }) => theme.fonts.mono};
-  font-size: 1.5rem;
-  color: ${({ theme }) => theme.colors.neonOrange};
-  font-weight: bold;
-  text-align: right;
-  white-space: nowrap;
-
-  @media (max-width: 768px) {
-    font-size: 1.3rem;
-    text-align: left;
-  }
-`;
-
-const ExpenseDetails = styled.div<{ theme: ThemeType }>`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-
-  @media (max-width: 768px) {
-    gap: 1rem;
-    flex-direction: column;
-  }
-`;
-
-const ExpenseDetail = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.9;
-  font-size: 0.9rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0; /* Allow text truncation */
-
-  @media (max-width: 768px) {
-    font-size: 0.85rem;
-  }
-`;
-
-const ExpenseLabel = styled.span<{ theme: ThemeType }>`
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.6;
-
-  @media (max-width: 768px) {
-    font-size: 0.7rem;
-  }
-`;
-
-const ExpenseValue = styled.span<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  word-break: break-word;
-`;
-
-const ErrorMessage = styled.div<{ theme: ThemeType }>`
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  border-radius: 6px;
-  padding: 1rem;
-  color: #ff6b6b;
-  margin-top: 1rem;
-`;
-
-const SuccessMessage = styled.div<{ theme: ThemeType }>`
-  background: rgba(40, 167, 69, 0.1);
-  border: 1px solid rgba(40, 167, 69, 0.3);
-  border-radius: 6px;
-  padding: 1rem;
-  color: #28a745;
-  margin-top: 1rem;
-`;
-
-const PayoutButton = styled.button<{ theme: ThemeType; status: string; disabled?: boolean }>`
-  background: ${({ status, disabled }) => 
-    disabled ? 'rgba(255, 255, 255, 0.1)' :
-    status === 'completed' ? 'rgba(40, 167, 69, 0.2)' :
-    status === 'processing' ? 'rgba(255, 193, 7, 0.2)' :
-    status === 'failed' ? 'rgba(220, 53, 69, 0.2)' :
-    'rgba(0, 123, 255, 0.2)'};
-  color: ${({ status, disabled }) => 
-    disabled ? 'rgba(255, 255, 255, 0.3)' :
-    status === 'completed' ? '#28a745' :
-    status === 'processing' ? '#ffc107' :
-    status === 'failed' ? '#dc3545' :
-    '#007bff'};
-  border: 1px solid ${({ status, disabled }) => 
-    disabled ? 'rgba(255, 255, 255, 0.1)' :
-    status === 'completed' ? '#28a745' :
-    status === 'processing' ? '#ffc107' :
-    status === 'failed' ? '#dc3545' :
-    '#007bff'};
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
-  transition: all 0.3s ease;
-  margin-top: 0.5rem;
-  width: 100%;
-  max-width: 300px;
-
-  &:hover:not(:disabled) {
-    opacity: 0.8;
-  }
-
-  @media (max-width: 768px) {
-    max-width: 100%;
-    font-size: 0.85rem;
-    padding: 0.75rem 1rem;
-  }
-`;
-
-const PayoutStatus = styled.div<{ theme: ThemeType; status: string }>`
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  background: ${({ status }) => 
-    status === 'completed' ? 'rgba(40, 167, 69, 0.2)' :
-    status === 'processing' ? 'rgba(255, 193, 7, 0.2)' :
-    status === 'failed' ? 'rgba(220, 53, 69, 0.2)' :
-    'rgba(108, 117, 125, 0.2)'};
-  color: ${({ status }) => 
-    status === 'completed' ? '#28a745' :
-    status === 'processing' ? '#ffc107' :
-    status === 'failed' ? '#dc3545' :
-    '#6c757d'};
-  margin-left: 0.5rem;
-`;
-
-const TransactionLink = styled.a<{ theme: ThemeType }>`
-  color: #28a745;
-  text-decoration: none;
-  font-size: 0.8rem;
-  margin-left: 0.5rem;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const ImageUploadArea = styled.div<{ theme: ThemeType }>`
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  padding: 1rem;
-  margin-top: 1rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.creamyBeige};
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.75rem;
-  }
-`;
-
-const ImageUploadText = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-`;
-
-const ImageUploadSubtext = styled.div<{ theme: ThemeType }>`
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.6;
-  font-size: 0.8rem;
-`;
-
-const ImageGrid = styled.div<{ theme: ThemeType }>`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 1rem;
-  margin-top: 1rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.75rem;
-  }
 `;
 
-const ImageItem = styled.div<{ theme: ThemeType }>`
-  position: relative;
+const Message = styled.div<{ success?: boolean; error?: boolean }>`
+  padding: 1rem;
   border-radius: 6px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-height: 120px;
-
-  @media (max-width: 768px) {
-    min-height: 100px;
-  }
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  background: ${({ success, error }) => 
+    success 
+      ? 'rgba(40, 167, 69, 0.1)' 
+      : error 
+      ? 'rgba(220, 53, 69, 0.1)'
+      : 'rgba(220, 53, 69, 0.1)'
+  };
+  border: 1px solid ${({ success, error }) => 
+    success 
+      ? 'rgba(40, 167, 69, 0.3)' 
+      : error 
+      ? 'rgba(220, 53, 69, 0.3)'
+      : 'rgba(220, 53, 69, 0.3)'
+  };
+  color: ${({ success, error }) => 
+    success 
+      ? '#28a745' 
+      : error 
+      ? '#dc3545'
+      : '#dc3545'
+  };
 `;
 
-const ImagePreview = styled.img<{ theme: ThemeType }>`
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.3s ease;
 
-  &:hover {
-    transform: scale(1.05);
-  }
-
-  @media (max-width: 768px) {
-    height: 100px;
-  }
-`;
-
-const ImageOverlay = styled.div<{ theme: ThemeType }>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-
-  ${ImageItem}:hover & {
-    opacity: 1;
-  }
-`;
-
-const ImageActions = styled.div<{ theme: ThemeType }>`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const ImageActionButton = styled.button<{ theme: ThemeType; variant?: 'view' | 'delete' }>`
-  background: ${({ variant }) => 
-    variant === 'delete' ? 'rgba(220, 53, 69, 0.8)' : 'rgba(40, 167, 69, 0.8)'};
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: ${({ variant }) => 
-      variant === 'delete' ? 'rgba(220, 53, 69, 1)' : 'rgba(40, 167, 69, 1)'};
-  }
-`;
-
-const ImageDescription = styled.div<{ theme: ThemeType }>`
-  padding: 0.5rem;
-  font-size: 0.8rem;
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  opacity: 0.8;
-  word-break: break-word;
-`;
-
-interface ExpenseImage {
+interface Builder {
   id: number;
-  expenseId: number;
-  imageUrl: string;
-  description?: string;
-  imageType?: string;
-  uploadedBy?: string;
-  createdAt: string;
+  name: string;
+  email: string;
 }
 
 interface Expense {
@@ -488,43 +128,30 @@ interface Expense {
   expenseDate?: string;
   notes?: string;
   receiptUrl?: string;
-  metadata?: string;
   payoutStatus?: string;
-  payoutTxHash?: string;
-  payoutAmountCents?: number;
-  payoutDate?: string;
-  submittedBy?: number;
   payoutAddress?: string;
+  submittedBy?: number;
+  submitter?: {
+    name: string;
+    email: string;
+  };
+  createdAt: string;
   approvedBy?: string;
   approvedAt?: string;
   rejectedBy?: string;
   rejectedAt?: string;
   rejectionReason?: string;
-  createdAt: string;
-  updatedAt: string;
-  images?: ExpenseImage[];
-  submitter?: {
-    id: number;
-    name: string;
-    email: string;
-  };
 }
 
 export default function AdminExpenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [processingPayouts, setProcessingPayouts] = useState<Set<number>>(new Set());
   const [activeFilter, setActiveFilter] = useState('all');
-  const [processingApprovals, setProcessingApprovals] = useState<Set<number>>(new Set());
+  const [editingExpense, setEditingExpense] = useState<number | null>(null);
+  const [builders, setBuilders] = useState<Builder[]>([]);
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [activeFilter]);
-
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     try {
       const url = activeFilter === 'all' ? '/api/expenses' : `/api/expenses?status=${activeFilter}`;
       const response = await fetch(url);
@@ -541,164 +168,87 @@ export default function AdminExpenses() {
     } catch {
       setError('Failed to fetch expenses');
     }
+  }, [activeFilter]);
+
+  useEffect(() => {
+    fetchExpenses();
+    fetchBuilders();
+  }, [fetchExpenses]);
+
+  const fetchBuilders = async () => {
+    try {
+      const response = await fetch('/api/builders');
+      if (response.ok) {
+        const data = await response.json();
+        setBuilders(data.builders || []);
+      } else {
+        console.error('Failed to fetch builders');
+      }
+    } catch (error) {
+      console.error('Error fetching builders:', error);
+    }
   };
 
-  const handleFileUpload = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setError('Please select an image file');
-      return;
-    }
-
-    setIsUploading(true);
-    setError(null);
-    setSuccess(null);
-
+  const updateExpense = async (expenseId: number, updates: Partial<Expense>) => {
     try {
-      // Compress image before uploading to stay within Vercel's 4.5MB limit
-      const compressedData = await compressImage(file, {
-        maxWidth: 1920,
-        maxHeight: 1920,
-        quality: 0.8,
-        maxSizeMB: 2, // Target 2MB to stay well under Vercel's limits
-      });
-
-      const compressedSize = getBase64SizeMB(compressedData);
-      console.log(`Compressed receipt size: ${compressedSize.toFixed(2)}MB`);
-
       const response = await fetch('/api/expenses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'upload',
-          file: compressedData,
-          fileName: `receipt-${Date.now()}.${file.name.split('.').pop()}`,
-          fileType: file.type,
+          action: 'update',
+          expenseId,
+          ...updates
         }),
       });
 
       const data = await response.json();
       
       if (data.success) {
-        setSuccess('Receipt uploaded and analyzed successfully!');
+        setSuccess('Expense updated successfully');
         fetchExpenses(); // Refresh the list
+        setEditingExpense(null);
       } else {
-        setError(data.error || 'Failed to upload receipt');
+        setError(data.error || 'Failed to update expense');
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      setError('Failed to upload receipt. Please try a smaller file.');
-    } finally {
-      setIsUploading(false);
+      console.error('Error updating expense:', error);
+      setError('Failed to update expense');
     }
   };
 
-  const handlePayout = async (expenseId: number) => {
-    setProcessingPayouts(prev => new Set(prev).add(expenseId));
-    setError(null);
-    setSuccess(null);
-
+  const handleApprove = async (expenseId: number) => {
     try {
-      // Find the expense to get the amount
-      const expense = expenses.find(e => e.id === expenseId);
-      if (!expense || !expense.amountCents) {
-        setError('Expense not found or invalid amount');
-        return;
-      }
-
-      // Check MetaMask connection
-      await checkMetaMaskConnection();
-
-      // Check and switch to Base network if needed
-      const { isBase } = await getCurrentNetwork();
-      if (!isBase) {
-        await switchToBaseNetwork();
-      }
-
-      // Send USDC transaction via MetaMask
-      const result = await sendUSDCPayout(
-        expense.amountCents,
-        expense.payoutAddress || '0x3C6eF34939aaA850bA787cB775128746f86b8661' // Use expense's payout address or fallback
-      );
-
-      if (result.success && result.txHash) {
-        // Record the payout in the database
         const response = await fetch('/api/expenses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            action: 'payout',
-            expenseId: expenseId,
-            txHash: result.txHash,
+          action: 'approve',
+          expenseId,
+          approvedBy: 'admin@example.com' // You might want to get this from auth
           }),
         });
 
         const data = await response.json();
         
         if (data.success) {
-          setSuccess(`Payout sent successfully! Transaction: ${result.txHash}`);
+        setSuccess('Expense approved successfully');
           fetchExpenses(); // Refresh the list
-        } else {
-          setError(data.error || 'Failed to record payout');
-        }
-      } else {
-        setError(result.error || 'Failed to send payout');
-      }
-    } catch {
-      setError('Failed to send payout');
-    } finally {
-      setProcessingPayouts(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(expenseId);
-        return newSet;
-      });
-    }
-  };
-
-  const handleApprove = async (expenseId: number) => {
-    setProcessingApprovals(prev => new Set(prev).add(expenseId));
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const response = await fetch('/api/expenses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'approve',
-          expenseId: expenseId,
-          approvedBy: 'admin@detroitcommons.xyz', // TODO: Get from auth context
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setSuccess('Expense approved successfully!');
-        fetchExpenses();
       } else {
         setError(data.error || 'Failed to approve expense');
       }
-    } catch {
+    } catch (error) {
+      console.error('Error approving expense:', error);
       setError('Failed to approve expense');
-    } finally {
-      setProcessingApprovals(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(expenseId);
-        return newSet;
-      });
     }
   };
 
-  const handleReject = async (expenseId: number, reason?: string) => {
-    setProcessingApprovals(prev => new Set(prev).add(expenseId));
-    setError(null);
-    setSuccess(null);
+  const handleReject = async (expenseId: number) => {
+    const reason = prompt('Please provide a reason for rejection:');
+    if (!reason) return;
 
     try {
       const response = await fetch('/api/expenses', {
@@ -708,594 +258,114 @@ export default function AdminExpenses() {
         },
         body: JSON.stringify({
           action: 'reject',
-          expenseId: expenseId,
-          rejectedBy: 'admin@detroitcommons.xyz', // TODO: Get from auth context
-          rejectionReason: reason,
+          expenseId,
+          rejectedBy: 'admin@example.com', // You might want to get this from auth
+          rejectionReason: reason
         }),
       });
 
       const data = await response.json();
       
       if (data.success) {
-        setSuccess('Expense rejected successfully!');
-        fetchExpenses();
+        setSuccess('Expense rejected successfully');
+        fetchExpenses(); // Refresh the list
       } else {
         setError(data.error || 'Failed to reject expense');
       }
-    } catch {
-      setError('Failed to reject expense');
-    } finally {
-      setProcessingApprovals(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(expenseId);
-        return newSet;
-      });
-    }
-  };
-
-  const handleImageUpload = async (expenseId: number, file: File, description?: string, imageType?: string) => {
-    setError(null);
-
-    try {
-      // Compress image before uploading to stay within Vercel's 4.5MB limit
-      const compressedData = await compressImage(file, {
-        maxWidth: 1920,
-        maxHeight: 1920,
-        quality: 0.8,
-        maxSizeMB: 2, // Target 2MB to stay well under Vercel's limits
-      });
-
-      const compressedSize = getBase64SizeMB(compressedData);
-      console.log(`Compressed image size: ${compressedSize.toFixed(2)}MB`);
-
-      const response = await fetch('/api/expense-images', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          expenseId,
-          file: compressedData,
-          fileName: `proof-${Date.now()}.${file.name.split('.').pop()}`,
-          fileType: file.type,
-          description: description || '',
-          imageType: imageType || 'proof',
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setSuccess('Proof image uploaded successfully!');
-        fetchExpenses(); // Refresh the list
-      } else {
-        setError(data.error || 'Failed to upload image');
-      }
     } catch (error) {
-      console.error('Upload error:', error);
-      setError('Failed to upload image. Please try a smaller file.');
+      console.error('Error rejecting expense:', error);
+      setError('Failed to reject expense');
     }
   };
 
-  const handleDeleteImage = async (imageId: number) => {
-    try {
-      const response = await fetch(`/api/expense-images?imageId=${imageId}`, {
-        method: 'DELETE',
-      });
 
-      const data = await response.json();
-      
-      if (data.success) {
-        setSuccess('Image deleted successfully!');
-        fetchExpenses(); // Refresh the list
-      } else {
-        setError(data.error || 'Failed to delete image');
-      }
-    } catch {
-      setError('Failed to delete image');
+  // Clear messages after 5 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(null), 5000);
+      return () => clearTimeout(timer);
     }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleFileUpload(files[0]);
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [success, error]);
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileUpload(file);
-    }
-  };
-
-  const formatAmount = (amountCents: number, currency: string) => {
-    const amount = amountCents / 100;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    // Handle date strings that might be in YYYY-MM-DD format
-    // If it's just a date (no time), treat it as local date to avoid timezone issues
-    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const [year, month, day] = dateString.split('-').map(Number);
-      const date = new Date(year, month - 1, day); // month is 0-indexed
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    }
-    
-    // For ISO date strings with time, use the original logic
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   return (
     <Container>
       <Header>
-        <Title>Expense Tracking</Title>
-        <Subtitle>Upload receipts to automatically extract expense information using AI</Subtitle>
+        <Title>Expense Management</Title>
+        <Subtitle>Review, approve, and manage expense submissions</Subtitle>
       </Header>
 
-      <UploadSection>
-        <UploadTitle>Upload Receipt</UploadTitle>
-        <UploadArea
-          isDragOver={isDragOver}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => document.getElementById('file-input')?.click()}
-        >
-          <UploadText>
-            {isUploading ? (
-              <>
-                <LoadingSpinner />
-                Analyzing receipt...
-              </>
-            ) : (
-              'Drop receipt image here or click to browse'
-            )}
-          </UploadText>
-          <UploadSubtext>
-            Supports JPG, PNG, and other image formats (max 10MB)
-          </UploadSubtext>
-        </UploadArea>
-        <HiddenInput
-          id="file-input"
-          type="file"
-          accept="image/*"
-          onChange={handleFileInput}
-        />
+      {error && <Message error>{error}</Message>}
+      {success && <Message success>{success}</Message>}
 
-        
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        {success && <SuccessMessage>{success}</SuccessMessage>}
-      </UploadSection>
+      <FilterTabs>
+        <FilterTab
+          active={activeFilter === 'all'}
+          onClick={() => setActiveFilter('all')}
+        >
+          All Expenses
+        </FilterTab>
+        <FilterTab
+          active={activeFilter === 'pending_approval'}
+          onClick={() => setActiveFilter('pending_approval')}
+        >
+          Pending Approval
+        </FilterTab>
+        <FilterTab
+          active={activeFilter === 'pending'}
+          onClick={() => setActiveFilter('pending')}
+        >
+          Approved (Pending Payout)
+        </FilterTab>
+        <FilterTab
+          active={activeFilter === 'completed'}
+          onClick={() => setActiveFilter('completed')}
+        >
+          Completed
+        </FilterTab>
+        <FilterTab
+          active={activeFilter === 'rejected'}
+          onClick={() => setActiveFilter('rejected')}
+        >
+          Rejected
+        </FilterTab>
+      </FilterTabs>
 
       <ExpensesList>
-        <ExpensesTitle>Expense Management ({expenses.length})</ExpensesTitle>
-        
-        {/* Filter Tabs */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '0.5rem', 
-          marginBottom: '1.5rem', 
-          flexWrap: 'wrap' 
-        }}>
-          <button
-            onClick={() => setActiveFilter('all')}
-            style={{
-              background: activeFilter === 'all' ? '#ff6b35' : 'transparent',
-              color: activeFilter === 'all' ? '#1a1a1a' : '#f5f5dc',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: '0.85rem'
-            }}
-          >
-            All ({expenses.length})
-          </button>
-          <button
-            onClick={() => setActiveFilter('pending_approval')}
-            style={{
-              background: activeFilter === 'pending_approval' ? '#ff6b35' : 'transparent',
-              color: activeFilter === 'pending_approval' ? '#1a1a1a' : '#f5f5dc',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: '0.85rem'
-            }}
-          >
-            Pending Approval ({expenses.filter(e => e.payoutStatus === 'pending_approval').length})
-          </button>
-          <button
-            onClick={() => setActiveFilter('pending')}
-            style={{
-              background: activeFilter === 'pending' ? '#ff6b35' : 'transparent',
-              color: activeFilter === 'pending' ? '#1a1a1a' : '#f5f5dc',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: '0.85rem'
-            }}
-          >
-            Approved ({expenses.filter(e => e.payoutStatus === 'pending').length})
-          </button>
-          <button
-            onClick={() => setActiveFilter('completed')}
-            style={{
-              background: activeFilter === 'completed' ? '#ff6b35' : 'transparent',
-              color: activeFilter === 'completed' ? '#1a1a1a' : '#f5f5dc',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: '0.85rem'
-            }}
-          >
-            Paid ({expenses.filter(e => e.payoutStatus === 'completed').length})
-          </button>
-          <button
-            onClick={() => setActiveFilter('rejected')}
-            style={{
-              background: activeFilter === 'rejected' ? '#ff6b35' : 'transparent',
-              color: activeFilter === 'rejected' ? '#1a1a1a' : '#f5f5dc',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: '0.85rem'
-            }}
-          >
-            Rejected ({expenses.filter(e => e.payoutStatus === 'rejected').length})
-          </button>
-        </div>
-
-        <div style={{ 
-          background: 'rgba(0, 123, 255, 0.1)', 
-          border: '1px solid rgba(0, 123, 255, 0.3)', 
-          borderRadius: '6px', 
-          padding: '1rem', 
-          marginBottom: '1.5rem',
-          fontSize: '0.9rem',
-          color: '#007bff'
-        }}>
-          💡 <strong>MetaMask Required:</strong> To send payouts, you&apos;ll need MetaMask installed and connected to the Base network. 
-          Make sure you have USDC in your wallet for the transaction amount.
-        </div>
         {expenses.length === 0 ? (
           <div style={{ color: 'rgba(255, 255, 255, 0.6)', textAlign: 'center', padding: '2rem' }}>
-            No expenses yet. Upload a receipt to get started!
+            No expenses found for the selected filter.
           </div>
         ) : (
           expenses.map((expense) => (
-            <ExpenseCard key={expense.id}>
-              <ExpenseHeader>
-                <ExpenseHeaderLeft>
-                  <ExpenseTitle>{expense.title}</ExpenseTitle>
-                  <ExpenseMetadata>
-                    <span>📅 {expense.expenseDate ? formatDate(expense.expenseDate) : formatDate(expense.createdAt)}</span>
-                    {expense.merchant && <span>• {expense.merchant}</span>}
-                    {expense.category && <span>• {expense.category}</span>}
-                    {expense.submitter && <span>• 👤 {expense.submitter.name}</span>}
-                  </ExpenseMetadata>
-                </ExpenseHeaderLeft>
-                {expense.amountCents && (
-                  <ExpenseAmount>
-                    {formatAmount(expense.amountCents, expense.currency)}
-                  </ExpenseAmount>
-                )}
-              </ExpenseHeader>
-              
-              <ExpenseDetails>
-                {expense.notes && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Notes</ExpenseLabel>
-                    <ExpenseValue>{expense.notes}</ExpenseValue>
-                  </ExpenseDetail>
-                )}
-                {expense.receiptUrl && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Receipt</ExpenseLabel>
-                    <ExpenseValue>
-                      <a 
-                        href={expense.receiptUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{ color: '#28a745', textDecoration: 'underline' }}
-                      >
-                        View Original Receipt
-                      </a>
-                    </ExpenseValue>
-                  </ExpenseDetail>
-                )}
-                {expense.payoutAddress && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Payout Address</ExpenseLabel>
-                    <ExpenseValue style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                      {expense.payoutAddress}
-                    </ExpenseValue>
-                  </ExpenseDetail>
-                )}
-                {expense.payoutStatus && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Payout Status</ExpenseLabel>
-                    <ExpenseValue>
-                      <PayoutStatus status={expense.payoutStatus}>
-                        {expense.payoutStatus}
-                      </PayoutStatus>
-                      {expense.payoutTxHash && (
-                        <>
-                          {' • '}
-                          <TransactionLink 
-                            href={`https://basescan.org/tx/${expense.payoutTxHash}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            View TX
-                          </TransactionLink>
-                        </>
-                      )}
-                    </ExpenseValue>
-                  </ExpenseDetail>
-                )}
-                {expense.approvedBy && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Approved By</ExpenseLabel>
-                    <ExpenseValue>{expense.approvedBy}</ExpenseValue>
-                  </ExpenseDetail>
-                )}
-                {expense.rejectedBy && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Rejected By</ExpenseLabel>
-                    <ExpenseValue>{expense.rejectedBy}</ExpenseValue>
-                  </ExpenseDetail>
-                )}
-                {expense.rejectionReason && (
-                  <ExpenseDetail>
-                    <ExpenseLabel>Rejection Reason</ExpenseLabel>
-                    <ExpenseValue>{expense.rejectionReason}</ExpenseValue>
-                  </ExpenseDetail>
-                )}
-              </ExpenseDetails>
-              
-              {/* Approval/Rejection Buttons for pending_approval */}
-              {expense.payoutStatus === 'pending_approval' && (
-                <div style={{ 
-                  marginTop: '1rem', 
-                  display: 'flex', 
-                  gap: '1rem', 
-                  flexWrap: 'wrap' 
-                }}>
-                  <button
-                    onClick={() => handleApprove(expense.id)}
-                    disabled={processingApprovals.has(expense.id)}
-                    style={{
-                      background: 'rgba(40, 167, 69, 0.2)',
-                      color: '#28a745',
-                      border: '1px solid #28a745',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '4px',
-                      cursor: processingApprovals.has(expense.id) ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.3s ease',
-                      fontSize: '0.9rem',
-                      opacity: processingApprovals.has(expense.id) ? 0.5 : 1
-                    }}
-                  >
-                    {processingApprovals.has(expense.id) ? (
-                      <>
-                        <LoadingSpinner />
-                        Approving...
-                      </>
-                    ) : (
-                      '✓ Approve'
-                    )}
-                  </button>
-                  <button
-                    onClick={() => {
-                      const reason = prompt('Rejection reason (optional):');
-                      if (reason !== null) {
-                        handleReject(expense.id, reason);
-                      }
-                    }}
-                    disabled={processingApprovals.has(expense.id)}
-                    style={{
-                      background: 'rgba(220, 53, 69, 0.2)',
-                      color: '#dc3545',
-                      border: '1px solid #dc3545',
-                      padding: '0.5rem 1rem',
-                      borderRadius: '4px',
-                      cursor: processingApprovals.has(expense.id) ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.3s ease',
-                      fontSize: '0.9rem',
-                      opacity: processingApprovals.has(expense.id) ? 0.5 : 1
-                    }}
-                  >
-                    {processingApprovals.has(expense.id) ? (
-                      <>
-                        <LoadingSpinner />
-                        Rejecting...
-                      </>
-                    ) : (
-                      '✗ Reject'
-                    )}
-                  </button>
-                </div>
-              )}
-
-              {/* Payout Button for approved expenses */}
-              {expense.payoutStatus === 'pending' && expense.amountCents && expense.amountCents > 0 && (
-                <div style={{ marginTop: '1rem' }}>
-                  <PayoutButton
-                    status={expense.payoutStatus}
-                    disabled={processingPayouts.has(expense.id)}
-                    onClick={() => handlePayout(expense.id)}
-                  >
-                    {processingPayouts.has(expense.id) ? (
-                      <>
-                        <LoadingSpinner />
-                        Processing...
-                      </>
-                    ) : (
-                      'Pay with MetaMask'
-                    )}
-                  </PayoutButton>
-                </div>
-              )}
-              
-              {/* Show payout status for completed/failed */}
-              {(expense.payoutStatus === 'completed' || expense.payoutStatus === 'processing' || expense.payoutStatus === 'failed') && expense.amountCents && expense.amountCents > 0 && (
-                <div style={{ marginTop: '1rem' }}>
-                  <PayoutButton
-                    status={expense.payoutStatus}
-                    disabled={true}
-                    onClick={() => {}}
-                  >
-                    {expense.payoutStatus === 'completed' ? (
-                      'Paid Out'
-                    ) : expense.payoutStatus === 'processing' ? (
-                      'Processing...'
-                    ) : (
-                      'Failed - Retry in Admin'
-                    )}
-                  </PayoutButton>
-                </div>
-              )}
-
-              {/* Proof Images Section */}
-              <div style={{ 
-                marginTop: '1.5rem', 
-                paddingTop: '1.5rem',
-                borderTop: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <ExpenseDetail style={{ marginBottom: '1rem' }}>
-                  <ExpenseLabel>Proof Images ({expense.images?.length || 0})</ExpenseLabel>
-                </ExpenseDetail>
-
-                <HiddenInput
-                  id={`image-input-${expense.id}`}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      handleImageUpload(expense.id, file);
-                    }
-                    // Reset input so same file can be uploaded again if needed
-                    e.target.value = '';
-                  }}
-                />
-
-                {expense.images && expense.images.length > 0 && (
-                  <ImageGrid>
-                    {expense.images.map((image) => (
-                      <ImageItem key={image.id}>
-                        <ImagePreview
-                          src={image.imageUrl}
-                          alt={image.description || 'Proof image'}
-                          onClick={() => window.open(image.imageUrl, '_blank')}
-                        />
-                        <ImageOverlay>
-                          <ImageActions>
-                            <ImageActionButton
-                              onClick={() => window.open(image.imageUrl, '_blank')}
-                            >
-                              View
-                            </ImageActionButton>
-                            <ImageActionButton
-                              variant="delete"
-                              onClick={() => {
-                                if (confirm('Are you sure you want to delete this image?')) {
-                                  handleDeleteImage(image.id);
-                                }
-                              }}
-                            >
-                              Delete
-                            </ImageActionButton>
-                          </ImageActions>
-                        </ImageOverlay>
-                        <ImageDescription>
-                          <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
-                            {formatDate(image.createdAt)}
-                          </div>
-                        </ImageDescription>
-                      </ImageItem>
-                    ))}
-                    {/* Add New Image Button */}
-                    <ImageItem 
-                      style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.05)' }}
-                      onClick={() => document.getElementById(`image-input-${expense.id}`)?.click()}
-                    >
-                      <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        height: '100%',
-                        color: 'rgba(255, 255, 255, 0.5)',
-                        fontSize: '2rem'
-                      }}>
-                        <div>+</div>
-                        <div style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>Add Image</div>
-                      </div>
-                    </ImageItem>
-                  </ImageGrid>
-                )}
-
-                {(!expense.images || expense.images.length === 0) && (
-                  <ImageUploadArea
-                    onClick={() => document.getElementById(`image-input-${expense.id}`)?.click()}
-                  >
-                    <ImageUploadText>
-                      📸 Click to upload proof images
-                    </ImageUploadText>
-                    <ImageUploadSubtext>
-                      JPG, PNG, and other image formats
-                    </ImageUploadSubtext>
-                  </ImageUploadArea>
-                )}
-              </div>
-            </ExpenseCard>
+            <ExpenseCard
+              key={expense.id}
+              expense={expense}
+              builders={builders}
+              onUpdateExpense={updateExpense}
+              showBuilderInfo={true}
+              showActions={true}
+              showEditForm={true}
+              onEditClick={setEditingExpense}
+              onCancelEdit={() => setEditingExpense(null)}
+              editingExpenseId={editingExpense}
+              customActions={[
+                {
+                  label: 'Approve',
+                  icon: '✅',
+                  onClick: (expense) => handleApprove(expense.id)
+                },
+                {
+                  label: 'Reject',
+                  icon: '❌',
+                  onClick: (expense) => handleReject(expense.id)
+                }
+              ]}
+            />
           ))
         )}
       </ExpensesList>
