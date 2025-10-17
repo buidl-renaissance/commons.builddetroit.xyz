@@ -111,6 +111,151 @@ const Message = styled.div<{ success?: boolean; error?: boolean }>`
   };
 `;
 
+const UploadButton = styled.button<{ theme: ThemeType }>`
+  background: ${({ theme }) => theme.colors.neonOrange};
+  color: ${({ theme }) => theme.colors.asphaltBlack};
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 6px;
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+
+  &:hover {
+    background: #ffd700;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 79, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
+`;
+
+const Modal = styled.div<{ isOpen: boolean }>`
+  display: ${({ isOpen }) => isOpen ? 'flex' : 'none'};
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+`;
+
+const ModalContent = styled.div<{ theme: ThemeType }>`
+  background: ${({ theme }) => theme.colors.asphaltBlack};
+  border: 2px solid ${({ theme }) => theme.colors.creamyBeige};
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+`;
+
+const ModalHeader = styled.div<{ theme: ThemeType }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
+const ModalTitle = styled.h2<{ theme: ThemeType }>`
+  font-family: ${({ theme }) => theme.fonts.heading};
+  font-size: 1.5rem;
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+`;
+
+const CloseButton = styled.button<{ theme: ThemeType }>`
+  background: transparent;
+  border: none;
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.neonOrange};
+    transform: scale(1.1);
+  }
+`;
+
+const UploadArea = styled.div<{ theme: ThemeType; isDragOver: boolean }>`
+  border: 2px dashed ${({ theme, isDragOver }) => 
+    isDragOver ? theme.colors.neonOrange : 'rgba(255, 255, 255, 0.3)'};
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: ${({ isDragOver }) => isDragOver ? 'rgba(255, 79, 0, 0.1)' : 'transparent'};
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.neonOrange};
+    background: rgba(255, 79, 0, 0.05);
+  }
+
+  @media (max-width: 768px) {
+    padding: 2rem 1rem;
+  }
+`;
+
+const UploadIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
+const UploadText = styled.div<{ theme: ThemeType }>`
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+`;
+
+const UploadSubtext = styled.div<{ theme: ThemeType }>`
+  color: ${({ theme }) => theme.colors.creamyBeige};
+  opacity: 0.6;
+  font-size: 0.9rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
+`;
+
+const HiddenInput = styled.input`
+  display: none;
+`;
+
 
 interface Builder {
   id: number;
@@ -150,6 +295,9 @@ export default function AdminExpenses() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [editingExpense, setEditingExpense] = useState<number | null>(null);
   const [builders, setBuilders] = useState<Builder[]>([]);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const fetchExpenses = useCallback(async () => {
     try {
@@ -278,6 +426,81 @@ export default function AdminExpenses() {
     }
   };
 
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const response = await fetch('/api/expenses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'upload',
+          file: base64Data,
+          fileName: `receipt-${Date.now()}.${file.name.split('.').pop()}`,
+          fileType: file.type,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccess('Receipt uploaded and analyzed successfully!');
+        setIsUploadModalOpen(false);
+        fetchExpenses(); // Refresh the list
+      } else {
+        setError(data.error || 'Failed to upload receipt');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setError('Failed to upload receipt. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
 
   // Clear messages after 5 seconds
   useEffect(() => {
@@ -301,6 +524,10 @@ export default function AdminExpenses() {
 
       {error && <Message error>{error}</Message>}
       {success && <Message success>{success}</Message>}
+
+      <UploadButton onClick={() => setIsUploadModalOpen(true)}>
+        📤 Upload New Receipt
+      </UploadButton>
 
       <FilterTabs>
         <FilterTab
@@ -369,6 +596,43 @@ export default function AdminExpenses() {
           ))
         )}
       </ExpensesList>
+
+      <Modal isOpen={isUploadModalOpen}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Upload Receipt</ModalTitle>
+            <CloseButton onClick={() => setIsUploadModalOpen(false)}>
+              ×
+            </CloseButton>
+          </ModalHeader>
+
+          <UploadArea
+            isDragOver={isDragOver}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={() => document.getElementById('file-input')?.click()}
+          >
+            <UploadIcon>
+              {isUploading ? '⏳' : '📸'}
+            </UploadIcon>
+            <UploadText>
+              {isUploading ? 'Analyzing receipt...' : 'Drop receipt image here or click to browse'}
+            </UploadText>
+            <UploadSubtext>
+              Supports JPG, PNG, and other image formats. AI will extract expense details.
+            </UploadSubtext>
+          </UploadArea>
+
+          <HiddenInput
+            id="file-input"
+            type="file"
+            accept="image/*"
+            onChange={handleFileInput}
+            disabled={isUploading}
+          />
+        </ModalContent>
+      </Modal>
     </Container>
   );
 }
