@@ -6,8 +6,8 @@ const ExpenseCardContainer = styled.div`
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
   transition: all 0.3s ease;
   position: relative;
 
@@ -21,8 +21,8 @@ const ExpenseHeader = styled.div<{ theme: ThemeType }>`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
-  gap: 1rem;
+  margin-bottom: 0.5rem;
+  gap: 0.75rem;
 `;
 
 const ExpenseHeaderLeft = styled.div`
@@ -30,19 +30,25 @@ const ExpenseHeaderLeft = styled.div`
   min-width: 0;
 `;
 
+const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
 const ExpenseTitle = styled.h3<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.heading};
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.35rem 0;
   word-break: break-word;
 `;
 
 const ExpenseMetadata = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   align-items: center;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
   flex-wrap: wrap;
 
@@ -54,26 +60,71 @@ const ExpenseMetadata = styled.div`
 const ReceiptLink = styled.a`
   color: #28a745;
   text-decoration: underline;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   display: inline-block;
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
   
   &:hover {
     color: #3cdb5c;
   }
 `;
 
-const BottomActionsContainer = styled.div`
+const EditIconButton = styled.button<{ theme: ThemeType }>`
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 0;
+  cursor: pointer;
   display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
 `;
+
+const ApprovalActions = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+`;
+
+const ApprovalButton = styled.button<{ theme: ThemeType; variant?: 'approve' | 'reject' }>`
+  background: ${({ variant }) => 
+    variant === 'reject' ? 'rgba(220, 53, 69, 0.2)' : 'rgba(40, 167, 69, 0.2)'};
+  color: ${({ variant }) => 
+    variant === 'reject' ? '#dc3545' : '#28a745'};
+  border: 1px solid ${({ variant }) => 
+    variant === 'reject' ? 'rgba(220, 53, 69, 0.3)' : 'rgba(40, 167, 69, 0.3)'};
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &:hover {
+    background: ${({ variant }) => 
+      variant === 'reject' ? 'rgba(220, 53, 69, 0.3)' : 'rgba(40, 167, 69, 0.3)'};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 
 const ExpenseAmount = styled.div<{ theme: ThemeType }>`
   font-family: ${({ theme }) => theme.fonts.mono};
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: ${({ theme }) => theme.colors.neonOrange};
   font-weight: bold;
   text-align: right;
@@ -82,9 +133,9 @@ const ExpenseAmount = styled.div<{ theme: ThemeType }>`
 
 const StatusBadge = styled.span<{ status: string }>`
   display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -123,90 +174,18 @@ const StatusBadge = styled.span<{ status: string }>`
   }};
 `;
 
-const BuilderInfo = styled.div<{ theme: ThemeType }>`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-`;
-
-const BuilderAvatar = styled.div<{ theme: ThemeType }>`
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.neonOrange};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.colors.asphaltBlack};
-  font-weight: bold;
-  font-size: 0.8rem;
-`;
-
-const DropdownContainer = styled.div<{ theme: ThemeType }>`
-  position: relative;
-  display: inline-block;
-`;
-
-const DropdownButton = styled.button<{ theme: ThemeType }>`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: ${({ theme }) => theme.colors.creamyBeige};
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: ${({ theme }) => theme.colors.neonOrange};
-  }
-`;
-
-const DropdownMenu = styled.div<{ theme: ThemeType }>`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  min-width: 200px;
-  color: ${({ theme }) => theme.colors.asphaltBlack};
-`;
-
-const DropdownItem = styled.div<{ theme: ThemeType }>`
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
 
 const ExpenseDetails = styled.div<{ theme: ThemeType }>`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 `;
 
 const ExpenseDetail = styled.div<{ theme: ThemeType }>`
   color: ${({ theme }) => theme.colors.creamyBeige};
   opacity: 0.9;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 `;
 
 const ExpenseLabel = styled.span<{ theme: ThemeType }>`
@@ -228,17 +207,17 @@ const ExpenseValue = styled.span<{ theme: ThemeType }>`
 const EditForm = styled.div<{ theme: ThemeType }>`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 0.6rem;
+  padding: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 6px;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 `;
 
 const FormRow = styled.div<{ theme: ThemeType }>`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0.75rem;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -248,11 +227,11 @@ const FormRow = styled.div<{ theme: ThemeType }>`
 const FormGroup = styled.div<{ theme: ThemeType }>`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
 `;
 
 const FormLabel = styled.label<{ theme: ThemeType }>`
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.creamyBeige};
   text-transform: uppercase;
@@ -263,9 +242,9 @@ const FormInput = styled.input<{ theme: ThemeType }>`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  padding: 0.75rem;
+  padding: 0.6rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
 
   &:focus {
@@ -283,9 +262,9 @@ const FormSelect = styled.select<{ theme: ThemeType }>`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  padding: 0.75rem;
+  padding: 0.6rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
 
   &:focus {
@@ -304,10 +283,10 @@ const FormTextArea = styled.textarea<{ theme: ThemeType }>`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  padding: 0.75rem;
+  padding: 0.6rem;
   color: ${({ theme }) => theme.colors.creamyBeige};
-  font-size: 1rem;
-  min-height: 80px;
+  font-size: 0.95rem;
+  min-height: 70px;
   resize: vertical;
   transition: all 0.2s ease;
 
@@ -324,9 +303,9 @@ const FormTextArea = styled.textarea<{ theme: ThemeType }>`
 
 const FormActions = styled.div<{ theme: ThemeType }>`
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: flex-end;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 `;
 
 const FormButton = styled.button<{ theme: ThemeType; variant?: 'primary' | 'secondary' }>`
@@ -336,11 +315,11 @@ const FormButton = styled.button<{ theme: ThemeType; variant?: 'primary' | 'seco
     variant === 'secondary' ? theme.colors.creamyBeige : theme.colors.asphaltBlack};
   border: 2px solid ${({ variant, theme }) => 
     variant === 'secondary' ? theme.colors.rustedSteel : theme.colors.neonOrange};
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 6px;
   font-family: ${({ theme }) => theme.fonts.body};
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
@@ -400,34 +379,27 @@ interface ExpenseCardProps {
   expense: Expense;
   builders?: Builder[];
   onUpdateExpense?: (expenseId: number, updates: Partial<Expense>) => Promise<void>;
-  showBuilderInfo?: boolean;
-  showActions?: boolean;
   showEditForm?: boolean;
   onEditClick?: (expenseId: number) => void;
   onCancelEdit?: () => void;
   editingExpenseId?: number | null;
-  customActions?: Array<{
-    label: string;
-    icon?: string;
-    onClick: (expense: Expense) => void;
-  }>;
+  onApprove?: (expense: Expense) => void;
+  onReject?: (expense: Expense) => void;
 }
 
 export default function ExpenseCard({
   expense,
   builders = [],
   onUpdateExpense,
-  showBuilderInfo = true,
-  showActions = true,
   showEditForm = false,
   onEditClick,
   onCancelEdit,
   editingExpenseId,
-  customActions = []
+  onApprove,
+  onReject
 }: ExpenseCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localExpense, setLocalExpense] = useState(expense);
-  const [showDropdown, setShowDropdown] = useState(false);
 
   const formatAmount = (amountCents: number, currency: string) => {
     const amount = amountCents / 100;
@@ -495,16 +467,14 @@ export default function ExpenseCard({
     <ExpenseCardContainer>
       <ExpenseHeader>
         <ExpenseHeaderLeft>
-          <ExpenseTitle>{localExpense.title}</ExpenseTitle>
-          {localExpense.receiptUrl && (
-            <ReceiptLink 
-              href={localExpense.receiptUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              📎 View Original Receipt
-            </ReceiptLink>
-          )}
+          <TitleRow>
+            <ExpenseTitle>{localExpense.title}</ExpenseTitle>
+            {showEditForm && (
+              <EditIconButton onClick={handleEditClick} title="Edit expense">
+                ✏️
+              </EditIconButton>
+            )}
+          </TitleRow>
           <ExpenseMetadata>
             <span>📅 {localExpense.expenseDate ? formatDate(localExpense.expenseDate) : formatDate(localExpense.createdAt)}</span>
             {localExpense.merchant && <span>• {localExpense.merchant}</span>}
@@ -516,6 +486,29 @@ export default function ExpenseCard({
               </StatusBadge>
             )}
           </ExpenseMetadata>
+          {localExpense.receiptUrl && (
+            <ReceiptLink 
+              href={localExpense.receiptUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              📎 View Original Receipt
+            </ReceiptLink>
+          )}
+          {localExpense.payoutStatus === 'pending_approval' && (onApprove || onReject) && (
+            <ApprovalActions>
+              {onApprove && (
+                <ApprovalButton onClick={() => onApprove(expense)}>
+                  ✓ Approve
+                </ApprovalButton>
+              )}
+              {onReject && (
+                <ApprovalButton variant="reject" onClick={() => onReject(expense)}>
+                  ✕ Reject
+                </ApprovalButton>
+              )}
+            </ApprovalActions>
+          )}
         </ExpenseHeaderLeft>
         {localExpense.amountCents && (
           <ExpenseAmount>
@@ -525,7 +518,7 @@ export default function ExpenseCard({
       </ExpenseHeader>
 
       {/* Builder Info */}
-      {showBuilderInfo && localExpense.submitter && (
+      {/* {showBuilderInfo && localExpense.submitter && (
         <BuilderInfo>
           <BuilderAvatar>
             {localExpense.submitter.name.charAt(0).toUpperCase()}
@@ -535,7 +528,7 @@ export default function ExpenseCard({
             <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{localExpense.submitter.email}</div>
           </div>
         </BuilderInfo>
-      )}
+      )} */}
 
       {/* Edit Form */}
       {showEditForm && isCurrentlyEditing && (
@@ -689,44 +682,6 @@ export default function ExpenseCard({
         )}
       </ExpenseDetails>
 
-      {/* Actions at Bottom Right */}
-      {showActions && (customActions.length > 0 || showEditForm) && (
-        <BottomActionsContainer>
-          <DropdownContainer>
-            <DropdownButton onClick={() => setShowDropdown(!showDropdown)}>
-              ⋯ Actions
-            </DropdownButton>
-            {showDropdown && (
-              <DropdownMenu>
-                {showEditForm && (
-                  <DropdownItem onClick={() => { handleEditClick(); setShowDropdown(false); }}>
-                    ✏️ Edit Expense
-                  </DropdownItem>
-                )}
-                {onUpdateExpense && localExpense.submitter && (
-                  <DropdownItem onClick={() => { 
-                    onUpdateExpense(expense.id, { submittedBy: undefined });
-                    setShowDropdown(false);
-                  }}>
-                    🔄 Reassign to Guest
-                  </DropdownItem>
-                )}
-                {customActions.map((action, index) => (
-                  <DropdownItem 
-                    key={index}
-                    onClick={() => { 
-                      action.onClick(expense);
-                      setShowDropdown(false);
-                    }}
-                  >
-                    {action.icon && `${action.icon} `}{action.label}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            )}
-          </DropdownContainer>
-        </BottomActionsContainer>
-      )}
     </ExpenseCardContainer>
   );
 }
