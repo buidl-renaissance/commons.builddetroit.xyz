@@ -256,7 +256,7 @@ const Message = styled.div<{ theme: ThemeType; success?: boolean; error?: boolea
   };
 `;
 
-const ExpenseCard = styled.div<{ theme: ThemeType }>`
+const ExpenseWrapper = styled.div<{ theme: ThemeType }>`
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
@@ -1041,7 +1041,7 @@ export default function BuilderExpenses() {
               fontFamily: theme.fonts.heading,
               fontSize: '1.2rem',
               marginBottom: '1rem',
-              color: theme.colors.asphaltBlack
+              color: 'white'
             }}>
               Upload Receipt
             </h3>
@@ -1071,7 +1071,7 @@ export default function BuilderExpenses() {
                   <p style={{ 
                     fontSize: '1.1rem', 
                     marginBottom: '0.5rem',
-                    color: theme.colors.asphaltBlack
+                    color: 'white'
                   }}>
                     📷 Upload Receipt
                   </p>
@@ -1155,119 +1155,6 @@ export default function BuilderExpenses() {
                 showActions={false}
                 showEditForm={false}
               />
-            ))
-                      <ExpenseLabel>Merchant</ExpenseLabel>
-                      <ExpenseValue>{expense.merchant}</ExpenseValue>
-                    </ExpenseDetail>
-                  )}
-                  {expense.category && (
-                    <ExpenseDetail>
-                      <ExpenseLabel>Category</ExpenseLabel>
-                      <ExpenseValue>{expense.category}</ExpenseValue>
-                    </ExpenseDetail>
-                  )}
-                  <ExpenseDetail>
-                    <ExpenseLabel>Date</ExpenseLabel>
-                    <ExpenseValue>
-                      {expense.expenseDate ? formatDate(expense.expenseDate) : formatDate(expense.createdAt)}
-                    </ExpenseValue>
-                  </ExpenseDetail>
-                  <ExpenseDetail>
-                    <ExpenseLabel>Payout Address</ExpenseLabel>
-                    {editingExpense === expense.id ? (
-                      <EditForm>
-                        <input
-                          type="text"
-                          value={editFormData.payoutAddress}
-                          onChange={(e) => setEditFormData({ payoutAddress: e.target.value })}
-                          placeholder="0x..."
-                          style={{ 
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            color: theme.colors.creamyBeige,
-                            fontFamily: 'monospace',
-                            fontSize: '0.8rem'
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleUpdatePayoutAddress(expense.id)}
-                          disabled={submitting}
-                          style={{ 
-                            background: theme.colors.neonOrange,
-                            color: theme.colors.asphaltBlack,
-                            border: 'none',
-                            padding: '0.5rem 1rem',
-                            borderRadius: '4px',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {submitting ? 'Saving...' : 'Save'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingExpense(null);
-                            setEditFormData({ payoutAddress: '' });
-                          }}
-                          style={{ 
-                            background: 'transparent',
-                            color: theme.colors.rustedSteel,
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            padding: '0.5rem 1rem',
-                            borderRadius: '4px',
-                            fontSize: '0.75rem',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Cancel
-                        </button>
-                      </EditForm>
-                    ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <ExpenseValue style={{ fontFamily: 'monospace', fontSize: '0.8rem', flex: 1 }}>
-                          {expense.payoutAddress || 'Not set'}
-                        </ExpenseValue>
-                        <EditButton
-                          onClick={() => {
-                            setEditingExpense(expense.id);
-                            setEditFormData({ payoutAddress: expense.payoutAddress || '' });
-                          }}
-                        >
-                          Edit
-                        </EditButton>
-                      </div>
-                    )}
-                  </ExpenseDetail>
-                  {expense.approvedBy && (
-                    <ExpenseDetail>
-                      <ExpenseLabel>Approved By</ExpenseLabel>
-                      <ExpenseValue>{expense.approvedBy}</ExpenseValue>
-                    </ExpenseDetail>
-                  )}
-                  {expense.rejectedBy && (
-                    <ExpenseDetail>
-                      <ExpenseLabel>Rejected By</ExpenseLabel>
-                      <ExpenseValue>{expense.rejectedBy}</ExpenseValue>
-                    </ExpenseDetail>
-                  )}
-                  {expense.rejectionReason && (
-                    <ExpenseDetail>
-                      <ExpenseLabel>Rejection Reason</ExpenseLabel>
-                      <ExpenseValue>{expense.rejectionReason}</ExpenseValue>
-                    </ExpenseDetail>
-                  )}
-                </ExpenseDetails>
-                
-                {expense.notes && (
-                  <ExpenseDetail style={{ marginTop: '1rem' }}>
-                    <ExpenseLabel>Notes</ExpenseLabel>
-                    <ExpenseValue>{expense.notes}</ExpenseValue>
-                  </ExpenseDetail>
-                )}
-              </ExpenseCard>
             ))
           )}
         </Section>
