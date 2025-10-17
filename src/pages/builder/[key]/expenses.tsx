@@ -1100,8 +1100,6 @@ export default function BuilderExpenses() {
               <ExpenseCard
                 key={expense.id}
                 expense={expense}
-                showBuilderInfo={false}
-                showActions={false}
                 showEditForm={false}
               />
             ))

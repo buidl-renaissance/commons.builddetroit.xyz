@@ -600,24 +600,10 @@ export default function AdminExpenses() {
               expense={expense}
               builders={builders}
               onUpdateExpense={updateExpense}
-              showBuilderInfo={true}
-              showActions={true}
               showEditForm={true}
               onEditClick={setEditingExpense}
               onCancelEdit={() => setEditingExpense(null)}
               editingExpenseId={editingExpense}
-              customActions={[
-                {
-                  label: 'Approve',
-                  icon: '✅',
-                  onClick: (expense) => handleApprove(expense.id)
-                },
-                {
-                  label: 'Reject',
-                  icon: '❌',
-                  onClick: (expense) => handleReject(expense.id)
-                }
-              ]}
             />
           ))
         )}
