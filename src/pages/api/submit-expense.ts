@@ -101,7 +101,7 @@ export default async function handler(
         await sendExpenseSubmissionNotification({
           expenseTitle: result[0].title,
           amount: result[0].amountCents! / 100,
-          currency: result[0].currency,
+          currency: result[0].currency || 'USD',
           submitterName: name,
           submitterEmail: email
         });

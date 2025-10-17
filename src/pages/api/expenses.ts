@@ -163,7 +163,7 @@ export default async function handler(
         // Strip markdown code blocks if present
         const cleanedText = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         parsedAnalysis = JSON.parse(cleanedText);
-      } catch (parseError) {
+      } catch {
         console.error('Failed to parse OpenAI response:', analysisText);
         throw new Error('Failed to parse receipt analysis');
       }
@@ -363,7 +363,7 @@ export default async function handler(
         await sendExpenseSubmissionNotification({
           expenseTitle: result[0].title,
           amount: result[0].amountCents! / 100,
-          currency: result[0].currency,
+          currency: result[0].currency || 'USD',
           submitterName: member[0].name,
           submitterEmail: member[0].email
         });
@@ -640,18 +640,29 @@ export default async function handler(
       }
 
       // Build update object with only provided fields
-      const updateData: any = {
+      const updateData: {
+        title?: string;
+        merchant?: string;
+        category?: string;
+        amountCents?: number;
+        currency?: string;
+        expenseDate?: string;
+        notes?: string;
+        payoutAddress?: string;
+        submittedBy?: number;
+        updatedAt?: string;
+      } = {
         updatedAt: new Date().toISOString()
       };
 
       if (title !== undefined) updateData.title = title.trim();
-      if (merchant !== undefined) updateData.merchant = merchant?.trim() || null;
-      if (category !== undefined) updateData.category = category?.trim() || null;
+      if (merchant !== undefined) updateData.merchant = merchant?.trim() || undefined;
+      if (category !== undefined) updateData.category = category?.trim() || undefined;
       if (amountCents !== undefined) updateData.amountCents = amountCents;
       if (currency !== undefined) updateData.currency = currency;
       if (expenseDate !== undefined) updateData.expenseDate = expenseDate;
-      if (notes !== undefined) updateData.notes = notes?.trim() || null;
-      if (payoutAddress !== undefined) updateData.payoutAddress = payoutAddress?.trim() || null;
+      if (notes !== undefined) updateData.notes = notes?.trim() || undefined;
+      if (payoutAddress !== undefined) updateData.payoutAddress = payoutAddress?.trim() || undefined;
       if (submittedBy !== undefined) updateData.submittedBy = submittedBy;
 
       // Update the expense
@@ -675,20 +686,145 @@ export default async function handler(
     try {
       const { builderId, status } = req.query;
       
-      let query = db.select().from(expenses);
-      
-      // Filter by builder if specified
-      if (builderId) {
-        query = query.where(eq(expenses.submittedBy, parseInt(builderId as string)));
+      if (builderId && status) {
+        // For both filters, get by builderId and filter by status in memory
+        const allExpenses = await db
+          .select()
+          .from(expenses)
+          .where(eq(expenses.submittedBy, parseInt(builderId as string)))
+          .orderBy(expenses.createdAt);
+        const filtered = allExpenses.filter(e => e.payoutStatus === status);
+        
+        // Fetch images and submitter info for filtered expenses
+        const expensesWithDetails = await Promise.all(
+          filtered.map(async (expense) => {
+            const images = await db
+              .select()
+              .from(expenseImages)
+              .where(eq(expenseImages.expenseId, expense.id))
+              .orderBy(expenseImages.createdAt);
+
+            let submitterInfo = null;
+            if (expense.submittedBy) {
+              const submitter = await db
+                .select()
+                .from(members)
+                .where(eq(members.id, expense.submittedBy))
+                .limit(1);
+              
+              if (submitter.length > 0) {
+                submitterInfo = {
+                  id: submitter[0].id,
+                  name: submitter[0].name,
+                  email: submitter[0].email
+                };
+              }
+            }
+
+            return {
+              ...expense,
+              images,
+              submitter: submitterInfo
+            };
+          })
+        );
+
+        return res.status(200).json({
+          success: true,
+          expenses: expensesWithDetails
+        });
+      } else if (builderId) {
+        const allExpenses = await db
+          .select()
+          .from(expenses)
+          .where(eq(expenses.submittedBy, parseInt(builderId as string)))
+          .orderBy(expenses.createdAt);
+
+        const expensesWithDetails = await Promise.all(
+          allExpenses.map(async (expense) => {
+            const images = await db
+              .select()
+              .from(expenseImages)
+              .where(eq(expenseImages.expenseId, expense.id))
+              .orderBy(expenseImages.createdAt);
+
+            let submitterInfo = null;
+            if (expense.submittedBy) {
+              const submitter = await db
+                .select()
+                .from(members)
+                .where(eq(members.id, expense.submittedBy))
+                .limit(1);
+              
+              if (submitter.length > 0) {
+                submitterInfo = {
+                  id: submitter[0].id,
+                  name: submitter[0].name,
+                  email: submitter[0].email
+                };
+              }
+            }
+
+            return {
+              ...expense,
+              images,
+              submitter: submitterInfo
+            };
+          })
+        );
+
+        return res.status(200).json({
+          success: true,
+          expenses: expensesWithDetails
+        });
+      } else if (status) {
+        const allExpenses = await db
+          .select()
+          .from(expenses)
+          .where(eq(expenses.payoutStatus, status as string))
+          .orderBy(expenses.createdAt);
+
+        const expensesWithDetails = await Promise.all(
+          allExpenses.map(async (expense) => {
+            const images = await db
+              .select()
+              .from(expenseImages)
+              .where(eq(expenseImages.expenseId, expense.id))
+              .orderBy(expenseImages.createdAt);
+
+            let submitterInfo = null;
+            if (expense.submittedBy) {
+              const submitter = await db
+                .select()
+                .from(members)
+                .where(eq(members.id, expense.submittedBy))
+                .limit(1);
+              
+              if (submitter.length > 0) {
+                submitterInfo = {
+                  id: submitter[0].id,
+                  name: submitter[0].name,
+                  email: submitter[0].email
+                };
+              }
+            }
+
+            return {
+              ...expense,
+              images,
+              submitter: submitterInfo
+            };
+          })
+        );
+
+        return res.status(200).json({
+          success: true,
+          expenses: expensesWithDetails
+        });
       }
       
-      // Filter by status if specified
-      if (status) {
-        query = query.where(eq(expenses.payoutStatus, status as string));
-      }
-      
-      // Get expenses with their related images
-      const allExpenses = await query.orderBy(expenses.createdAt);
+      // Get all expenses (no filters)
+      const allExpenses = await db.select().from(expenses).orderBy(expenses.createdAt);
 
       // Fetch images and submitter info for each expense
       const expensesWithDetails = await Promise.all(
